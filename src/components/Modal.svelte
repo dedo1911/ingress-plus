@@ -7,23 +7,25 @@
 	$: if (dialog && showModal) dialog.showModal()
 </script>
 
-<dialog
-	bind:this={dialog}  
-  on:close={() => (showModal = false)}
-  on:click|self={() => dialog.close()}
->
-  <div on:click|stopPropagation on:keydown|stopPropagation>
-    <figure>
-      <slot name="image" />
-    </figure>
-    <section style="--badge-size: {$badgeSize}px">
-      <slot name="title" />
-      <hr />
-      <slot />
-      <button autofocus on:click={() => dialog.close()}>Done</button>
-    </section>
-  </div>
-</dialog>
+{#if showModal}
+  <dialog
+    bind:this={dialog}  
+    on:close={() => (showModal = false)}
+    on:click|self={() => dialog.close()}
+  >
+    <div on:click|stopPropagation on:keydown|stopPropagation>
+      <figure>
+        <slot name="image" />
+      </figure>
+      <section style="--badge-size: {$badgeSize}px">
+        <slot name="title" />
+        <hr />
+        <slot />
+        <button autofocus on:click={() => dialog.close()}>Done</button>
+      </section>
+    </div>
+  </dialog>
+{/if}
 
 <style>
 	dialog {
