@@ -1,6 +1,7 @@
 <script>
   import { serverAddress } from '$lib/pocketbase'
   import { categories, badgeSize } from '$lib/stores'
+  import Modal from './Modal.svelte'
 
   export let categoryIndex
   export let index
@@ -11,6 +12,8 @@
   let tiers = []
   let tier = 0
   let title = ''
+  let tabindex = (categoryIndex+1) * 1E3 + index
+  let showModal = false
   
   $: index
   $: category = $categories[categoryIndex]
@@ -25,15 +28,31 @@
   $: title = hasTiers
     ? `${badge?.title} - ${tiers[tier]}`
     : badge?.title
+  
+  function onBadgeClick () {
+    showModal = true
+  }
+  function onBadgeKeydown (e) {
+    if (e.key === 'Escape') showModal = false
+  }
 </script>
 
 {#if badge }
-  <img height="{$badgeSize}" width="{$badgeSize}" alt="{title}"
-  src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize}x{$badgeSize}" />
+  <span on:click={onBadgeClick} on:keydown={onBadgeKeydown} role='button' tabindex={tabindex}>
+    <img height="{$badgeSize}" width="{$badgeSize}" alt="{title}"
+    src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize}x{$badgeSize}" />
+  </span>
+  <Modal bind:showModal>
+    <img slot="image" height={$badgeSize*2} width={$badgeSize*2} alt="{title}"
+    src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize*2}x{$badgeSize*2}" />
+    <h2 slot="title">{title}</h2>
+    <p>{badge.description}</p>
+  </Modal>
 {/if}
 
 <style>
   img {
     display: inline-block;
+    cursor: pointer;
   }
 </style>
