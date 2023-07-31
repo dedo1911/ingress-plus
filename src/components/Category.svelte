@@ -23,8 +23,8 @@
     : Math.ceil(category.badges.length / badgesPerRow)
 </script>
 
-<h2>{category.title}</h2>
 <section style="--badge-size: {$badgeSize}px">
+  <h2>{category.title}</h2>
   {#each {length: rows} as _, r}
     <div>
     {#each {length: badgesPerRow} as _, c}
@@ -38,14 +38,15 @@
 <style>
   h2 {
     text-align: center;
-    margin: 2em 0em;
+    margin: calc(var(--badge-size) / 3) 0 calc(var(--badge-size) / 2) 0;
     font-size: 2em;
+    text-shadow: 0 0 10px black;
   }
 	section {
     max-width: 1200px;
     margin: auto;
     white-space: nowrap;
-    padding-bottom: var(--badge-size);
+    padding-bottom: calc(var(--badge-size) / 4);
   }
   section div {
     margin-top: calc(var(--badge-size) / -5);
@@ -56,9 +57,5 @@
   section div:nth-child(even of div) {
     margin-left: calc(var(--badge-size) / 2);
   }
-  hr {
-    border: 0;
-    border-top: 1px solid #FFFFFF;
-    width: 256px;
-  }
+
 </style>

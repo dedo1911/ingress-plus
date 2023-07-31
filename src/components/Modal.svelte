@@ -65,13 +65,6 @@
   figure :global(img) {
     cursor: default;
   }
-  hr {
-    border: 0;
-    height: 3px;
-    background: rgb(183,74,131);
-    background: linear-gradient(90deg, rgba(183,74,131,0.1) 0%, rgba(183,74,131,1) 50%, rgba(183,74,131,0.1) 100%);
-    margin: 0;
-  }
   section :global(> :first-child) {
     margin: 0.1em 0;
   }

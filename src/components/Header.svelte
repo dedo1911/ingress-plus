@@ -10,6 +10,7 @@
     align-items: center;
     justify-content: center;
     height: 100px;
+    color: #FFF;
   }
   img {
     height: 75px;

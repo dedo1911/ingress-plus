@@ -11,6 +11,15 @@
 body {
   background: rgb(47,55,97);
   background: linear-gradient(180deg, rgba(47,55,97,1) 0%, rgba(17,20,35,1) 50%, rgba(0,0,0,1) 100%) fixed;
-  color: white;
+  color: #9593c3;
   margin: 0;
+}
+
+hr {
+  border: 0;
+  height: 3px;
+  background: rgb(183,74,131);
+  background: linear-gradient(90deg, rgba(183,74,131,0.1) 0%, rgba(183,74,131,1) 50%, rgba(183,74,131,0.1) 100%);
+  margin: 0 auto;
+  max-width: 32em;
 }
