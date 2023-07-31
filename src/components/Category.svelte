@@ -21,11 +21,10 @@
   $: rows = hasTiers
     ? Math.ceil(category.badges.length * tiers.length / badgesPerRow)
     : Math.ceil(category.badges.length / badgesPerRow)
-  $: console.log(hasTiers, badgesPerRow, rows)
 </script>
 
 <h2>{category.title}</h2>
-<section>
+<section style="--badge-size: {$badgeSize}px">
   {#each {length: rows} as _, r}
     <div>
     {#each {length: badgesPerRow} as _, c}
@@ -46,16 +45,16 @@
     max-width: 1200px;
     margin: auto;
     white-space: nowrap;
-    padding-bottom: 64px;
+    padding-bottom: var(--badge-size);
   }
   section div {
-    margin-top: -25px;
+    margin-top: calc(var(--badge-size) / -5);
   }
   section div:first-child {
     margin-top: 0;
   }
   section div:nth-child(even of div) {
-    margin-left: 64px;
+    margin-left: calc(var(--badge-size) / 2);
   }
   hr {
     border: 0;
