@@ -17,7 +17,7 @@
     margin-right: 1em;
   }
   h1 {
-    font-size: 2.5em;
+    font-size: 2em;
     text-align: center;
   }
 </style>

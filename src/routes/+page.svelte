@@ -1,7 +1,7 @@
 <script async>
   import { onMount } from 'svelte'
   import { client } from '$lib/pocketbase'
-  import { categories } from '$lib/stores'
+  import { categories, badgeSize } from '$lib/stores'
   import sortBy from 'lodash.sortby'
 
   import Category from '../components/Category.svelte'
@@ -18,6 +18,7 @@
     }))
   })
   let width
+  $: badgeSize.set(width < 600 ? 64 : 128)
 </script>
 
 <svelte:head>
