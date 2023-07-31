@@ -6,6 +6,12 @@
   export let categoryIndex
   export let index
 
+  const thumbSize = (badgeSize) => {
+    if (badgeSize <= 64) return '96x96'
+    if (badgeSize <= 128) return '128x128'
+    return '256x256'
+  }
+
   let badge = {}
   let category = {}
   let hasTiers = false
@@ -39,7 +45,7 @@
 {#if badge }
   <span on:click={onBadgeClick} on:keydown={onBadgeKeydown} role='button' tabindex='0'>
     <img height="{$badgeSize}" width="{$badgeSize}" alt="{title}"
-    src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize}x{$badgeSize}" />
+    src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={thumbSize($badgeSize)}" />
   </span>
   <Modal bind:showModal>
     <img slot="image" height={$badgeSize*2} width={$badgeSize*2} alt="{title}"
