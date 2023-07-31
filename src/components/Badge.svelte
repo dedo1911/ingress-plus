@@ -52,6 +52,10 @@
     src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize*2}x{$badgeSize*2}" />
     <h2 slot="title">{title}</h2>
     <p>{badge.description}</p>
+    {#if badge.description_extra}
+      <hr />
+      <p>{@html badge.description_extra}</p>
+    {/if}
   </Modal>
 {/if}
 
