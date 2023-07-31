@@ -12,7 +12,6 @@
   let tiers = []
   let tier = 0
   let title = ''
-  let tabindex = (categoryIndex+1) * 1E3 + index
   let showModal = false
   
   $: index
@@ -38,7 +37,7 @@
 </script>
 
 {#if badge }
-  <span on:click={onBadgeClick} on:keydown={onBadgeKeydown} role='button' tabindex={tabindex}>
+  <span on:click={onBadgeClick} on:keydown={onBadgeKeydown} role='button' tabindex='0'>
     <img height="{$badgeSize}" width="{$badgeSize}" alt="{title}"
     src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize}x{$badgeSize}" />
   </span>
