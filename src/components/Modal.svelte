@@ -81,7 +81,8 @@
   }
   button {
     cursor: pointer;
-    width: 8em;
+    width: 100%;
+    max-width: 8em;
     padding: 0.25em 0;
     font-size: larger;
     color: #FFF;

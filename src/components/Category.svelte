@@ -45,10 +45,10 @@
 	section {
     max-width: 1200px;
     margin: auto;
-    white-space: nowrap;
     padding-bottom: calc(var(--badge-size) / 4);
   }
   section div {
+    white-space: nowrap;
     margin-top: calc(var(--badge-size) / -5);
   }
   section div:first-child {
