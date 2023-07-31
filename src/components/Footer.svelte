@@ -1,5 +1,5 @@
 <footer>
-  <p>Not officially affiliated with Ingress or Niantic Labs! All images shown on this website are of their respective owners.</p>
+  <p>Ingress Fan-site. Not officially affiliated with Ingress or Niantic Labs! All images shown on this website are property of their respective owners.</p>
   <p>
     Made with <img src="/heart.svg" alt="Love"> with 
     <a href="https://svelte.dev" target="_blank"><img src="/svelte.svg" alt="Svelte" /> Svelte</a> and 
