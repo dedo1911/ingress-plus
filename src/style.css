@@ -1,0 +1,16 @@
+@font-face {
+  font-family: 'Exo';
+  src: url('/Exo-Regular.otf');
+  font-display: swap;
+}
+
+* {
+  font-family: 'Exo', sans-serif;
+}
+
+body {
+  background: rgb(47,55,97);
+  background: linear-gradient(180deg, rgba(47,55,97,1) 0%, rgba(17,20,35,1) 50%, rgba(0,0,0,1) 100%) fixed;
+  color: white;
+  margin: 0;
+}
