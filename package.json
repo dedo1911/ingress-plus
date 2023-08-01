@@ -20,6 +20,6 @@
 	"type": "module",
 	"dependencies": {
 		"lodash.sortby": "^4.7.0",
-		"pocketbase": "^0.15.3"
+		"pocketbase": "^0.16.0"
 	}
 }
