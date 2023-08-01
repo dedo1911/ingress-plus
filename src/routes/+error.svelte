@@ -18,6 +18,7 @@
     align-items: center;
     align-content: center;
     height: 192px;
+    min-width: 192px;
     margin: 1em auto;
   }
   h1, p {

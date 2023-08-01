@@ -25,16 +25,17 @@
     <title>Ingress Badges</title> 
 </svelte:head>
 
-{#each $categories as category, index}
-  {#if category.badges.length > 0 }
-    <Category {width} {category} {index} />
-  {/if}
-{/each}
+<section bind:clientWidth={width}>
+  {#each $categories as category, index}
+    {#if category.badges.length > 0 }
+      <Category {width} {category} {index} />
+    {/if}
+  {/each}
 
-<div bind:clientWidth={width} />
+</section>
 
 <style>
-	div {
+	section {
     max-width: 1200px;
     margin: auto;
   }

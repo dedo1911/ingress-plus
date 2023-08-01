@@ -16,8 +16,8 @@
   $: tiers = category.tiers.split(',').filter(t => t)
   $: hasTiers = tiers.length > 0
   $: badgesPerRow = hasTiers
-    ? Math.max(1, Math.min(tiers.length, Math.floor((width-64)/$badgeSize)))
-    : Math.max(1, Math.floor((width-64)/$badgeSize))
+    ? Math.max(1, Math.min(tiers.length, Math.floor((width-$badgeSize)/$badgeSize)))
+    : Math.max(1, Math.floor((width-$badgeSize)/$badgeSize))
   $: rows = hasTiers
     ? Math.ceil(category.badges.length * tiers.length / badgesPerRow)
     : Math.ceil(category.badges.length / badgesPerRow)
