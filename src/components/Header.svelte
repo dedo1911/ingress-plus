@@ -1,24 +1,40 @@
 <script>
+  import { onMount } from 'svelte'
   import { client } from '$lib/pocketbase'
+  import { authData, ownedBadges } from '$lib/stores'
 
-  let isLogged = client.authStore.isValid
   const login = async () => {
     const user = await client.collection('users').authWithOAuth2({ provider: 'google' })
-    isLogged = client.authStore.isValid
     
-    if (isLogged) {
+    if (client.authStore.isValid) {
       // Update username and avatar
       user.record.avatar = user.meta.avatarUrl
       user.record.display_name = user.meta.name
       client.collection('users').update(user.record.id, user.record)
     }
+
+    authData.set(client.authStore)
+    await refreshOwnedBadges()
   }
   const logout = () => {
     client.authStore.clear()
-    isLogged = client.authStore.isValid
+    authData.set({ isValid: false })
+    ownedBadges.set([])
   }
   
   const openTelegram = () => (window.location.href = "https://t.me/ingressbadges")
+
+  const refreshOwnedBadges = async () => {
+    const owned = await client.collection('user_badges').getFullList()
+    ownedBadges.set(owned)
+  }
+
+  onMount(async () => {
+    if (!client.authStore.isValid) return
+    await client.collection('users').authRefresh()
+    authData.set(client.authStore)
+    await refreshOwnedBadges()
+  })
 </script>
 
 <header>
@@ -32,8 +48,8 @@
   <div data-nav="large">
     <ul>
       <li on:click={openTelegram}><img src="/telegram.svg" alt="Telegram" /> Telegram</li>
-      {#if isLogged}
-        <li on:click={logout}><img src="{client.authStore.model.avatar}" alt="{client.authStore.model.display_name}" /> Logout</li>
+      {#if $authData.isValid }
+        <li on:click={logout}><img src="/user.svg" alt="{$authData.model.display_name}" /> Logout</li>
       {:else}
         <li on:click={login}><img src="/user.svg" alt="Login" /> Login</li>
       {/if}

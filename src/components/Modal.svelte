@@ -77,9 +77,9 @@
     cursor: default;
   }
   header :global(a) {
-    width: 32px;
     height: 32px;
-    margin: 0 30px;
+    width: 32px;
+    margin: 0 8px;
     margin-top: calc(32px + 15px);
   }
   header :global(a img) {
