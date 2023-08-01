@@ -5,6 +5,9 @@
 	let dialog
   
 	$: if (dialog && showModal) dialog.showModal()
+  $: document.getElementsByTagName('body')[0].style.overflow = showModal
+    ? 'hidden'
+    : 'auto'
 </script>
 
 {#if showModal}
@@ -35,7 +38,8 @@
 		border-radius: 0.2em;
 		border: none;
 		padding: 0;
-		width: 32em;
+		min-width: min(32em, 100vw);
+    max-width: 1000px;
 		animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 	}
 	dialog::backdrop {
@@ -72,7 +76,7 @@
   header :global(a) {
     width: 32px;
     height: 32px;
-    margin: 0 10px;
+    margin: 0 30px;
     margin-top: calc(32px + 15px);
   }
   header :global(a img) {
@@ -91,6 +95,9 @@
     text-align: center;
     font-size: larger;
     white-space: pre-wrap;
+    word-break: break-word;
+    overflow: auto;
+    max-height: 50vh;
   }
   button {
     cursor: pointer;
