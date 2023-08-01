@@ -3,8 +3,12 @@
 	export let showModal
 
 	let dialog
+  let content
   
-	$: if (dialog && showModal) dialog.showModal()
+	$: if (dialog && showModal) {
+    dialog.showModal()
+    content.scrollTo(0, 0)
+  }
   $: document.getElementsByTagName('body')[0].style.overflow = showModal
     ? 'hidden'
     : 'auto'
@@ -22,7 +26,7 @@
         <slot name="image" />
         <slot name="download" />
       </header>
-      <section style="--badge-size: {$badgeSize}px">
+      <section bind:this={content} style="--badge-size: {$badgeSize}px">
         <slot name="title" />
         <hr />
         <slot />
