@@ -3,7 +3,7 @@
 	export let showModal
 
 	let dialog
-
+  
 	$: if (dialog && showModal) dialog.showModal()
 </script>
 
@@ -14,9 +14,11 @@
     on:click|self={() => dialog.close()}
   >
     <div on:click|stopPropagation on:keydown|stopPropagation>
-      <figure>
+      <header>
+        <slot name="owned" />
         <slot name="image" />
-      </figure>
+        <slot name="download" />
+      </header>
       <section style="--badge-size: {$badgeSize}px">
         <slot name="title" />
         <hr />
@@ -58,14 +60,23 @@
 			opacity: 1;
 		}
 	}
-  figure {
+  header {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.75));
   }
-  figure :global(img) {
+  header :global(img) {
     cursor: default;
+  }
+  header :global(a) {
+    width: 32px;
+    height: 32px;
+    margin: 0 10px;
+    margin-top: calc(32px + 15px);
+  }
+  header :global(a img) {
+    cursor: pointer;
   }
   section :global(> :first-child) {
     margin: 0.1em 0;

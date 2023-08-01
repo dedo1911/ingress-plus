@@ -48,8 +48,14 @@
     src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={thumbSize($badgeSize)}" />
   </span>
   <Modal bind:showModal>
+    <a slot="owned" href="#">
+
+    </a>
     <img slot="image" height={$badgeSize*2} width={$badgeSize*2} alt="{title}"
     src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize*2}x{$badgeSize*2}" />
+    <a title="Download" slot="download" href="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?download">
+      <img src="/download.svg" alt="Download" />
+    </a>
     <h2 slot="title">{title}</h2>
     <p>{badge.description}</p>
     {#if badge.description_extra}
