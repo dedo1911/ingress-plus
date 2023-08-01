@@ -34,10 +34,8 @@
     ? `${badge?.title} - ${tiers[tier]}`
     : badge?.title
   
-  function onBadgeClick () {
-    showModal = true
-  }
-  function onBadgeKeydown (e) {
+  const onBadgeClick = () => (showModal = true)
+  const onBadgeKeydown = (e) => {
     if (e.key === 'Escape') showModal = false
   }
 </script>

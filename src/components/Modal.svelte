@@ -39,7 +39,6 @@
 <style>
 	dialog {
     background: none;
-		border-radius: 0.2em;
 		border: none;
 		padding: 0;
 		min-width: min(32em, 100vw);
