@@ -27,11 +27,4 @@
     vertical-align: sub;
     margin: 0 0.25em;
   }
-  a:link, a:visited, a:hover, a:active {
-    color: #FFFFFF;
-    text-decoration: none;
-  }
-  a:hover {
-    font-weight: bold;
-  }
 </style>

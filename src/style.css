@@ -23,3 +23,12 @@ hr {
   margin: 0 auto;
   max-width: 32em;
 }
+
+a:link, a:visited, a:hover, a:active {
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+a:hover {
+  font-weight: bold;
+}
