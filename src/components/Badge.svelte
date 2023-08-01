@@ -53,7 +53,7 @@
     </a>
     <img slot="image" height={$badgeSize*2} width={$badgeSize*2} alt="{title}"
     src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize*2}x{$badgeSize*2}" />
-    <a title="Download" slot="download" href="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?download">
+    <a title="Download" slot="download" href="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?download=true">
       <img src="/download.svg" alt="Download" />
     </a>
     <h2 slot="title">{title}</h2>
