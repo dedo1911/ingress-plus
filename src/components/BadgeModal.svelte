@@ -1,7 +1,8 @@
 <script>
-  import Modal from "./Modal.svelte"
+  import { slide } from 'svelte/transition'
   import { pb, serverAddress } from "$lib/pocketbase"
   import { authData, ownedBadges, badgeSize } from "$lib/stores"
+  import Modal from "./Modal.svelte"
 
   export let showModal
   export let badge
@@ -99,7 +100,7 @@
 
     <button on:click={() => (showModal = false)}>Done</button>
     {#if !badge.unobtainable && ownedCounter > 0 }
-      <small>{ownedCounter} other {ownedCounter === 1 ? 'agent' : 'agents'} have this badge!</small>
+      <small transition:slide>{ownedCounter} {ownedCounter === 1 ? 'agent has' : 'agents have'} this badge!</small>
     {/if}
   </section>
 </Modal>
