@@ -140,8 +140,8 @@
   }
 
   nav[data-nav="mobile"] span {
-    height: 50px;
-    width: 50px;
+    height: 32px;
+    width: 32px;
     background-image: url('/menu.png');
     background-size: contain;
     transition: all 0.3s ease-in-out;
