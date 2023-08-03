@@ -1,5 +1,12 @@
 <footer>
-  <p>Ingress Fan-site. Not officially affiliated with Ingress or Niantic Labs! All images shown on this website are property of their respective owners.</p>
+  <p>
+    If you like this website consider buying me a 
+    <a href="https://ko-fi.com/dedo1911" target="_blank"><img src="/kofi.png" alt="Ko-fi" /> Ko-fi</a> 
+    to support this project.
+  </p>
+  <p class="small">
+    Ingress Fan-site. Not officially affiliated with Ingress or Niantic Labs! All images shown on this website are property of their respective owners.
+  </p>
   <p>
     Made with <img src="/heart.svg" alt="Love"> with 
     <a href="https://svelte.dev" target="_blank"><img src="/svelte.svg" alt="Svelte" /> Svelte</a> and 
@@ -19,7 +26,7 @@
     background: #3b1e5f;
     flex-direction: column;
   }
-  p:first-child {
+  p.small {
     font-size: small;
   }
   img {
