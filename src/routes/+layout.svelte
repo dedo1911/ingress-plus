@@ -5,6 +5,7 @@
   import '../style.css'
 </script>
 
+<div class="background" />
 <main>
 <Header />
   <div>
