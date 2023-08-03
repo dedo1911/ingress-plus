@@ -15,7 +15,7 @@
 		"eslint": "^8.28.0",
 		"eslint-plugin-svelte": "^2.30.0",
 		"svelte": "^4.0.5",
-		"vite": "^4.4.2"
+		"vite": "^4.4.8"
 	},
 	"type": "module",
 	"dependencies": {
