@@ -1,0 +1,17 @@
+{
+  "short_name": "ingress-badges",
+  "name": "Ingress Badges",
+  "description": "All your Ingress badges in one place!",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "background_color": "#2f3761",
+  "theme_color": "#000000",
+  "display": "fullscreen",
+  "scope": "/"
+}
