@@ -39,8 +39,10 @@
 
 <header>
   <div>
-    <img src="favicon.png" alt="Ingress" height="75" width="75" />
-    <h1>Ingress Badges</h1>
+    <a href="/">
+      <img src="favicon.png" alt="Ingress" height="75" width="75" />
+      <h1>Ingress Badges</h1>
+    </a>
   </div>
   <div data-nav="mobile">
     
@@ -70,6 +72,9 @@
     display: flex;
     align-items: center;
     padding: 0 1em;
+  }
+  header a {
+    display: flex;
   }
   div:first-child img {
     height: 75px;
