@@ -5,4 +5,4 @@ export const serverAddress = dev
   ? 'https://ingress.dedo1911.xyz'
   : window.location.origin
 
-export const client = new PocketBase(serverAddress)
+export const pb = new PocketBase(serverAddress)

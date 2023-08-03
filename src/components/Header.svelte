@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte'
   import { slide } from 'svelte/transition'
-  import { client } from '$lib/pocketbase'
+  import { pb } from '$lib/pocketbase'
   import { authData, ownedBadges } from '$lib/stores'
 
   let menuOpen = false
@@ -10,21 +10,21 @@
 
   const login = async () => {
     menuOpen = false
-    const user = await client.collection('users').authWithOAuth2({ provider: 'google' })
+    const user = await pb.collection('users').authWithOAuth2({ provider: 'google' })
     
-    if (client.authStore.isValid) {
+    if (pb.authStore.isValid) {
       // Update username and avatar
       user.record.avatar = user.meta.avatarUrl
       user.record.display_name = user.meta.name
-      client.collection('users').update(user.record.id, user.record)
+      pb.collection('users').update(user.record.id, user.record)
     }
 
-    authData.set(client.authStore)
+    authData.set(pb.authStore)
     await refreshOwnedBadges()
   }
   const logout = () => {
     menuOpen = false
-    client.authStore.clear()
+    pb.authStore.clear()
     authData.set({ isValid: false })
     ownedBadges.set([])
   }
@@ -35,14 +35,14 @@
   }
 
   const refreshOwnedBadges = async () => {
-    const owned = await client.collection('user_badges').getFullList()
+    const owned = await pb.collection('user_badges').getFullList()
     ownedBadges.set(owned)
   }
 
   onMount(async () => {
-    if (!client.authStore.isValid) return
-    await client.collection('users').authRefresh()
-    authData.set(client.authStore)
+    if (!pb.authStore.isValid) return
+    await pb.collection('users').authRefresh()
+    authData.set(pb.authStore)
     await refreshOwnedBadges()
   })
 </script>

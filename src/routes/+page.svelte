@@ -1,13 +1,13 @@
 <script async>
   import { onMount } from 'svelte'
-  import { client } from '$lib/pocketbase'
+  import { pb } from '$lib/pocketbase'
   import { categories, badgeSize } from '$lib/stores'
   import sortBy from 'lodash.sortby'
 
   import Category from '../components/Category.svelte'
 
   onMount(async () => {
-    const items = await client.collection('categories').getFullList({
+    const items = await pb.collection('categories').getFullList({
       sort: '-sorting',
       expand: 'badges(category)'
     })
