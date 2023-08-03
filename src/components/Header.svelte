@@ -154,7 +154,7 @@
     position: absolute;
     top: 75px;
     background: rgb(47,55,97);
-    background: linear-gradient(0deg, rgba(47,55,97,0.9) 0%, rgba(17,20,35,1) 50%, rgba(0,0,0,1) 100%);
+    background: linear-gradient(0deg, rgba(47,55,97,0.9) 0%, rgba(17,20,35,0.9) 50%, rgba(0,0,0,1) 100%);
     flex-direction: column;
     margin: 0;
     width: 100%;
