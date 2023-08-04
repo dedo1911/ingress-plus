@@ -1,12 +1,14 @@
 {
   "name": "Ingress Badges",
-  "short_name": "Ingress Badges",
+  "short_name": "IngresBadges",
+  "version": "1.0.0",
+  "manifest_version": 2,
   "description": "All your Ingress badges in one place!",
   "background_color": "#2f3761",
   "theme_color": "#000000",
   "display": "standalone",
-  "scope": "./",
-  "start_url": "./",
+  "scope": "/",
+  "start_url": "/",
   "icons": [
     {
       "src": "pwa/icon-72x72.png",
