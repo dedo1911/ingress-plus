@@ -10,7 +10,13 @@
 
   const login = async () => {
     menuOpen = false
-    const user = await pb.collection('users').authWithOAuth2({ provider: 'google' })
+    let w = window.open()
+    const user = await pb.collection('users').authWithOAuth2({
+      provider: 'google',
+      urlCallback: (url) => {
+          w.location.href = url
+      }
+    })
     
     if (pb.authStore.isValid) {
       // Update username and avatar
