@@ -50,7 +50,7 @@
 <header>
   <div>
     <a href="/">
-      <img src="favicon.png" alt="Ingress" height="75" width="75" />
+      <img src="/images/favicon.png" alt="Ingress" height="75" width="75" />
       <h1>Ingress Badges</h1>
     </a>
   </div>
@@ -58,22 +58,22 @@
     <span class:open={menuOpen} on:click={toggleMenu} />
     {#if menuOpen}
       <ul transition:slide>
-        <li on:click={openTelegram}><img src="/telegram.svg" alt="Telegram" /> Telegram</li>
+        <li on:click={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
         {#if $authData.isValid }
-          <li on:click={logout}><img src="/user.svg" alt="{$authData.model.display_name}" /> Logout</li>
+          <li on:click={logout}><img src="/images/user.svg" alt="{$authData.model.display_name}" /> Logout</li>
         {:else}
-          <li on:click={login}><img src="/user.svg" alt="Login" /> Login</li>
+          <li on:click={login}><img src="/images/user.svg" alt="Login" /> Login</li>
         {/if}
       </ul>
     {/if}
   </nav>
   <nav data-nav="large">
     <ul>
-      <li on:click={openTelegram}><img src="/telegram.svg" alt="Telegram" /> Telegram</li>
+      <li on:click={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
       {#if $authData.isValid }
-        <li on:click={logout}><img src="/user.svg" alt="{$authData.model.display_name}" /> Logout</li>
+        <li on:click={logout}><img src="/images/user.svg" alt="{$authData.model.display_name}" /> Logout</li>
       {:else}
-        <li on:click={login}><img src="/user.svg" alt="Login" /> Login</li>
+        <li on:click={login}><img src="/images/user.svg" alt="Login" /> Login</li>
       {/if}
     </ul>
   </nav>
@@ -142,13 +142,13 @@
   nav[data-nav="mobile"] span {
     height: 32px;
     width: 32px;
-    background-image: url('/menu.png');
+    background-image: url('/images/menu.png');
     background-size: contain;
     transition: all 0.3s ease-in-out;
     cursor: pointer;
   }
   nav[data-nav="mobile"] span.open {
-    background-image: url('/close.png');
+    background-image: url('/images/close.png');
   }
   nav[data-nav="mobile"] ul {
     position: absolute;

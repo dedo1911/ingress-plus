@@ -9,7 +9,7 @@
 
 <style>
   div {
-    background: url('/onyx_error_badge.png') center no-repeat;
+    background: url('/images/onyx_error_badge.png') center no-repeat;
     background-size: contain;
     text-align: center;
     display: flex;

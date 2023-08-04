@@ -65,7 +65,7 @@
     {#if $authData.isValid && !badge.unobtainable }
       <button on:click={toggleOwned} title={owned ? "Mark not owned" : "Mark owned"}>
           <img
-            src="/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
+            src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
             alt="Download"
             height="32"
             width="32"
@@ -86,7 +86,7 @@
       href="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge
         .image[tier]}?download=true"
     >
-      <img src="/download.svg" alt="Download" height="32" width="32" />
+      <img src="/images/download.svg" alt="Download" height="32" width="32" />
     </a>
   </header>
   <section bind:this={content} style="--badge-size: {$badgeSize}px">
