@@ -57,7 +57,7 @@
   <div>
     <a href="/">
       <img src="/images/favicon.png" alt="Ingress" height="75" width="75" />
-      <h1>Ingress Badges</h1>
+      <h1>Ingress Plus</h1>
     </a>
   </div>
   <nav data-nav="mobile">

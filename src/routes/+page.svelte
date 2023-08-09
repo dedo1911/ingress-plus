@@ -22,7 +22,7 @@
 </script>
 
 <svelte:head>
-    <title>Ingress Badges</title> 
+    <title>Ingress Plus</title> 
 </svelte:head>
 
 <section bind:clientWidth={width}>

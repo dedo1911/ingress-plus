@@ -1,7 +1,7 @@
 {
-  "name": "Ingress Badges",
-  "short_name": "IngresBadges",
-  "version": "1.0.0",
+  "name": "Ingress Plus",
+  "short_name": "Ingress Plus",
+  "version": "1.1.0",
   "manifest_version": 2,
   "description": "All your Ingress badges in one place!",
   "background_color": "#2f3761",
