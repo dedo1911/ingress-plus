@@ -37,7 +37,7 @@
   
   const openTelegram = () => {
     menuOpen = false
-    window.location.href = "https://t.me/ingressbadges"
+    window.location.href = "https://t.me/Ingress_Plus"
   }
 
   const refreshOwnedBadges = async () => {
