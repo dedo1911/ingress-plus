@@ -29,7 +29,7 @@ hr {
   height: 3px;
   background: rgb(183,74,131);
   background: linear-gradient(90deg, rgba(183,74,131,0.1) 0%, rgba(183,74,131,1) 50%, rgba(183,74,131,0.1) 100%);
-  margin: 0 auto;
+  margin: 1em auto;
   max-width: 32em;
 }
 

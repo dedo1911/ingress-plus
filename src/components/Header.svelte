@@ -1,10 +1,12 @@
 <script>
+  import { afterNavigate } from '$app/navigation'
   import { onMount } from 'svelte'
   import { slide } from 'svelte/transition'
   import { pb } from '$lib/pocketbase'
   import { authData, ownedBadges } from '$lib/stores'
 
   let menuOpen = false
+  let pathname = '/'
 
   const toggleMenu = () => (menuOpen = !menuOpen)
 
@@ -51,6 +53,11 @@
     authData.set(pb.authStore)
     await refreshOwnedBadges()
   })
+
+  afterNavigate(() => {
+    pathname = window.location.pathname
+    menuOpen = false
+  })
 </script>
 
 <header>
@@ -64,6 +71,9 @@
     <span class:open={menuOpen} on:click={toggleMenu} />
     {#if menuOpen}
       <ul transition:slide>
+        <li class="{pathname === '/stats' ? 'active' : ''}">
+          <a href="/stats"><img src="/images/statistics.svg" alt="Statistics" /> Statistics</a>
+        </li>
         <li on:click={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
         {#if $authData.isValid }
           <li on:click={logout}><img src="/images/user.svg" alt="{$authData.model.display_name}" /> Logout</li>
@@ -75,6 +85,9 @@
   </nav>
   <nav data-nav="large">
     <ul>
+      <li class="{pathname === '/stats' ? 'active' : ''}">
+        <a href="/stats"><img src="/images/statistics.svg" alt="Statistics" /> Statistics</a>
+      </li>
       <li on:click={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
       {#if $authData.isValid }
         <li on:click={logout}><img src="/images/user.svg" alt="{$authData.model.display_name}" /> Logout</li>
@@ -128,7 +141,8 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0);
     transition: border 0.3s ease-in-out;
   }
-  nav ul li:hover {
+  nav ul li:hover,
+  nav ul li.active {
     border-bottom: 1px solid rgba(255, 255, 255, 1);
   }
   nav ul li img {
