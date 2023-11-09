@@ -12,7 +12,7 @@
       expand: 'badges(category)'
     })
     categories.set(items.map(i => {
-      const r = { ...i, badges: sortBy(i.expand['badges(category)'] || [] ).reverse() }
+      const r = { ...i, badges: i.expand ? sortBy(i.expand['badges(category)'] || []).reverse() : [] }
       delete r.expand
       return r
     }))
