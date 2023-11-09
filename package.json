@@ -9,17 +9,17 @@
 		"lint": "eslint ."
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "^2.0.0",
+		"@sveltejs/adapter-auto": "2.1.1",
 		"@sveltejs/adapter-static": "^2.0.3",
-		"@sveltejs/kit": "^1.20.4",
-		"eslint": "^8.28.0",
-		"eslint-plugin-svelte": "^2.30.0",
-		"svelte": "^4.0.5",
-		"vite": "^4.4.8"
+		"@sveltejs/kit": "1.27.4",
+		"eslint": "8.53.0",
+		"eslint-plugin-svelte": "2.35.0",
+		"svelte": "4.2.2",
+		"vite": "4.5.0"
 	},
 	"type": "module",
 	"dependencies": {
 		"lodash.sortby": "^4.7.0",
-		"pocketbase": "^0.16.0"
+		"pocketbase": "0.19.0"
 	}
 }
