@@ -43,7 +43,7 @@
     text-shadow: 0 0 10px black;
   }
 	section {
-    max-width: 1200px;
+    width: fit-content;
     margin: auto;
     padding-bottom: calc(var(--badge-size) / 4);
   }
