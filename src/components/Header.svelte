@@ -42,10 +42,10 @@
     window.location.href = "https://t.me/Ingress_Plus"
   }
 
-  const refreshOwnedBadges = async () => {
-    const owned = await pb.collection('user_badges').getFullList()
-    ownedBadges.set(owned)
-  }
+  const refreshOwnedBadges = async () => ownedBadges.set(
+    await pb.collection('user_badges').getFullList({
+      expand: 'badge,badge.category'
+    }))
 
   onMount(async () => {
     if (!pb.authStore.isValid) return

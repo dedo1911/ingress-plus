@@ -1,6 +1,7 @@
 <script async>
   import { onMount } from 'svelte'
   import { pb, serverAddress } from '$lib/pocketbase'
+  import TimeAgo from 'svelte-timeago/TimeAgo.svelte'
 
   let statistics, topBadges
 
@@ -35,7 +36,7 @@
     </div>
     <div class="stat">
       <span>Last user signup:</span>
-      <strong>{new Date(statistics.user_last_created).toLocaleDateString()}</strong>
+      <strong><TimeAgo date={statistics.user_last_created} live /></strong>
     </div>
     <div class="stat">
       <span>Total owned badges:</span>

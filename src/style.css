@@ -41,3 +41,8 @@ a:link, a:visited, a:hover, a:active {
 a:hover {
   font-weight: bold;
 }
+
+:root {
+  --color-faction-enl: #00ef6b;
+  --color-faction-res: #00c2ff;
+}

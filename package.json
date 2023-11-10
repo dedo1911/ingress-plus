@@ -20,6 +20,7 @@
 	"type": "module",
 	"dependencies": {
 		"lodash.sortby": "^4.7.0",
-		"pocketbase": "0.19.0"
+		"pocketbase": "0.19.0",
+		"svelte-timeago": "^0.1.2"
 	}
 }
