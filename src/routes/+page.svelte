@@ -18,7 +18,7 @@
     }))
   })
   let width
-  $: badgeSize.set(width < 600 ? 64 : 128)
+  $: badgeSize.set(Math.min(128, width / 7))
 </script>
 
 <svelte:head>

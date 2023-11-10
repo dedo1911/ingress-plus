@@ -10,12 +10,11 @@
   }
 
   let width = 1
-  let badgesPerRow = 1
+  const badgesPerRow = 6
   let rows = 1
   let sortedBadges = []
 
-  $: badgeSize.set(width < 600 ? 64 : 128)
-  $: badgesPerRow = Math.max(1, Math.floor((width - $badgeSize) / $badgeSize))
+  $: badgeSize.set(Math.min(128, width / 7))
   $: rows = Math.ceil($ownedBadges.length / badgesPerRow)
   $: sortedBadges = sortBy($ownedBadges, [
     'expand.badge.expand.category.sorting',
@@ -30,24 +29,22 @@
 <section bind:clientWidth={width} style="--badge-size: {$badgeSize}px">
   <h2>{$authData?.baseModel?.username || ''}</h2>
 
-  {#each {length: rows} as _, r}
-    <div>
-    {#each {length: badgesPerRow} as _, c}
-      {@const badge = sortedBadges[r * badgesPerRow + c]}
-      {#if badge}
-        <img height="{$badgeSize}" width="{$badgeSize}" alt="{badge.expand.badge.title}"
-          src="{serverAddress}/api/files/{badge.expand.badge.collectionId}/{badge.expand.badge.id}/{badge.expand.badge.image[badge.tier]}?thumb={thumbSize($badgeSize)}" />
-      {/if}
+  <div class="badges">
+    {#each {length: rows} as _, r}
+      <div>
+      {#each {length: badgesPerRow} as _, c}
+        {@const badge = sortedBadges[r * badgesPerRow + c]}
+        {#if badge}
+          <img height="{$badgeSize}" width="{$badgeSize}" alt="{badge.expand.badge.title}"
+            src="{serverAddress}/api/files/{badge.expand.badge.collectionId}/{badge.expand.badge.id}/{badge.expand.badge.image[badge.tier]}?thumb={thumbSize($badgeSize)}" />
+        {/if}
+      {/each}
+      </div>
     {/each}
-    </div>
-  {/each}
+  </div>
 </section>
 
 <style>
-	section {
-    max-width: 1200px;
-    margin: auto;
-  }
   h2 {
     text-align: center;
     margin: calc(var(--badge-size) / 3) 0 calc(var(--badge-size) / 2) 0;
@@ -60,7 +57,11 @@
     margin: auto;
     padding-bottom: calc(var(--badge-size) / 4);
   }
+  div.badges {
+    margin: auto;
+  }
   section div {
+    width: fit-content;
     white-space: nowrap;
     margin-top: calc(var(--badge-size) / -5);
   }
