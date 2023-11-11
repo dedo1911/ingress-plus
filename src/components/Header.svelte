@@ -71,12 +71,19 @@
     <span class:open={menuOpen} on:click={toggleMenu} />
     {#if menuOpen}
       <ul transition:slide>
-        <li class="{pathname === '/stats' ? 'active' : ''}">
-          <a href="/stats"><img src="/images/statistics.svg" alt="Statistics" /> Statistics</a>
-        </li>
+        <a href="/stats">
+          <li class="{pathname === '/stats' ? 'active' : ''}">
+            <img src="/images/statistics.svg" alt="Statistics" /> Statistics
+          </li>
+        </a>
         <li on:click={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
         {#if $authData.isValid }
-          <li on:click={logout}><img src="/images/user.svg" alt="{$authData.model.display_name}" /> Logout</li>
+        <a href="/profile">
+          <li class="{pathname === '/profile' ? 'active' : ''}">
+            <img src="/images/user.svg" alt="{$authData.model.username}" /> {$authData.baseModel.username}
+          </li>
+        </a>
+        <li on:click={logout}><img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout</li>
         {:else}
           <li on:click={login}><img src="/images/user.svg" alt="Login" /> Login</li>
         {/if}
@@ -85,12 +92,19 @@
   </nav>
   <nav data-nav="large">
     <ul>
-      <li class="{pathname === '/stats' ? 'active' : ''}">
-        <a href="/stats"><img src="/images/statistics.svg" alt="Statistics" /> Statistics</a>
-      </li>
+      <a href="/stats">
+        <li class="{pathname === '/stats' ? 'active' : ''}">
+          <img src="/images/statistics.svg" alt="Statistics" /> Statistics
+        </li>
+      </a>
       <li on:click={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
       {#if $authData.isValid }
-        <li on:click={logout}><img src="/images/user.svg" alt="{$authData.model.display_name}" /> Logout</li>
+        <a href="/profile">
+          <li class="{pathname === '/profile' ? 'active' : ''}">
+            <img src="/images/user.svg" alt="{$authData.model.username}" /> {$authData.baseModel.username}
+          </li>
+        </a>
+        <li on:click={logout}><img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout</li>
       {:else}
         <li on:click={login}><img src="/images/user.svg" alt="Login" /> Login</li>
       {/if}
@@ -188,7 +202,7 @@
     padding: 1em 0.5em;
   }
 
-  @media (max-width: 800px) {
+  @media (max-width: 900px) {
     nav[data-nav="large"] {
       display: none;
     }

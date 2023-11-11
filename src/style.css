@@ -43,6 +43,8 @@ a:hover {
 }
 
 :root {
-  --color-faction-enl: #00ef6b;
-  --color-faction-res: #00c2ff;
+  --color-faction-unaligned: #ffce00;
+  --color-faction-enlightened: #00b056;
+  --color-faction-resistance: #00adef;
+  --color-faction-machina: #ff2020;
 }
