@@ -22,7 +22,7 @@
 
   $: badgeSize.set(Math.min(128, width / 7))
   $: rows = Math.ceil($ownedBadges.length / badgesPerRow)
-  $: sortedBadges = sortBy($ownedBadges.filter(b => b.expand.badge.expand.category.profile_visible), [
+  $: sortedBadges = sortBy($ownedBadges.filter(b => b.expand?.badge?.expand?.category?.profile_visible || false), [
     'expand.badge.expand.category.sorting',
     'expand.badge.sorting'
   ]).reverse()
