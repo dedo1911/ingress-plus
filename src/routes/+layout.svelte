@@ -1,11 +1,20 @@
 <script>
+  import { SvelteToast } from '@zerodevx/svelte-toast'
   import Header from '../components/Header.svelte'
   import Footer from '../components/Footer.svelte'
   
   import '../style.css'
+
+  const options = {
+    duration: 2000,
+    reversed: true
+  }
 </script>
 
+<SvelteToast {options} />
+
 <div class="background" />
+
 <main>
 <Header />
   <div>

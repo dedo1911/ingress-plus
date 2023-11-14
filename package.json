@@ -19,6 +19,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@zerodevx/svelte-toast": "^0.9.5",
 		"lodash.sortby": "^4.7.0",
 		"pocketbase": "0.19.0",
 		"svelte-timeago": "^0.1.2"

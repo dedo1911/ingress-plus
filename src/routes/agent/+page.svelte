@@ -6,6 +6,7 @@
   import sortBy from 'lodash.sortby'
   import { slide } from 'svelte/transition'
   import zalgo from '$lib/zalgo'
+  import { toast } from '@zerodevx/svelte-toast'
 
   const thumbSize = (badgeSize) => {
     if (badgeSize <= 64) return '96x96'
@@ -43,11 +44,14 @@
   $: username = $authData?.baseModel?.username || ''
   $: newUsername = username
   const saveUsername = async () => {
-    $authData.baseModel.username = newUsername
+    const oldUsername = $authData.baseModel.username
     try {
+      $authData.baseModel.username = newUsername
       await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
     } catch (err) {
-      alert(err)
+      $authData.baseModel.username = oldUsername
+      console.error(username, err)
+      toast.push('An error has occurred.', { classes: [ 'errorToast' ]})
       return
     }
     editVisible = false
@@ -56,6 +60,16 @@
   $: factionLogo = $authData?.baseModel?.faction === 'machina'
     ? 'machina.png'
     : `${$authData?.baseModel?.faction || 'unaligned'}.svg`
+  
+  const copyProfileLink = async () => {
+    try {
+      await navigator.clipboard.writeText(`https://ingress.plus/agent/${newUsername}`)
+      toast.push('Copied to clipboard!', { classes: [ 'successToast' ]})
+    } catch (err) {
+      console.error(err)
+      toast.push('An error has occurred.', { classes: [ 'errorToast' ]})
+    }
+  }
 </script>
 
 <svelte:head>
@@ -83,7 +97,7 @@
     {#if $authData.baseModel.public}
       <p transition:slide class="publicNotice">
         Your profile is public and will be visible at:<br />
-        <span on:click={() => navigator.clipboard.writeText(`https://ingress.plus/agent/${newUsername}`)}>
+        <span on:click={copyProfileLink}>
           https://ingress.plus/agent/{newUsername}
         </span>
       </p>

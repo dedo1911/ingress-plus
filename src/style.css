@@ -47,4 +47,27 @@ a:hover {
   --color-faction-enlightened: #00b056;
   --color-faction-resistance: #00adef;
   --color-faction-machina: #ff2020;
+  
+  --toastBarHeight: 0;
+  --toastContainerTop: auto;
+  --toastContainerRight: auto;
+  --toastContainerBottom: 1rem;
+  --toastContainerLeft: calc(50vw - 8rem);
+  --toastWidth: 16rem
+}
+
+._toastItem {
+  max-width: 80vw;
+}
+
+._toastMsg {
+  text-align: center;
+}
+
+.successToast {
+  --toastBackground: #00b056;
+}
+
+.errorToast {
+  --toastBackground: #ff2020;
 }
