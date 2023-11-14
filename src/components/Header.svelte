@@ -30,6 +30,7 @@
     authData.set(pb.authStore)
     await refreshOwnedBadges()
   }
+  
   const logout = () => {
     menuOpen = false
     pb.authStore.clear()
@@ -44,7 +45,8 @@
 
   const refreshOwnedBadges = async () => ownedBadges.set(
     await pb.collection('user_badges').getFullList({
-      expand: 'badge,badge.category'
+      expand: 'badge,badge.category',
+      filter: `user="${pb.authStore.baseModel.id}"`,
     }))
 
   onMount(async () => {

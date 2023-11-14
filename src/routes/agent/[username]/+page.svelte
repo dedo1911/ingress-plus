@@ -1,8 +1,6 @@
 <script>
-  import { goto } from '$app/navigation'
-  import { browser } from '$app/environment'
   import { badgeSize } from '$lib/stores'
-  import { pb, serverAddress } from '$lib/pocketbase'
+  import { serverAddress } from '$lib/pocketbase'
   import sortBy from 'lodash.sortby'
   import { slide } from 'svelte/transition'
   import zalgo from '$lib/zalgo'
