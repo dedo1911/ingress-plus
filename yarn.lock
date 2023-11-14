@@ -251,10 +251,10 @@
   resolved "https://registry.yarnpkg.com/@sveltejs/adapter-static/-/adapter-static-2.0.3.tgz#616836c30bdce4d673a2e26c0f5ffbd5c1bc7c67"
   integrity sha512-VUqTfXsxYGugCpMqQv1U0LIdbR3S5nBkMMDmpjGVJyM6Q2jHVMFtdWJCkeHMySc6mZxJ+0eZK3T7IgmUCDrcUQ==
 
-"@sveltejs/kit@1.27.4":
-  version "1.27.4"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.27.4.tgz#2452045c9b61f309b70ae28092cec94e43327cac"
-  integrity sha512-Vxl8Jf0C1+/8i/slsxFOnwJntCBDLueO/O6GJ0390KUnyW3Zs+4ZiIinD+cEcYnJPQQ9CRzVSr9Bn6DbmTn4Dw==
+"@sveltejs/kit@1.27.6":
+  version "1.27.6"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-1.27.6.tgz#2feea84413205422887e01326d979edd9a982dff"
+  integrity sha512-GsjTkMbKzXdbeRg0tk8S7HNShQ4879ftRr0ZHaZfjbig1xQwG57Bvcm9U9/mpLJtCapLbLWUnygKrgcLISLC8A==
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^2.5.0"
     "@types/cookie" "^0.5.1"
@@ -1166,10 +1166,10 @@ svelte-timeago@^0.1.2:
   resolved "https://registry.yarnpkg.com/svelte-timeago/-/svelte-timeago-0.1.2.tgz#a72ef17a5783b395e8bbbfb6633f54ff0db6cb21"
   integrity sha512-+RcFlbbhrnPYdcp9hF5QbNasr2F8NRRLd6VmfK+c/l57WlCDEGI1rmOZQvxtLx2tYjevh/B9m/3RxfQT6X7Lqw==
 
-svelte@4.2.2:
-  version "4.2.2"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-4.2.2.tgz#07d42eefc1bce46e48d2056c5f11dc4cc1e06555"
-  integrity sha512-My2tytF2e2NnHSpn2M7/3VdXT4JdTglYVUuSuK/mXL2XtulPYbeBfl8Dm1QiaKRn0zoULRnL+EtfZHHP0k4H3A==
+svelte@4.2.3:
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-4.2.3.tgz#4e77f7d528a543a0d516af00bc9b3131f01a2721"
+  integrity sha512-sqmG9KC6uUc7fb3ZuWoxXvqk6MI9Uu4ABA1M0fYDgTlFYu1k02xp96u6U9+yJZiVm84m9zge7rrA/BNZdFpOKw==
   dependencies:
     "@ampproject/remapping" "^2.2.1"
     "@jridgewell/sourcemap-codec" "^1.4.15"
