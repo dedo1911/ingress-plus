@@ -27,7 +27,7 @@
     'expand.badge.sorting'
   ]).reverse()
 
-  $: if (browser && !$authData.isValid) goto('/')
+  $: if (browser && $authData.isValid === false) goto('/')
 
   const toggleFaction = async () => {
     $authData.baseModel.faction = $authData.baseModel.faction === 'enlightened' ? 'resistance' : 'enlightened'

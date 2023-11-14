@@ -4,6 +4,6 @@ export const badgeSize = writable(128)
 
 export const categories = writable([])
 
-export const authData = writable({ isValid: false })
+export const authData = writable({ isValid: null })
 
 export const ownedBadges = writable([])
