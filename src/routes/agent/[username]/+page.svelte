@@ -29,7 +29,7 @@
 </script>
 
 <svelte:head>
-    <title>Ingress Plus &middot; {publicUser?.username || 'Profile'}</title> 
+    <title>Ingress Plus &middot; {publicUser?.username || 'Agent Profile'}</title> 
 </svelte:head>
 
 <section bind:clientWidth={width} style="--badge-size: {$badgeSize}px">

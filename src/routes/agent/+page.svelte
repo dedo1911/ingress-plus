@@ -34,9 +34,16 @@
     await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
   }
 
-  let username = $authData?.baseModel?.username || ''
+  const togglePublic = async () => {
+    $authData.baseModel.public = !$authData.baseModel.public
+    await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+  }
+
+  let newUsername = ''
+  $: username = $authData?.baseModel?.username || ''
+  $: newUsername = username
   const saveUsername = async () => {
-    $authData.baseModel.username = username
+    $authData.baseModel.username = newUsername
     try {
       await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
     } catch (err) {
@@ -45,27 +52,42 @@
     }
     editVisible = false
   }
+
+  $: factionLogo = $authData?.baseModel?.faction === 'machina'
+    ? 'machina.png'
+    : `${$authData?.baseModel?.faction || 'unaligned'}.svg`
 </script>
 
 <svelte:head>
-    <title>Ingress Plus &middot; {$authData?.baseModel?.username || 'Profile'}</title> 
+    <title>Ingress Plus &middot; {username || 'Agent Profile'}</title> 
 </svelte:head>
 
 <section bind:clientWidth={width} style="--badge-size: {$badgeSize}px">
   {#if !editVisible}
     <h2 transition:slide style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" on:click={() => editVisible = true}>
       {#if $authData?.baseModel?.faction === 'machina'}
-        {zalgo($authData?.baseModel?.username || '')}
+        {zalgo(username)}
       {:else}
-        {$authData?.baseModel?.username || ''}
+        {username}
       {/if}
     </h2>
   {:else}
     <div transition:slide class="editbox">
-      <img src="/images/{$authData?.baseModel?.faction || 'unaligned'}.svg" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} on:click={toggleFaction} />
-      <input type="text" bind:value={username} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" />
-      <img src="/images/accept.svg" height="32" alt="Save" on:click={saveUsername} />
+      <img src="/images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} on:click={toggleFaction} />
+      <input type="text" bind:value={newUsername} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" />
+      <div class="actions">
+        <img src={$authData.baseModel.public ? '/images/public.svg':'/images/private.svg'} alt={$authData.baseModel.public ? 'Public' : 'Private'} height="32" on:click={togglePublic} />
+        <img src="/images/accept.svg" height="32" alt="Save" on:click={saveUsername} />
+      </div>
     </div>
+    {#if $authData.baseModel.public}
+      <p transition:slide class="publicNotice">
+        Your profile is public and will be visible at:<br />
+        <span on:click={() => navigator.clipboard.writeText(`https://ingress.plus/agent/${newUsername}`)}>
+          https://ingress.plus/agent/{newUsername}
+        </span>
+      </p>
+    {/if}
   {/if}
 
   <div class="badges">
@@ -102,6 +124,7 @@
   }
   div.editbox img {
     cursor: pointer;
+    margin-left: 1em;
   }
   input {
     font-size: 1.5em;
@@ -128,5 +151,17 @@
   }
   div.badges div:nth-child(even of div) {
     margin-left: calc(var(--badge-size) / 2);
+  }
+  p.publicNotice {
+    text-align: center;
+    color: var(--color-faction-unaligned)
+  }
+  p.publicNotice span {
+    border: 3px double #5e5a75;
+    border-radius: 8px;
+    display: inline-block;
+    padding: 1rem;
+    margin-top: 1rem;
+    cursor: pointer;
   }
 </style>

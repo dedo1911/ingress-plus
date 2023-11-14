@@ -78,8 +78,8 @@
         </a>
         <li on:click={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
         {#if $authData.isValid }
-        <a href="/profile">
-          <li class="{pathname === '/profile' ? 'active' : ''}">
+        <a href="/agent">
+          <li class="{pathname === '/agent' ? 'active' : ''}">
             <img src="/images/user.svg" alt="{$authData.model.username}" /> {$authData.baseModel.username}
           </li>
         </a>
@@ -99,8 +99,8 @@
       </a>
       <li on:click={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
       {#if $authData.isValid }
-        <a href="/profile">
-          <li class="{pathname === '/profile' ? 'active' : ''}">
+        <a href="/agent">
+          <li class="{pathname === '/agent' ? 'active' : ''}">
             <img src="/images/user.svg" alt="{$authData.model.username}" /> {$authData.baseModel.username}
           </li>
         </a>

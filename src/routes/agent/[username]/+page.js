@@ -15,5 +15,5 @@ export async function load({ params }) {
   } catch (err) {
     console.error(err)
   }
-  throw error(404, 'Profile not found')
+  throw error(404, 'Agent not found')
 }
