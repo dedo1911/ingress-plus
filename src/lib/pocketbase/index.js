@@ -1,7 +1,7 @@
-import { dev } from '$app/environment'
+import { dev, building } from '$app/environment'
 import PocketBase from 'pocketbase'
 
-export const serverAddress = dev
+export const serverAddress = dev || building
   ? 'https://ingress.plus'
   : window.location.origin
 
