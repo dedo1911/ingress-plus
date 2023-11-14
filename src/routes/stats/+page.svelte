@@ -2,14 +2,18 @@
   import { onMount } from 'svelte'
   import { pb, serverAddress } from '$lib/pocketbase'
   import TimeAgo from 'svelte-timeago/TimeAgo.svelte'
+  import zalgo from '$lib/zalgo'
 
-  let statistics, topBadges
+  let statistics, topBadges, topUsers
 
   onMount(async () => {
     statistics = (await pb.collection('statistics').getFullList())[0]
     topBadges = (await pb.collection('owned_badges').getList(1, 10, {
       sort: '-count',
       expand: 'badge'
+    })).items
+    topUsers = (await pb.collection('public_users_owned_badges').getList(1, 10, {
+      sort: '-count'
     })).items
   })
 
@@ -22,7 +26,7 @@
 
 <div class="page">
   <h1>Statistics</h1>
-  {#if !statistics || !topBadges}
+  {#if !statistics || !topBadges || !topUsers}
     <p>Loading...</p>
   {:else}
   <div class="stats">
@@ -42,6 +46,36 @@
       <span>Total owned badges:</span>
       <strong>{formatNumber(statistics.total_owned_badges)}</strong>
     </div>
+  </div>
+  <hr />
+  <h2>Agents with the most badges<br /><small>(public profiles only)</small></h2>
+  <div class="users">
+  {#each topUsers as topUser}
+    {@const factionLogo = topUser.faction === 'machina'
+      ? 'machina.png'
+      : `${topUser.faction || 'unaligned'}.svg`}
+    <div class="user">
+      <div class="icon">
+        <a href="/agent/{topUser.username}">
+          <img src={`/images/${factionLogo}`} height="32" alt={topUser.faction} />
+        </a>
+      </div>
+      <div class="title" style="color: var(--color-faction-{topUser.faction || 'unaligned'})">
+        <a href="/agent/{topUser.username}">
+          {#if topUser.faction === 'machina'}
+            {zalgo(topUser.username)}
+          {:else}
+            {topUser.username}
+          {/if}
+        </a>
+      </div>
+      <div class="count">
+        <a href="/agent/{topUser.username}">
+          {topUser.count}
+        </a>
+      </div>
+    </div>
+  {/each}
   </div>
   <hr />
   <h2>Most Owned Badges</h2>
@@ -65,36 +99,46 @@
 </div>
 
 <style>
+  small {
+    display: inline-block;
+    margin-top: 0.5rem;
+  }
   div.page {
     max-width: 1000px;
     margin: auto;
     padding: 0 1em;
     line-height: 1.2em;
   }
-  div.badges {
+  div.badges, div.users {
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
-  div.badge {
+  div.badge, div.user {
     width: 100%;
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
     margin-bottom: 1rem;
   }
-  div.badge div.icon {
+  div.icon {
     display: flex;
     flex-basis: 32px;
     justify-content: center;
   }
-  div.badge div.title {
+  div.title {
     display: flex;
     flex-grow: 1;
     margin-left: 2%;
     line-height: normal;
   }
-  div.badge div.count {
+  a {
+    color: unset;
+  }
+  a:hover {
+    font-weight: normal;
+  }
+  div.count {
     display: flex;
   }
   div.stats {
