@@ -65,7 +65,7 @@
 <header>
   <div>
     <a href="/">
-      <img src="/images/favicon.png" alt="Ingress" height="75" width="75" />
+      <img src='/images/favicon.png' alt='Ingress Plus' height="75" width="75" />
       <h1>Ingress Plus</h1>
     </a>
   </div>
@@ -73,6 +73,11 @@
     <span class:open={menuOpen} on:click={toggleMenu} />
     {#if menuOpen}
       <ul transition:slide>
+        <a href="/media">
+          <li class="{pathname === '/media' ? 'active' : ''}">
+            <img src="/images/mediagress.png" alt="Mediagress" /> Mediagress
+          </li>
+        </a>
         <a href="/stats">
           <li class="{pathname === '/stats' ? 'active' : ''}">
             <img src="/images/statistics.svg" alt="Statistics" /> Statistics
@@ -94,6 +99,11 @@
   </nav>
   <nav data-nav="large">
     <ul>
+      <a href="/media">
+        <li class="{pathname === '/media' ? 'active' : ''}">
+          <img src="/images/mediagress.png" alt="Mediagress" /> Mediagress
+        </li>
+      </a>
       <a href="/stats">
         <li class="{pathname === '/stats' ? 'active' : ''}">
           <img src="/images/statistics.svg" alt="Statistics" /> Statistics
@@ -204,7 +214,7 @@
     padding: 1em 0.5em;
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 1050px) {
     nav[data-nav="large"] {
       display: none;
     }

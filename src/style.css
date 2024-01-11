@@ -53,7 +53,20 @@ a:hover {
   --toastContainerRight: auto;
   --toastContainerBottom: 1rem;
   --toastContainerLeft: calc(50vw - 8rem);
-  --toastWidth: 16rem
+  --toastWidth: 16rem;
+
+  --sms-bg: rgba(14, 11, 28, 0.9);
+  --sms-border: 3px double #5e5a75;
+  --sms-padding: 0.25em 0.5em;
+  --sms-font-size: 1.25em;
+  --sms-width: 100%;
+  --sms-max-width: 100%;
+  --sms-options-bg: rgba(14, 11, 28, 0.9);
+  --sms-options-border: 3px double #5e5a75;
+  --sms-options-border-radius: 0 0 1ex 1ex;
+  --sms-li-active-bg: rgba(94, 90, 117, 0.25);
+  --sms-selected-bg: rgba(94, 90, 117, 0.25);
+  --sms-remove-btn-hover-color: var(--color-faction-unaligned);
 }
 
 ._toastItem {
@@ -71,3 +84,24 @@ a:hover {
 .errorToast {
   --toastBackground: #ff2020;
 }
+
+input[type=text], select {
+  font-size: 1.25em;
+  background: rgba(14, 11, 28, 0.9);
+  border: 3px double #5e5a75;
+  color: #FFFFFF;
+  border-radius: 8px;
+  padding: 0.25em 0.5em;
+  text-align: center;
+  min-width: 20px;
+}
+
+.level span { color: #FFFFFF }
+.level.level-1 { color: #D9DD1D; }
+.level.level-2 { color: #FFB01C; }
+.level.level-3 { color: #FF8733; }
+.level.level-4 { color: #FF632C; }
+.level.level-5 { color: #C80431; }
+.level.level-6 { color: #FF0E82; }
+.level.level-7 { color: #B400FF; }
+.level.level-8 { color: #5200FF; }

@@ -140,17 +140,7 @@
     cursor: pointer;
     margin-left: 1em;
   }
-  input {
-    font-size: 1.5em;
-    background: rgba(14, 11, 28, 0.9);
-    border: 3px double #5e5a75;
-    border-radius: 8px;
-    padding: 0.25em 0.5em;
-    text-align: center;
-    min-width: 20px;
-    margin: 0 0.5em;
-  }
-	section {
+  section {
     max-width: 1200px;
     margin: auto;
   }

@@ -9,19 +9,22 @@
 		"lint": "eslint ."
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "2.1.1",
-		"@sveltejs/adapter-static": "^2.0.3",
-		"@sveltejs/kit": "1.27.6",
-		"eslint": "8.53.0",
-		"eslint-plugin-svelte": "2.35.0",
-		"svelte": "4.2.3",
-		"vite": "4.5.0"
+		"@sveltejs/adapter-auto": "3.1.0",
+		"@sveltejs/adapter-static": "3.0.1",
+		"@sveltejs/kit": "2.3.0",
+		"@sveltejs/vite-plugin-svelte": "^3.0.1",
+		"eslint": "8.56.0",
+		"eslint-plugin-svelte": "2.35.1",
+		"svelte": "4.2.8",
+		"svelte-multiselect": "^10.2.0",
+		"svelte-time": "^0.8.2",
+		"vite": "5.0.11"
 	},
 	"type": "module",
 	"dependencies": {
 		"@zerodevx/svelte-toast": "^0.9.5",
 		"lodash.sortby": "^4.7.0",
-		"pocketbase": "0.19.0",
+		"pocketbase": "0.20.1",
 		"svelte-timeago": "^0.1.2"
 	}
 }

@@ -4,17 +4,26 @@
   import TimeAgo from 'svelte-timeago/TimeAgo.svelte'
   import zalgo from '$lib/zalgo'
 
-  let statistics, topBadges, topUsers
+  let statistics, topBadges, topUsers, topMediaUsers
 
   onMount(async () => {
-    statistics = (await pb.collection('statistics').getFullList())[0]
-    topBadges = (await pb.collection('owned_badges').getList(1, 10, {
-      sort: '-count',
-      expand: 'badge'
-    })).items
-    topUsers = (await pb.collection('public_users_owned_badges').getList(1, 10, {
-      sort: '-count'
-    })).items
+    const s = await Promise.all([
+      pb.collection('statistics').getFullList(), // statistics
+      pb.collection('owned_badges').getList(1, 10, {
+        sort: '-count',
+        expand: 'badge'
+      }), // topBadges
+      pb.collection('public_users_owned_badges').getList(1, 10, {
+        sort: '-count'
+      }), // topUsers
+      pb.collection('media_users').getList(1, 10, {
+        sort: '-count'
+      }), // topMediaUsers
+    ])
+    statistics = s[0][0]
+    topBadges = s[1].items
+    topUsers = s[2].items
+    topMediaUsers = s[3].items
   })
 
   const formatNumber = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -26,7 +35,7 @@
 
 <div class="page">
   <h1>Statistics</h1>
-  {#if !statistics || !topBadges || !topUsers}
+  {#if !statistics || !topBadges || !topUsers || !topMediaUsers}
     <p>Loading...</p>
   {:else}
   <div class="stats">
@@ -45,6 +54,10 @@
     <div class="stat">
       <span>Total owned badges:</span>
       <strong>{formatNumber(statistics.total_owned_badges)}</strong>
+    </div>
+    <div class="stat">
+      <span>Total media:</span>
+      <strong>{formatNumber(statistics.total_media)}</strong>
     </div>
   </div>
   <hr />
@@ -91,6 +104,35 @@
           </div>
           <div class="count">
             <strong>{formatNumber(badge.count)}</strong>
+          </div>
+        </div>
+      {/each}
+    </div><hr />
+    <h2>Agents that have uploaded the most media</h2>
+    <div class="users">
+      {#each topMediaUsers as topUser}
+        {@const factionLogo = topUser.faction === 'machina'
+                ? 'machina.png'
+                : `${topUser.faction || 'unaligned'}.svg`}
+        <div class="user">
+          <div class="icon">
+            <a href="/agent/{topUser.username}">
+              <img src={`/images/${factionLogo}`} height="32" alt={topUser.faction} />
+            </a>
+          </div>
+          <div class="title" style="color: var(--color-faction-{topUser.faction || 'unaligned'})">
+            <a href="/agent/{topUser.username}">
+              {#if topUser.faction === 'machina'}
+                {zalgo(topUser.username)}
+              {:else}
+                {topUser.username}
+              {/if}
+            </a>
+          </div>
+          <div class="count">
+            <a href="/agent/{topUser.username}">
+              {topUser.count}
+            </a>
           </div>
         </div>
       {/each}
