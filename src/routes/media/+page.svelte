@@ -24,10 +24,10 @@
             filter.push(`(short_description ~ '${searchFilter}' || description ~ '${searchFilter}')`)
         }
         if (topicsFilter.length > 0) {
-            filter.push(`(${topicsFilter.map(t => `topic ~ '${t.value}'`).join(' || ')})`)
+            filter.push(`(${topicsFilter.map(t => `topic ~ '${t.value}'`).join(' && ')})`)
         }
         if (destinationsFilter.length > 0) {
-            filter.push(`(${destinationsFilter.map(t => `destination ~ '${t.value}'`).join(' || ')})`)
+            filter.push(`(${destinationsFilter.map(t => `destination ~ '${t.value}'`).join(' && ')})`)
         }
         if (filter.length > 0) {
             options.filter = filter.join(' && ')
