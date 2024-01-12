@@ -78,7 +78,7 @@
 
 <div class="container">
     <div class="search">
-        <div>
+        <div style="min-width: 270px">
             <input type="text" bind:value={searchFilter} on:change={executeSearch} placeholder="Search..." />
         </div>
         <div>
@@ -145,7 +145,6 @@
     }
     div.search div {
         flex: calc(50% - .5em);
-        flex-grow: 1;
         margin: .25em;
     }
     p.empty {

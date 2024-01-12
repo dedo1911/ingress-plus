@@ -2,13 +2,13 @@
 <section>
     <div class="header">
         <a href="/media">
-            <img src='/images/mediagress.png' alt='Mediagress' height="75" width="75" />
+            <img src='/images/mediagress.png' alt='Mediagress' height="75" width="75" style="margin-right: 1em" />
             <h1>Mediagress</h1>
         </a>
         <div>
             <a href="/media/upload">
                 Upload new media
-                <img src="/images/upload.svg" alt="Upload" height="32" />
+                <img src="/images/upload.svg" alt="Upload" height="32" style="margin-left: 1em" />
             </a>
         </div>
     </div>
@@ -20,11 +20,10 @@
     div, a {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        margin: 1.5em 0;
+        justify-content: space-around;
     }
-    img {
-        margin: 0 1em;
+    div.header {
+        flex-wrap: wrap;
     }
     h1 {
         font-size: 2em;
