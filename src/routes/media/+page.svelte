@@ -81,7 +81,7 @@
         <div style="min-width: 270px">
             <input type="text" bind:value={searchFilter} on:change={executeSearch} placeholder="Search..." />
         </div>
-        <div>
+        <div style="min-width: 270px">
             <select bind:value={sorting} on:change={executeSearch}>
                 <option value="-released_at">Release (Newest first)</option>
                 <option value="released_at">Release (Oldest first)</option>
