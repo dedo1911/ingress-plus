@@ -10,15 +10,10 @@
     const s = await Promise.all([
       pb.collection('statistics').getFullList(), // statistics
       pb.collection('owned_badges').getList(1, 10, {
-        sort: '-count',
         expand: 'badge'
       }), // topBadges
-      pb.collection('public_users_owned_badges').getList(1, 10, {
-        sort: '-count'
-      }), // topUsers
-      pb.collection('media_users').getList(1, 10, {
-        sort: '-count'
-      }), // topMediaUsers
+      pb.collection('public_users_owned_badges').getList(1, 10), // topUsers
+      pb.collection('media_users').getList(1, 10), // topMediaUsers
     ])
     statistics = s[0][0]
     topBadges = s[1].items
@@ -108,7 +103,7 @@
         </div>
       {/each}
     </div><hr />
-    <h2>Agents that have uploaded the most media</h2>
+    <h2>Agents that have uploaded the most media<br /><small>(public profiles only)</small></h2>
     <div class="users">
       {#each topMediaUsers as topUser}
         {@const factionLogo = topUser.faction === 'machina'
