@@ -116,9 +116,10 @@
     background: rgba(94, 90, 117, 0.25) url("/images/external.svg") no-repeat 0.5em center;
     background-size: 16px;
     padding: .5em 1em .5em 2em;
-    margin: 1.5em 0;
+    margin: .25em;
     border-radius: 4px;
     transition: all 250ms ease-in-out;
+    display: inline-block;
   }
   p.link a:hover {
     background-color: rgba(94, 90, 117, 0.75);
@@ -127,10 +128,8 @@
   p.topic span {
     background: rgba(94, 90, 117, 0.25);
     padding: .5em 1em;
-    margin: 1.5em .25em;
+    margin: .25em;
     border-radius: 4px;
-  }
-  p.topic span:first-child {
-    margin-left: 0;
+    display: inline-block;
   }
 </style>
