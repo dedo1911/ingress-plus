@@ -51,8 +51,12 @@
       <strong>{formatNumber(statistics.total_owned_badges)}</strong>
     </div>
     <div class="stat">
-      <span>Total media:</span>
-      <strong>{formatNumber(statistics.total_media)}</strong>
+      <span>Estimated total media:</span>
+      <strong>{formatNumber(statistics.estimate_total_media)}</strong>
+    </div>
+    <div class="stat">
+      <span>Collected media:</span>
+      <strong>{formatNumber(statistics.total_media)} <small>(≈ {parseInt(statistics.total_media / statistics.estimate_total_media * 1000)/10} %)</small></strong>
     </div>
   </div>
   <hr />
@@ -103,7 +107,7 @@
         </div>
       {/each}
     </div><hr />
-    <h2>Agents that have uploaded the most media<br /><small>(public profiles only)</small></h2>
+    <h2>Agents that have discovered the most media<br /><small>(public profiles only)</small></h2>
     <div class="users">
       {#each topMediaUsers as topUser}
         {@const factionLogo = topUser.faction === 'machina'
@@ -139,6 +143,9 @@
   small {
     display: inline-block;
     margin-top: 0.5rem;
+  }
+  strong small {
+    margin-top: 0;
   }
   div.page {
     max-width: 1000px;
@@ -193,9 +200,7 @@
   p {
     text-align: justify;
   }
-  h1,
-  h2,
-  h3 {
+  h1, h2 {
     text-align: center;
   }
 </style>
