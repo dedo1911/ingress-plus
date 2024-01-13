@@ -55,7 +55,9 @@
     <hr />
     <p class="topic">
       {#each media.expand.topic as topic}
-        <span>{topic.name}</span>
+        <a href={`/media?t=${topic.id}`}>
+          {topic.name}
+        </a>
       {/each}
     </p>
   </div>
@@ -112,7 +114,7 @@
     align-items: center;
     justify-content: center;
   }
-  p.link a {
+  a {
     background: rgba(94, 90, 117, 0.25) url("/images/external.svg") no-repeat 0.5em center;
     background-size: 16px;
     padding: .5em 1em .5em 2em;
@@ -121,15 +123,12 @@
     transition: all 250ms ease-in-out;
     display: inline-block;
   }
-  p.link a:hover {
-    background-color: rgba(94, 90, 117, 0.75);
-    color: #ffffff;
-  }
-  p.topic span {
+  p.topic a {
     background: rgba(94, 90, 117, 0.25);
     padding: .5em 1em;
-    margin: .25em;
-    border-radius: 4px;
-    display: inline-block;
+  }
+  a:hover, p.topic a:hover {
+    background-color: rgba(94, 90, 117, 0.75);
+    color: #ffffff;
   }
 </style>
