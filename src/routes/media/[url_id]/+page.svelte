@@ -19,8 +19,10 @@
 </svelte:head>
 
 <div class="media-data">
-  <div class="image" style="background-image: url('{media.image_url.replace('http://', 'https://')}" />
-  <div>
+  <div class="image">
+    <img src={media.image_url.replace('http://', 'https://')} alt={media.short_description} />
+  </div>
+  <div style="max-width: 512px">
     <h2>{media.short_description}</h2>
     <div class="user">
       <div>
@@ -79,14 +81,15 @@
     margin: 1em;
     align-items: center;
     justify-content: center;
+    flex-wrap: wrap;
   }
-  div.image {
-    height: 256px;
-    width: 256px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+  div.image img {
+    min-width: 64px;
+    min-height: 64px;
+    max-height: 256px;
+    max-width: 256px;
     margin: 1em;
+    border-radius: 12px;
   }
   a {
     color: unset;
@@ -108,6 +111,9 @@
     display: flex;
     margin-left: 2%;
     line-height: normal;
+  }
+  p {
+    text-align: center;
   }
   p.description {
     font-size: 1.25rem;
