@@ -114,7 +114,7 @@
     align-items: center;
     justify-content: center;
   }
-  a {
+  p.topic a, p.link a {
     background: rgba(94, 90, 117, 0.25) url("/images/external.svg") no-repeat 0.5em center;
     background-size: 16px;
     padding: .5em 1em .5em 2em;
@@ -127,7 +127,7 @@
     background: rgba(94, 90, 117, 0.25);
     padding: .5em 1em;
   }
-  a:hover, p.topic a:hover {
+  p.link a:hover, p.topic a:hover {
     background-color: rgba(94, 90, 117, 0.75);
     color: #ffffff;
   }
