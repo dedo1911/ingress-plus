@@ -26,7 +26,7 @@
     <h2>{media.short_description}</h2>
     <div class="user">
       <div>
-        Uploaded by:
+        Discovered by:
       </div>
       <div class="icon">
         <a href="/agent/{media.uploader_ign}">
