@@ -15,7 +15,13 @@
 </script>
 
 <svelte:head>
-    <title>Ingress Plus &middot; {media?.short_description || 'Media'}</title>
+  <title>Ingress Plus &middot; {media?.short_description || 'Media'}</title>
+  <meta property="og:title" content={media?.short_description || 'Media'}>
+  <meta property="og:site_name" content="Ingress Plus">
+  <meta property="og:url" content={media ? `https://ingress.plus/media/${media.url_id}` : ''}>
+  <meta property="og:description" content={media?.description || ''}>
+  <meta property="og:type" content="article">
+  <meta property="og:image" content={media?.image_url?.replace('http://', 'https://') || ''}>
 </svelte:head>
 
 <div class="media-data">
