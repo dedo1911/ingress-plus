@@ -1,12 +1,9 @@
-import adapter from '@sveltejs/adapter-static'
+import adapter from '@sveltejs/adapter-node'
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
-		adapter: adapter({
-      prerender: { entries: [] },
-      fallback: "index.html"
-    })
+        adapter: adapter()
 	}
 }
 
