@@ -131,7 +131,7 @@
     {/if}
     <div class="paginator">
         <img class:disabled={page <= 1} src="/images/left.svg" on:click={prevPage} alt="Previous Page" />
-        Page {page} of {totalPages} (Total Medias: {totalItems})
+        Page {page} of {totalPages} (Total Media: {totalItems})
         <img class:disabled={page >= totalPages} src="/images/right.svg" on:click={nextPage} alt="Next Page" />
     </div>
     <div class="page-options">
