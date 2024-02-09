@@ -78,13 +78,11 @@
       height={$badgeSize * 2}
       width={$badgeSize * 2}
       alt={title}
-      src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge
-        .image[tier]}?thumb={$badgeSize * 2}x{$badgeSize * 2}"
+      src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize * 2}x{$badgeSize * 2}"
     />
     <a
       title="Download"
-      href="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge
-        .image[tier]}?download=true"
+      href="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?download=true"
     >
       <img src="/images/download.svg" alt="Download" height="32" width="32" />
     </a>

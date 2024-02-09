@@ -3,7 +3,6 @@
   import Badge from './Badge.svelte'
 
   export let category
-  export let index
   export let width
 
   let badgesPerRow = 1
@@ -12,7 +11,6 @@
   let tiers = []
 
   $: width
-  $: index
   $: tiers = category.tiers.split(',').filter(t => t)
   $: hasTiers = tiers.length > 0
   $: badgesPerRow = hasTiers
@@ -29,7 +27,7 @@
     {#each {length: rows} as _, r}
       <div>
       {#each {length: badgesPerRow} as _, c}
-        <Badge categoryIndex={index} index={r * badgesPerRow + c} />
+        <Badge category={category} index={r * badgesPerRow + c} />
       {/each}
       </div>
     {/each}

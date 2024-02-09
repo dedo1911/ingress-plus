@@ -1,9 +1,9 @@
 <script>
   import { serverAddress } from '$lib/pocketbase'
-  import { ownedBadges, categories, badgeSize } from '$lib/stores'
+  import { ownedBadges, badgeSize, siteSettings } from '$lib/stores'
   import BadgeModal from './BadgeModal.svelte'
 
-  export let categoryIndex
+  export let category
   export let index
 
   const thumbSize = (badgeSize) => {
@@ -13,15 +13,13 @@
   }
 
   let badge = {}
-  let category = {}
   let hasTiers = false
   let tiers = []
   let tier = 0
   let title = ''
   let showModal = false
-  
+
   $: index
-  $: category = $categories[categoryIndex]
   $: tiers = category.tiers.split(',').filter(t => t)
   $: hasTiers = tiers.length > 0
   $: badge = hasTiers
@@ -45,7 +43,7 @@
 
 {#if badge }
   <span on:click={onBadgeClick} on:keydown={onBadgeKeydown} role='button' tabindex='0'>
-    <img height="{$badgeSize}" width="{$badgeSize}" alt="{title}" class:owned={owned}
+    <img height="{$badgeSize}" width="{$badgeSize}" alt="{title}" class:opaque={$siteSettings.opaqueOwned ? owned : !owned}
     src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={thumbSize($badgeSize)}" />
   </span>
   <BadgeModal bind:showModal {badge} {tier} {owned} {title} />
@@ -58,7 +56,7 @@
     transition: opacity 0.3s ease-in-out;
     opacity: 1;
   }
-  img.owned {
+  img.opaque {
     opacity: 0.1;
   }
 </style>

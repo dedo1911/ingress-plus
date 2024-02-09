@@ -7,3 +7,8 @@ export const categories = writable([])
 export const authData = writable({ isValid: null })
 
 export const ownedBadges = writable([])
+
+export const siteSettings = writable({
+    opaqueOwned: true,
+    showUnobtainable: true
+})
