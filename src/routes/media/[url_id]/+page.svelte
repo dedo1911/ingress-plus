@@ -1,8 +1,4 @@
 <script>
-  import { badgeSize } from '$lib/stores'
-  import { serverAddress } from '$lib/pocketbase'
-  import sortBy from 'lodash.sortby'
-  import { slide } from 'svelte/transition'
   import zalgo from '$lib/zalgo'
   import Time from "svelte-time";
 
@@ -16,12 +12,20 @@
 
 <svelte:head>
   <title>Ingress Plus &middot; {media?.short_description || 'Media'}</title>
-  <meta property="og:title" content={media?.short_description || 'Media'}>
+
   <meta property="og:site_name" content="Ingress Plus">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content={`Mediagress: ${media?.short_description || 'Media'}`}>
   <meta property="og:url" content={media ? `https://ingress.plus/media/${media.url_id}` : ''}>
-  <meta property="og:description" content={media?.description || ''}>
-  <meta property="og:type" content="article">
+  <meta property="og:description" content={(media?.description || '').replace(/(<([^>]+)>)/gi, '')}>
   <meta property="og:image" content={media?.image_url?.replace('http://', 'https://') || ''}>
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:domain" content="ingress.plus">
+  <meta property="twitter:url" content={media ? `https://ingress.plus/media/${media.url_id}` : ''}>
+  <meta name="twitter:title" content={`Mediagress: ${media?.short_description || 'Media'}`}>
+  <meta name="twitter:description" content={(media?.description || '').replace(/(<([^>]+)>)/gi, '')}>
+  <meta name="twitter:image" content={media?.image_url?.replace('http://', 'https://') || ''}>
 </svelte:head>
 
 <div class="media-data">
