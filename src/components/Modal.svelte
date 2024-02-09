@@ -2,19 +2,19 @@
 	export let showModal
 
 	let dialog
-  
+
 	$: if (dialog) {
     if (showModal) dialog.showModal()
     else dialog.close()
   }
-  $: document.getElementsByTagName('body')[0].style.overflow = showModal
+  /*$: document.getElementsByTagName('body')[0].style.overflow = showModal
     ? 'hidden'
-    : 'auto'
+    : 'auto'*/
 </script>
 
 {#if showModal}
   <dialog
-    bind:this={dialog}  
+    bind:this={dialog}
     on:close={() => (showModal = false)}
     on:click|self={() => dialog.close()}
   >

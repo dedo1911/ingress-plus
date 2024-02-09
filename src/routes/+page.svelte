@@ -1,28 +1,13 @@
 <script async>
-  import { onMount } from 'svelte'
-  import { pb } from '$lib/pocketbase'
   import { categories, badgeSize } from '$lib/stores'
-  import sortBy from 'lodash.sortby'
-
   import Category from '../components/Category.svelte'
 
-  onMount(async () => {
-    const items = await pb.collection('categories').getFullList({
-      sort: '-sorting',
-      expand: 'badges(category)'
-    })
-    categories.set(items.map(i => {
-      const r = { ...i, badges: i.expand ? sortBy(i.expand['badges(category)'] || []).reverse() : [] }
-      delete r.expand
-      return r
-    }))
-  })
-  let width
+  let width = 1024
   $: badgeSize.set(Math.min(128, width / 7))
 </script>
 
 <svelte:head>
-    <title>Ingress Plus</title> 
+    <title>Ingress Plus</title>
 </svelte:head>
 
 <section bind:clientWidth={width}>

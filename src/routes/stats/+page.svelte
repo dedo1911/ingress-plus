@@ -1,33 +1,21 @@
-<script async>
-  import { onMount } from 'svelte'
-  import { pb, serverAddress } from '$lib/pocketbase'
+<script>
+  import { serverAddress } from '$lib/pocketbase'
   import TimeAgo from 'svelte-timeago/TimeAgo.svelte'
   import zalgo from '$lib/zalgo'
 
-  let statistics, topBadges, topUsers, topMediaUsers, topMediaUploads
-
-  onMount(async () => {
-    const s = await Promise.all([
-      pb.collection('statistics').getFullList(), // statistics
-      pb.collection('owned_badges').getList(1, 10, {
-        expand: 'badge'
-      }), // topBadges
-      pb.collection('public_users_owned_badges').getList(1, 10), // topUsers
-      pb.collection('media_users').getList(1, 10), // topMediaUsers
-      pb.collection('top_media_uploads').getList(1, 10), // topMediaUsers
-    ])
-    statistics = s[0][0]
-    topBadges = s[1].items
-    topUsers = s[2].items
-    topMediaUsers = s[3].items
-    topMediaUploads = s[4].items
-  })
+  export let data;
+  $: s = data.statistics
+  $: statistics = s[0][0]
+  $: topBadges = s[1].items
+  $: topUsers = s[2].items
+  $: topMediaUsers = s[3].items
+  $: topMediaUploads = s[4].items
 
   const formatNumber = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 </script>
 
 <svelte:head>
-    <title>Ingress Plus &middot; Statistics</title> 
+    <title>Ingress Plus &middot; Statistics</title>
 </svelte:head>
 
 <div class="page">
