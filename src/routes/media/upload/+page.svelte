@@ -14,7 +14,7 @@
         DOWNLOAD PLUGIN
     </a>
 
-    <p>If you still have the old plugin from mediagress.net installed, you can either update it or, if that is not possible, delete it before installing the new version from here. Updating the old plugin is not possible via the link above and has to be done via the add-on you use for plugins (Tampermonkey etc.). Future updates from here will be compatible after it.</p>
+    <p><b>Mediagress.net users:</b> If you still have the old plugin from mediagress.net installed, you should uninstall it before reinstalling the plugin from this site.</p>
 
     <h2>Usage</h2>
     <p><span style="color: #FFFFFF; text-decoration:underline">You need to have an active C.O.R.E. subscription</span> as the plugin needs to access your inventory from the Intel map.</p>
@@ -45,7 +45,7 @@
     <p class="question">What does the message "No new media has been found in your inventory." mean?</p>
     <p class="answer">Since your last upload, no new media has been found in your capsules compared to the last upload. If you have new media, make sure that it has been loaded into a capsule and try again in 5 minutes.</p>
     <p class="question">I have another question!</p>
-    <p class="answer">Join us in our Telegram group where we'll answer any questions that might come up <a href="https://t.me/Mediagress" target="_blank">with this link</a>.</p>
+    <p class="answer">Join us in our @Mediagress Telegram group where we'll answer any questions that might come up <a href="https://t.me/Mediagress" target="_blank">with the link in this channel</a>.</p>
 </div>
 
 <style>
