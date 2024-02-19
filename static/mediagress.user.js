@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name IITC Plugin: Mediagress
 // @category Misc
-// @version 1.0.0
+// @version 1.0.1
 // @namespace https://ingress.plus
 // @downloadURL https://ingress.plus/mediagress.user.js
 // @updateURL https://ingress.plus/mediagress.user.js
@@ -113,23 +113,23 @@ function wrapper(pluginInfo) {
     try {
       const { uploadedIds, lastUploadTimestamp } = getSettings();
       if (lastUploadTimestamp > Date.now() - 1000 * 60 * 5) {
-        return alert('Try again in 5 minutes');
+        return alert('You recently tried to upload media from your inventory. Niantic rate-limits inventory requests if they happen too quickly, so to ensure that you don\'t hit that limit, please try again in 5 minutes!');
       }
       if (!(await getHasActiveSubscription()).result) {
-        return alert('Your inventory is only available on Intel if you have an active C.O.R.E. subscription :c')
+        return alert('Your inventory is only available on Intel if you have an active C.O.R.E. subscription. Without it, you cannot upload media :c Please subscribe to C.O.R.E. in the Ingress app and then return here!')
       }
       const rawInventory = await getInventory();
       const mediaOutsideCapsulesCount = getCountOfMediaOutsideCapsules(rawInventory);
       // todo use dialog?
       if (mediaOutsideCapsulesCount > 0
-        && !confirm(`You have ${mediaOutsideCapsulesCount} Media outside of capsules; these won't be uploaded. Do you wish to proceed?`)) {
+        && !confirm(`You currently have ${mediaOutsideCapsulesCount} Media that are not loaded into a capsule; these won't be uploaded. Do you wish to proceed?`)) {
         return;
       }
       const medias = getMediaFromRawInventory(rawInventory);
       const filteredMedia = medias.filter((item) => !uploadedIds.flat().includes(item.storyItem.mediaId));
       if (!filteredMedia.length) {
         console.log('No new media to upload, skipping');
-        alert('No new media has been found in your inventory.');
+        alert('No new media has been found in your inventory since your last upload attempt. Make sure that you have loaded new Media into a Capsule and try again in 5 minutes!');
         saveSettings({
           lastUploadTimestamp: Date.now(),
         });
@@ -145,7 +145,7 @@ function wrapper(pluginInfo) {
       if (response.ok) {
         const responseBody = await response.json();
         if (responseBody.previouslyUnknownMediaCount) {
-          alert(`${filteredMedia.length} media have been uploaded, of which ${responseBody.previouslyUnknownMediaCount} were new! Please give us some time to approve and categorize them before they appear on the website.`);
+          alert(`${filteredMedia.length} media have been uploaded, and ${responseBody.previouslyUnknownMediaCount} were new! Please give us some time to approve and categorize them before they appear on the website.`);
         } else {
           alert(`${filteredMedia.length} media have been uploaded. Sadly, none of them were new, but we thank you for your contribution none the less!`);
         }
@@ -155,8 +155,10 @@ function wrapper(pluginInfo) {
         });
         return;
       }
-      console.error(`Error making request to Mediagress: ${response.status} ${await response.text()}`);
-      alert('Error :C please contact the developers at https://t.me/Mediagress');
+      const responseText = await response.text
+      console.error(`Error making request to Mediagress: ${response.status} ${responseText}`);
+      alert(`There has been an error! Please contact the developers at https://t.me/Mediagress.\n\nError code: ${response.status}`);
+      //TODO: get ${responseText} to work; I am just a noob that gets by using google :(
       return;
     } catch (e) {
       alert('Failed to get inventory data from Intel. Try again in a moment');
