@@ -13,6 +13,9 @@
 // @grant none
 // ==/UserScript==
 
+// Changelog 1.0.1
+// Edited strings to make process of uploading clearer as well as giving a better understanding of errors when they happen
+
 // shout out to https://github.com/EisFrei/ and his Live Inventory plugin
 
 function wrapper(pluginInfo) {
@@ -155,10 +158,9 @@ function wrapper(pluginInfo) {
         });
         return;
       }
-      const responseText = await response.text
-      console.error(`Error making request to Mediagress: ${response.status} ${responseText}`);
-      alert(`There has been an error! Please contact the developers at https://t.me/Mediagress.\n\nError code: ${response.status}`);
-      //TODO: get ${responseText} to work; I am just a noob that gets by using google :(
+      console.error(`Error making request to Mediagress: ${response.status} ${await response.text()}`);
+      alert('Error :C please contact the developers at https://t.me/Mediagress');
+      //TODO: add response code and text to alert so users can just screenshot it instead of going into the console
       return;
     } catch (e) {
       alert('Failed to get inventory data from Intel. Try again in a moment');
