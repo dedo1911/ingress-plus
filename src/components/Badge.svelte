@@ -1,6 +1,6 @@
 <script>
   import { serverAddress } from '$lib/pocketbase'
-  import { ownedBadges, badgeSize, siteSettings } from '$lib/stores'
+  import { authData, ownedBadges, badgeSize, siteSettings } from '$lib/stores'
   import BadgeModal from './BadgeModal.svelte'
 
   export let category
@@ -39,11 +39,13 @@
   const onBadgeKeydown = (e) => {
     if (e.key === 'Escape') showModal = false
   }
+
+  $: opaque = $authData.isValid ? ($siteSettings.opaqueOwned ? owned : !owned) : false
 </script>
 
 {#if badge }
   <span on:click={onBadgeClick} on:keydown={onBadgeKeydown} role='button' tabindex='0'>
-    <img height="{$badgeSize}" width="{$badgeSize}" alt="{title}" class:opaque={$siteSettings.opaqueOwned ? owned : !owned}
+    <img height="{$badgeSize}" width="{$badgeSize}" alt="{title}" class:opaque={opaque}
     src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={thumbSize($badgeSize)}" />
   </span>
   <BadgeModal bind:showModal {badge} {tier} {owned} {title} />

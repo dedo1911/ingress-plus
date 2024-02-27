@@ -1,6 +1,6 @@
 <script async>
-  import { slide } from 'svelte/transition'
-  import {categories, badgeSize, siteSettings, authData} from '$lib/stores'
+  import { fly } from 'svelte/transition'
+  import { categories, badgeSize, siteSettings, authData } from '$lib/stores'
   import Category from '../components/Category.svelte'
 
   let width = 1024
@@ -29,18 +29,18 @@
 </svelte:head>
 
 <section bind:clientWidth={width}>
-  {#if $authData.isValid === true}
-    <div class="controls" transition:slide>
+    <div class="controls">
       <button on:click={toggleSiteSettings('showUnobtainable')}>
         <img src={`/images/${$siteSettings.showUnobtainable ? 'hide' : 'show'}.svg`} height="24" alt="Show unobtainable badges" />
         {$siteSettings.showUnobtainable ? 'Hide' : 'Show'} unobtainable badges
       </button>
-      <button on:click={toggleSiteSettings('opaqueOwned')}>
-        <img src="/images/shuffle.svg" height="24" alt="Invert highlights" />
-        Highlight {$siteSettings.opaqueOwned ? 'obtained' : 'unobtained'}
-      </button>
+      {#if $authData.isValid === true}
+        <button on:click={toggleSiteSettings('opaqueOwned')} transition:fly={{ x: 50, duration: 500 }}>
+          <img src="/images/shuffle.svg" height="24" alt="Invert highlights" />
+          Highlight {$siteSettings.opaqueOwned ? 'obtained' : 'unobtained'}
+        </button>
+      {/if}
     </div>
-  {/if}
 
   {#each badgeCategories as category}
     {#if category.badges.length > 0 }

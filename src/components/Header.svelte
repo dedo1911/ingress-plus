@@ -1,7 +1,7 @@
 <script>
   import { afterNavigate } from '$app/navigation'
   import { onMount } from 'svelte'
-  import { slide } from 'svelte/transition'
+  import { slide, fly } from 'svelte/transition'
   import { pb } from '$lib/pocketbase'
   import { authData, ownedBadges } from '$lib/stores'
 
@@ -19,7 +19,7 @@
           w.location.href = url
       }
     })
-    
+
     if (pb.authStore.isValid) {
       // Update username and avatar
       user.record.avatar = user.meta.avatarUrl
@@ -30,14 +30,14 @@
     authData.set(pb.authStore)
     await refreshOwnedBadges()
   }
-  
+
   const logout = () => {
     menuOpen = false
     pb.authStore.clear()
     authData.set({ isValid: false })
     ownedBadges.set([])
   }
-  
+
   const openTelegram = () => {
     menuOpen = false
     window.location.href = "https://t.me/Ingress_Plus"
@@ -111,14 +111,18 @@
       </a>
       <li on:click={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
       {#if $authData.isValid }
-        <a href="/agent">
+        <a href="/agent" transition:fly={{ y: 50, duration: 500 }}>
           <li class="{pathname === '/agent' ? 'active' : ''}">
             <img src="/images/user.svg" alt="{$authData.model.username}" /> {$authData.baseModel.username}
           </li>
         </a>
-        <li on:click={logout}><img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout</li>
+        <li on:click={logout} transition:fly={{ y: 50, duration: 500 }}>
+          <img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout
+        </li>
       {:else}
-        <li on:click={login}><img src="/images/user.svg" alt="Login" /> Login</li>
+        <li on:click={login}>
+          <img src="/images/user.svg" alt="Login" /> Login
+        </li>
       {/if}
     </ul>
   </nav>
