@@ -1,3 +1,7 @@
+User-agent: ADA
+User-agent: Omnivore
+Disallow: /
+
 User-Agent: *
 Allow: /
 Disallow: /_
