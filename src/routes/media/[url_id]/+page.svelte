@@ -43,13 +43,12 @@
           <img src={`/images/${factionLogo}`} height="32" alt={media.uploader_faction} />
         </a>
       </div>
-    <div class="title" style="color: var(--color-faction-{media.uploader_faction.toLowerCase() || 'unaligned'})">
-    {#if media.uploader_faction.toLowerCase() === 'machina'}
-        {zalgo(media.uploader_ign)}
-    {:else}
-        <a href="/agent/{media.uploader_ign}">{media.uploader_ign}</a>
-    {/if}
-        </a>
+      <div class="title" style="color: var(--color-faction-{media.uploader_faction.toLowerCase() || 'unaligned'})">
+      {#if media.uploader_faction.toLowerCase() === 'machina'}
+          {zalgo(media.uploader_ign)}
+      {:else}
+          <a href="/agent/{media.uploader_ign}">{media.uploader_ign}</a>
+      {/if}
       </div>
     </div>
     <hr />
