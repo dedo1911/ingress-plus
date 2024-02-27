@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name IITC Plugin: Mediagress
 // @category Misc
-// @version 1.0.1
+// @version 1.0.2
 // @namespace https://ingress.plus
 // @downloadURL https://ingress.plus/mediagress.user.js
 // @updateURL https://ingress.plus/mediagress.user.js
@@ -13,8 +13,13 @@
 // @grant none
 // ==/UserScript==
 
+//
+// Changelog 1.0.2
+//   Display errors to the user so it can be easily screenshot for bug reports
+//
 // Changelog 1.0.1
-// Edited strings to make process of uploading clearer as well as giving a better understanding of errors when they happen
+//   Edited strings to make process of uploading clearer as well as giving a better understanding of errors when they happen
+//
 
 // shout out to https://github.com/EisFrei/ and his Live Inventory plugin
 
@@ -158,10 +163,9 @@ function wrapper(pluginInfo) {
         });
         return;
       }
-      console.error(`Error making request to Mediagress: ${response.status} ${await response.text()}`);
-      alert('Error :C please contact the developers at https://t.me/Mediagress');
-      //TODO: add response code and text to alert so users can just screenshot it instead of going into the console
-      return;
+      const err = `${response.status} ${response.statusText}: ${await response.text()}`
+      console.error(`Error making request to Mediagress: ${err}`);
+      alert(`Error :C please contact the developers at https://t.me/Mediagress\n\nError: ${err}`);
     } catch (e) {
       alert('Failed to get inventory data from Intel. Try again in a moment');
       console.error(e);
