@@ -6,11 +6,12 @@ export async function load() {
     const statistics = await Promise.all([
       pb.collection('statistics').getFullList(), // statistics
       pb.collection('owned_badges').getList(1, 10, {
-        expand: 'badge'
+        expand: 'badge',
+        skipTotal: true,
       }), // topBadges
-      pb.collection('public_users_owned_badges').getList(1, 10), // topUsers
-      pb.collection('media_users').getList(1, 10), // topMediaUsers
-      pb.collection('top_media_uploads').getList(1, 10), // topMediaUsers
+      pb.collection('public_users_owned_badges').getFullList(), // topUsers
+      pb.collection('media_users').getFullList(), // topMediaUsers
+      pb.collection('top_media_uploads').getFullList(), // topMediaUsers
     ])
     return {
       statistics

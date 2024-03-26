@@ -7,9 +7,9 @@
   $: s = data.statistics
   $: statistics = s[0][0]
   $: topBadges = s[1].items
-  $: topUsers = s[2].items
-  $: topMediaUsers = s[3].items
-  $: topMediaUploads = s[4].items
+  $: topUsers = s[2]
+  $: topMediaUsers = s[3]
+  $: topMediaUploads = s[4]
 
   const formatNumber = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 </script>
