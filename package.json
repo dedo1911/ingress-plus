@@ -10,8 +10,8 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "3.1.1",
-		"@sveltejs/adapter-node": "4.0.1",
-		"@sveltejs/kit": "2.5.2",
+		"@sveltejs/adapter-node": "5.0.1",
+		"@sveltejs/kit": "2.5.4",
 		"@sveltejs/vite-plugin-svelte": "3.0.2",
 		"@zerodevx/svelte-toast": "^0.9.5",
 		"eslint": "8.57.0",
@@ -22,7 +22,7 @@
 		"svelte-multiselect": "^10.2.0",
 		"svelte-time": "^0.8.2",
 		"svelte-timeago": "^0.1.2",
-		"vite": "5.1.4"
+		"vite": "5.2.6"
 	},
 	"type": "module"
 }
