@@ -24,5 +24,6 @@
 		"svelte-timeago": "^0.1.2",
 		"vite": "5.2.6"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {}
 }

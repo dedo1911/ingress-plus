@@ -85,7 +85,11 @@ a:hover {
   --toastBackground: #ff2020;
 }
 
-input[type=text], select {
+.flex {
+  display: flex;
+}
+
+input[type=text], select, textarea, button {
   font-size: 1.25em;
   background: rgba(14, 11, 28, 0.9);
   border: 3px double #5e5a75;
@@ -105,3 +109,21 @@ input[type=text], select {
 .level.level-6 { color: #FF0E82; }
 .level.level-7 { color: #B400FF; }
 .level.level-8 { color: #5200FF; }
+
+div.paginator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2em;
+}
+div.paginator img {
+  height: 48px;
+  width: 48px;
+  opacity: 1;
+  cursor: pointer;
+  transition: all 250ms ease-in-out;
+}
+div.paginator img.disabled {
+  opacity: 0.1;
+  cursor: not-allowed;
+}

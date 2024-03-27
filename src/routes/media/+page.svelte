@@ -206,23 +206,6 @@
         opacity: 1;
         color: #FFF;
     }
-    div.paginator {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 2em;
-    }
-    div.paginator img {
-        height: 48px;
-        width: 48px;
-        opacity: 1;
-        cursor: pointer;
-        transition: all 250ms ease-in-out;
-    }
-    div.paginator img.disabled {
-        opacity: 0.1;
-        cursor: not-allowed;
-    }
     div.search input {
         width: calc(100% - 1.25em);
     }

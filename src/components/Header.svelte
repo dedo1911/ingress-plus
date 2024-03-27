@@ -78,6 +78,11 @@
             <img src="/images/mediagress.png" alt="Mediagress" /> Mediagress
           </li>
         </a>
+        <a href="/bugs">
+          <li class="{pathname === '/bugs' ? 'active' : ''}">
+            <img src="/images/bugs.svg" alt="Bug Reports" /> Bug Reports
+          </li>
+        </a>
         <a href="/stats">
           <li class="{pathname === '/stats' ? 'active' : ''}">
             <img src="/images/statistics.svg" alt="Statistics" /> Statistics
@@ -102,6 +107,11 @@
       <a href="/media">
         <li class="{pathname === '/media' ? 'active' : ''}">
           <img src="/images/mediagress.png" alt="Mediagress" /> Mediagress
+        </li>
+      </a>
+      <a href="/bugs">
+        <li class="{pathname === '/bugs' ? 'active' : ''}">
+          <img src="/images/bugs.svg" alt="Bug Reports" /> Bug Reports
         </li>
       </a>
       <a href="/stats">
@@ -218,7 +228,7 @@
     padding: 1em 0.5em;
   }
 
-  @media (max-width: 1050px) {
+  @media (max-width: 1185px) {
     nav[data-nav="large"] {
       display: none;
     }
