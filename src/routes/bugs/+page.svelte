@@ -1,6 +1,7 @@
 <script>
     import { onMount } from 'svelte';
     import { pb } from '$lib/pocketbase/index.js'
+    import { authData } from '$lib/stores'
     import TimeAgo from 'svelte-timeago/TimeAgo.svelte'
 
     let itemsPerPage = "20"
@@ -45,10 +46,12 @@
 
 <div class="header">
     <h1>Bug Reports</h1>
+    {#if $authData.isValid === true}
     <a href="/bugs/new">
         Submit bug report
         <img src="/images/upload.svg" alt="Submit bug report" height="32" style="margin-left: 1em" />
     </a>
+    {/if}
 </div>
 
 <p class="help">
