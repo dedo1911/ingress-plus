@@ -1,14 +1,22 @@
 <script>
   import { pb } from '$lib/pocketbase'
   import { goto } from '$app/navigation'
-  import { browser } from '$app/environment'
   import { authData } from '$lib/stores'
   import { toast } from '@zerodevx/svelte-toast'
+  import { Carta, CartaEditor } from 'carta-md'
+  import DOMPurify from 'isomorphic-dompurify'
 
-  let title = '';
-  let description = '';
-  let ingressVersion = '';
-  $: if (browser && $authData.isValid !== true) goto('/bugs')
+	import '$lib/styles/editor.scss'
+
+  let title = ''
+  let ingressVersion = ''
+  let description = ''
+
+  const carta = new Carta({
+    sanitizer: DOMPurify.sanitize
+  });
+
+  $: if ($authData.isValid !== true) goto('/bugs')
 
   const publishReport = async () => {
     if (title.length < 3 || title.length > 256) {
@@ -41,9 +49,7 @@
   <input type="text" placeholder="Ingress version" bind:value={ingressVersion} />
   <hr />
   <h2>Description</h2>
-  <div class="flex">
-    <textarea class="editor" bind:value={description} rows="10" />
-  </div>
+  <CartaEditor {carta} theme='ingressplus' bind:value={description} placeholder="Type here..." />
   <div class="actions">
     <button on:click={publishReport}>Submit</button>
   </div>
@@ -67,9 +73,6 @@
   .tag-description p {
     flex-grow: 1;
     text-align: center;
-  }
-  .editor {
-    flex-grow: 1;
   }
   .actions {
     display: flex;

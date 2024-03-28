@@ -41,11 +41,11 @@
 </script>
 
 <svelte:head>
-    <title>Ingress Plus &middot; Bug Reports</title>
+    <title>Ingress Plus &middot; Bug Tracker</title>
 </svelte:head>
 
 <div class="header">
-    <h1>Bug Reports</h1>
+    <h1>Bug Tracker</h1>
     {#if $authData.isValid === true}
     <a href="/bugs/new">
         Submit bug report

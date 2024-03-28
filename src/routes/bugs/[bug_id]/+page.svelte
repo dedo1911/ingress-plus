@@ -1,10 +1,13 @@
 <script>
-    import Time from 'svelte-time/src/Time.svelte.js';
-    import zalgo from '$lib/zalgo'
-    import { serverAddress } from '$lib/pocketbase'
+  import Time from 'svelte-time/src/Time.svelte.js';
+  import zalgo from '$lib/zalgo'
+  import { serverAddress } from '$lib/pocketbase'
+  import { Carta, CartaViewer } from 'carta-md'
 
   export let data;
   $: report = data.report
+
+  const carta = new Carta({})
 </script>
 
 <svelte:head>
@@ -40,7 +43,7 @@
 <hr />
 
 <p class="description">
-  {@html report.description}
+  <CartaViewer {carta} value={report.description} />
 </p>
 
 {#if report.created != report.updated}

@@ -89,7 +89,7 @@ a:hover {
   display: flex;
 }
 
-input[type=text], select, textarea, button {
+input[type=text], select, button {
   font-size: 1.25em;
   background: rgba(14, 11, 28, 0.9);
   border: 3px double #5e5a75;

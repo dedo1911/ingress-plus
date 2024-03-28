@@ -80,7 +80,7 @@
         </a>
         <a href="/bugs">
           <li class="{pathname === '/bugs' ? 'active' : ''}">
-            <img src="/images/bugs.svg" alt="Bug Reports" /> Bug Reports
+            <img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker
           </li>
         </a>
         <a href="/stats">
@@ -111,7 +111,7 @@
       </a>
       <a href="/bugs">
         <li class="{pathname === '/bugs' ? 'active' : ''}">
-          <img src="/images/bugs.svg" alt="Bug Reports" /> Bug Reports
+          <img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker
         </li>
       </a>
       <a href="/stats">
