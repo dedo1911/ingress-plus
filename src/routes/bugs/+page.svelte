@@ -73,7 +73,7 @@
                     <span class="tag" title={tag.description}>{tag.name}</span>
                 {/each}
             </span>
-            <!-- <span class="upvotes">0</span> -->
+             <!--<span class="upvotes" on:click={e => e.preventDefault()}>0</span>-->
         </a>
     {/each}
 
@@ -103,15 +103,15 @@
     .container .bugreport {
         padding: 0.5em;
         display: flex;
-        justify-content: space-between;
         cursor: pointer;
         flex-wrap: wrap;
+        justify-content: space-between;
     }
     .container .bugreport:hover {
         background: rgba(0, 0, 0, 0.25);
         border-radius: 5px;
     }
-    .tag {
+    .bugreport .tag {
         margin: 0 1em;
         background-color: #9593c3;
         color: #000000;
@@ -119,10 +119,17 @@
         padding: 0.1em 0.25em;
         font-size: small;
     }
-    .upvotes {
+    .bugreport .date {
+        min-width: 75px;
+        margin-right: 1em;
+    }
+    .bugreport .title {
+        flex-grow: 1;
+    }
+    .bugreport .upvotes {
         background-color: #9593c3;
         border-radius: 5px;
-        padding: 0.25em 1em;
+        padding: 0.2em 1em;
         display: inline-block;
         width: 30px;
         text-align: center;
@@ -130,7 +137,7 @@
         cursor: pointer;
         align-self: flex-end;
     }
-    .upvotes.voted {
+    .bugreport .upvotes.voted {
         background-color: #7871ff;
     }
     .help {
