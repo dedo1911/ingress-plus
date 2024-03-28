@@ -7,7 +7,17 @@ export async function load() {
   try {
     const items = await pb.collection('categories').getFullList({
       sort: '-sorting',
-      expand: 'badges_via_category'
+      expand: 'badges_via_category',
+      fields: [
+        'title',
+        'tiers',
+        'expand.badges_via_category.collectionId',
+        'expand.badges_via_category.id',
+        'expand.badges_via_category.image',
+        'expand.badges_via_category.title',
+        'expand.badges_via_category.description',
+        'expand.badges_via_category.unobtainable',
+      ].join(',')
     })
     categories.set(items.map(i => {
       const r = {...i, badges: i.expand ? sortBy(i.expand.badges_via_category || []).reverse() : []}

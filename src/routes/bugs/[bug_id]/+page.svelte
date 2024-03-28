@@ -1,13 +1,46 @@
 <script>
-  import Time from 'svelte-time/src/Time.svelte.js';
+  import Time from 'svelte-time/src/Time.svelte.js'
   import zalgo from '$lib/zalgo'
-  import { serverAddress } from '$lib/pocketbase'
-  import { Carta, CartaViewer } from 'carta-md'
+  import { pb, serverAddress } from '$lib/pocketbase'
+  import { slide } from 'svelte/transition'
+  import { authData } from '$lib/stores'
+  import { toast } from '@zerodevx/svelte-toast'
+  import { Carta, CartaViewer, CartaEditor } from 'carta-md'
+  import {onMount} from "svelte"
+  import TimeAgo from 'svelte-timeago/TimeAgo.svelte'
+
+	import '$lib/styles/editor.scss'
+  import AgentName from "../../../components/AgentName.svelte";
 
   export let data;
+  let comments
+  let new_comment = ''
   $: report = data.report
 
   const carta = new Carta({})
+
+  const loadComments = async () => {
+    comments = await pb.collection('bug_comments').getFullList({
+      sort: 'created',
+      filter: `bug="${report.id}"`,
+      fields: 'created,comment,user'
+    })
+  }
+
+  const postComment = async () => {
+    if (new_comment.length < 3 || new_comment.length > 1024) {
+      toast.push('Invalid comment', { classes: [ 'errorToast' ]})
+      return
+    }
+    await pb.collection("bug_comments").create({
+      bug: report.id,
+      user: pb.authStore.model.id,
+      comment: new_comment,
+    })
+    loadComments()
+  }
+
+  onMount(loadComments)
 </script>
 
 <svelte:head>
@@ -69,6 +102,32 @@
 {/if}
 
 
+<h2>Comments</h2>
+
+{#if comments}
+  {#if comments.length === 0}
+    <p transition:slide class="no-comments">Nothing to show yet...</p>
+  {:else}
+    {#each comments as comment}
+    <div transition:slide class="comment">
+      <div class="info">
+        <span><AgentName id={comment.user} /></span>
+        <span><TimeAgo date={comment.created} live /></span>
+      </div>
+      <CartaViewer {carta} value={comment.comment} />
+    </div>
+    {/each}
+   {/if}
+{/if}
+
+{#if $authData.isValid === true}
+  <div transition:slide class="new-comment">
+    <CartaEditor {carta} theme="ingressplus" bind:value={new_comment} placeholder="Comment..." />
+    <div class="new-comment-button">
+      <button on:click={postComment}>Comment</button>
+    </div>
+  </div>
+{/if}
 
 <style>
   h1 {
@@ -109,5 +168,44 @@
   .updated {
     text-align: center;
     font-size: small;
+  }
+
+  .new-comment {
+    max-width: 750px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+  }
+  .new-comment-button {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .no-comments {
+    text-align: center;
+    font-style: italic;
+  }
+  .comment {
+    display: flex;
+    flex-wrap: wrap;
+    background: #131627;
+    padding: 1em;
+    margin: auto auto 1em;
+    max-width: calc(750px - 2em);
+    border: 1px solid #2b3138;
+    border-radius: 0.5em;
+  }
+  .comment .info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1em;
+    margin-right: 2em;
+    margin-top: 1em;
+  }
+
+  :global(.comment .carta-viewer) {
+    flex-grow: 1;
   }
 </style>

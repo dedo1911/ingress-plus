@@ -10,8 +10,12 @@
   export let owned
   export let title
   let content
+  let badgeData
 
-  $: if (showModal) content?.scrollTo(0, 0)
+  $: if (showModal) {
+    content?.scrollTo(0, 0)
+    fetchBadge()
+  }
 
   const toggleOwned = async () => {
     if (!$authData.isValid) return
@@ -38,6 +42,11 @@
       }
     }
     await updateCounter()
+  }
+
+  const fetchBadge = async () => {
+    badgeData = await pb.collection('badges').getFirstListItem(`id="${badge.id}"`)
+    console.log(badgeData)
   }
 
   let ownedCounter = 0
@@ -89,11 +98,13 @@
   </header>
   <section bind:this={content} style="--badge-size: {$badgeSize}px">
     <h2>{title}</h2>
-    <hr />
-    <p>{badge.description}</p>
-    {#if badge.description_extra}
-      <hr />
-      <p>{@html badge.description_extra}</p>
+    {#if badgeData}
+      <hr transition:slide />
+      <p transition:slide>{badgeData.description}</p>
+      {#if badgeData.description_extra}
+        <hr />
+        <p transition:slide>{@html badgeData.description_extra}</p>
+      {/if}
     {/if}
 
     <button on:click={() => (showModal = false)}>Done</button>
@@ -110,14 +121,10 @@
     justify-content: space-between;
     filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.75));
   }
-  header :global(img) {
-    cursor: default;
-  }
   header span, header a, header button {
     height: 32px;
     width: 32px;
-    margin: 0 20px;
-    margin-top: calc(32px + 15px);
+    margin: calc(32px + 15px) 20px 0;
   }
   header button {
     margin-left: 8px;

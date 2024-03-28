@@ -90,6 +90,10 @@ input[type=text], select, button {
   min-width: 20px;
 }
 
+button {
+  cursor: pointer;
+}
+
 .level span { color: #FFFFFF }
 .level.level-1 { color: #D9DD1D; }
 .level.level-2 { color: #FFB01C; }
