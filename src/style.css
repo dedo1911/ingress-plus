@@ -121,3 +121,9 @@ div.paginator img.disabled {
   opacity: 0.1;
   cursor: not-allowed;
 }
+
+blockquote {
+  background: rgba(14, 11, 28, 0.9);
+  padding: 0.1em 1em;
+  border-radius: 8px;
+}
