@@ -9,7 +9,9 @@ export async function load() {
         expand: 'badge',
         skipTotal: true,
       }), // topBadges
-      pb.collection('public_users_owned_badges').getFullList(), // topUsers
+      pb.collection('public_users_owned_badges').getFullList({
+        sort: '-count'
+      }), // topUsers
       pb.collection('media_users').getFullList(), // topMediaUsers
       pb.collection('top_media_uploads').getFullList(), // topMediaUsers
     ])
