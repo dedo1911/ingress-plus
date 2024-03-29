@@ -56,7 +56,7 @@
     <p class="released">Released <Time timestamp={media.released_at} relative live /> on <Time timestamp={media.released_at} format="MMMM D, YYYY [at] h:mm A" /></p>
     <p class="link">
       <a href={media.content_url} target="_blank">
-        {media.expand.destination.name}
+        {media.expand?.destination?.name || 'Open Media'}
       </a>
     </p>
     <p class="description">
@@ -64,7 +64,7 @@
     </p>
     <hr />
     <p class="topic">
-      {#each media.expand.topic as topic}
+      {#each media.expand?.topic || [] as topic}
         <a href={`/media?t=${topic.id}`}>
           {topic.name}
         </a>
