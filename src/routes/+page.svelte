@@ -1,7 +1,7 @@
 <script async>
   import { fly } from 'svelte/transition'
   import { categories, badgeSize, siteSettings, authData } from '$lib/stores'
-  import Category from '../components/Category.svelte'
+  import Category from '$lib/components/Category.svelte'
 
   let width = 1024
   $: badgeSize.set(Math.min(128, width / 7))

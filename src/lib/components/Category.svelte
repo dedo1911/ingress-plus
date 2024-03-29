@@ -1,6 +1,6 @@
 <script>
   import { badgeSize } from '$lib/stores'
-  import Badge from './Badge.svelte'
+  import Badge from '$lib/components/Badge.svelte'
 
   export let category
   export let width

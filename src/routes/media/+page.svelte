@@ -1,8 +1,8 @@
 <script>
     import { pb } from '$lib/pocketbase/index.js'
-    import {onMount} from "svelte";
-    import MultiSelect from "svelte-multiselect";
-    import {replaceState} from "$app/navigation";
+    import {onMount} from "svelte"
+    import MultiSelect from "svelte-multiselect"
+    import {replaceState} from "$app/navigation"
 
     let itemsPerPage = "20"
     let sorting = "-released_at"

@@ -1,21 +1,24 @@
 * {
   font-family: 'Exo', sans-serif;
+  font-optical-sizing: auto;
 }
 
 body {
   margin: 0;
   color: #9593c3;
+  background: #000000;
 }
 
-div.background {
-  background: rgb(47,55,97);
-  background: linear-gradient(180deg, rgb(47, 55, 97) 0%, rgb(17, 20, 35) 50%, rgb(0, 0, 0) 100%);
-  background-repeat: no-repeat;
-  background-position: center;
-  height: 100vh;
-  width: 100vw;
+body::before {
+  content: "";
+  display: block;
   position: fixed;
-  z-index: -1;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100lvh;
+  z-index: -10;
+  background: linear-gradient(180deg, rgb(47,55,97) 0%, rgba(17,20,35) 50%, rgba(0,0,0) 100%);
 }
 
 hr {
@@ -122,8 +125,34 @@ div.paginator img.disabled {
   cursor: not-allowed;
 }
 
-blockquote {
+h1, h2, h3 {
+  text-align: center;
+}
+
+small {
+  display: inline-block;
+}
+  h2 small {
+  margin-top: 0.5rem;
+}
+
+blockquote, pre {
   background: rgba(14, 11, 28, 0.9);
   padding: 0.1em 1em;
   border-radius: 8px;
+}
+code {
+  background: rgba(14, 11, 28, 0.9);
+  padding: 0.5em;
+  border-radius: 8px;
+  font-family: "Kode Mono", monospace;
+  font-optical-sizing: auto;
+}
+pre {
+  padding: 0.5em;
+  max-width: 50vw;
+}
+pre code {
+  padding: 0;
+  background: none;
 }

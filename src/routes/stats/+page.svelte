@@ -1,7 +1,8 @@
 <script>
   import { serverAddress } from '$lib/pocketbase'
   import TimeAgo from 'svelte-timeago/TimeAgo.svelte'
-  import zalgo from '$lib/zalgo'
+  import AgentName from "$lib/components/AgentName.svelte"
+  import { formatNumber } from "$lib/utils.js"
 
   export let data;
   $: s = data.statistics
@@ -10,8 +11,6 @@
   $: topUsers = s[2]
   $: topMediaUsers = s[3]
   $: topMediaUploads = s[4]
-
-  const formatNumber = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 </script>
 
 <svelte:head>
@@ -20,9 +19,6 @@
 
 <div class="page">
   <h1>Statistics</h1>
-  {#if !statistics || !topBadges || !topUsers || !topMediaUsers || !topMediaUploads}
-    <p>Loading...</p>
-  {:else}
   <div class="stats">
     <div class="stat">
       <span>Total badges:</span>
@@ -62,114 +58,55 @@
     </div>
   </div>
   <hr />
-  <h2>Agents with the most badges<br /><small class="mt">(public profiles only)</small></h2>
+  <h2>Agents with the most badges<br /><small>(public profiles only)</small></h2>
   <div class="users">
       {#each topUsers as topUser}
-        {@const factionLogo = topUser.faction === 'machina'
-          ? 'machina.png'
-          : `${topUser.faction || 'unaligned'}.svg`}
         <div class="user">
-          <div class="icon">
-            <a href="/agent/{topUser.username}">
-              <img src={`/images/${factionLogo}`} height="32" alt={topUser.faction} />
-            </a>
-          </div>
-          <div class="title" style="color: var(--color-faction-{topUser.faction || 'unaligned'})">
-            <a href="/agent/{topUser.username}">
-              {#if topUser.faction === 'machina'}
-                {zalgo(topUser.username)}
-              {:else}
-                {topUser.username}
-              {/if}
-            </a>
-          </div>
-          <div class="count">
-            <a href="/agent/{topUser.username}">{topUser.count}</a>
-          </div>
+          <AgentName user={{ username: topUser.username, faction: topUser.faction, public: true }} />
+          {formatNumber(topUser.count)}
         </div>
       {/each}
     </div>
-    <hr />
-    <h2>Most Owned Badges</h2>
-    <div class="badges">
-      {#each topBadges as badge}
-        <div class="badge">
-          <div class="icon">
-            <img height="32" width="32" alt="{badge.expand.badge.title}"
-            src="{serverAddress}/api/files/{badge.expand.badge.collectionId}/{badge.expand.badge.id}/{badge.expand.badge.image[badge.tier]}?thumb=96x96" />
-          </div>
-          <div class="title">
-            <span>{badge.expand.badge.title}</span>
-          </div>
-          <div class="count">
-            <strong>{formatNumber(badge.count)}</strong>
-          </div>
-        </div>
-      {/each}
-    </div>
-    <hr />
-    <h2>Agents that have discovered the most media<br /><small class="mt">(public profiles only)</small></h2>
-    <div class="users">
-      {#each topMediaUsers as topUser}
-        {@const factionLogo = topUser.faction === 'machina'
-                ? 'machina.png'
-                : `${topUser.faction || 'unaligned'}.svg`}
-        <div class="user">
-          <div class="icon">
-            <a href="/agent/{topUser.username}">
-              <img src={`/images/${factionLogo}`} height="32" alt={topUser.faction} />
-            </a>
-          </div>
-          <div class="title" style="color: var(--color-faction-{topUser.faction || 'unaligned'})">
-            <a href="/agent/{topUser.username}">
-              {#if topUser.faction === 'machina'}
-                {zalgo(topUser.username)}
-              {:else}
-                {topUser.username}
-              {/if}
-            </a>
-          </div>
-          <div class="count">
-            <a href="/agent/{topUser.username}">
-              {topUser.count}
-            </a>
-          </div>
-        </div>
-      {/each}
-    </div>
-    <hr />
-    <h2>Most uploaded media</h2>
-    <div class="medias">
-      {#each topMediaUploads as topMedia}
-        <div class="media">
-          <div class="icon">
-            <a href="/media/{topMedia.media_url_id}">
-              <img src={topMedia.image_url.replace('http://', 'https://')} height="32" alt={topMedia.short_description} />
-            </a>
-          </div>
-          <div class="title">
-            <a href="/media/{topMedia.media_url_id}">
-              {topMedia.short_description}
-            </a>
-          </div>
-          <div class="count">
-            <a href="/media/{topMedia.media_url_id}">
-              {topMedia.count}
-            </a>
-          </div>
-        </div>
-      {/each}
-    </div>
-  {/if}
+  <hr />
+  <h2>Most Owned Badges</h2>
+  <div class="badges">
+    {#each topBadges as badge}
+      <div class="badge">
+        <span>
+          <img height="32" width="32" alt="{badge.expand.badge.title}"
+          src="{serverAddress}/api/files/{badge.expand.badge.collectionId}/{badge.expand.badge.id}/{badge.expand.badge.image[badge.tier]}?thumb=96x96" />
+          {badge.expand.badge.title}
+        </span>
+        {formatNumber(badge.count)}
+      </div>
+    {/each}
+  </div>
+  <hr />
+  <h2>Agents that have discovered the most media<br /><small>(public profiles only)</small></h2>
+  <div class="users">
+    {#each topMediaUsers as topUser}
+      <div class="user">
+        <AgentName user={{ username: topUser.username, faction: topUser.faction, public: true }} />
+        {formatNumber(topUser.count)}
+      </div>
+    {/each}
+  </div>
+  <hr />
+  <h2>Most uploaded media</h2>
+  <div class="medias">
+    {#each topMediaUploads as topMedia}
+      <div class="media">
+        <a href="/media/{topMedia.media_url_id}">
+          <img src={topMedia.image_url.replace('http://', 'https://')} height="32" alt={topMedia.short_description} />
+          {topMedia.short_description}
+        </a>
+        {formatNumber(topMedia.count)}
+      </div>
+    {/each}
+  </div>
 </div>
 
 <style>
-  small {
-    display: inline-block;
-  }
-  small.mt {
-    margin-top: 0.5rem;
-  }
   div.page {
     max-width: 1000px;
     margin: auto;
@@ -179,37 +116,18 @@
   div.badges, div.users, div.medias {
     display: flex;
     flex-direction: column;
-    justify-content: center;
   }
   div.badge, div.user, div.media {
-    width: 100%;
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 1em;
+    justify-content: space-between;
   }
-  div.icon {
-    display: flex;
-    flex-basis: 32px;
-    justify-content: center;
-  }
-  div.media div.icon img {
+  div.media img, div.badge img {
     border-radius: 16px;
-  }
-  div.title {
-    display: flex;
-    flex-grow: 1;
-    margin-left: 2%;
-    line-height: normal;
-  }
-  a {
-    color: unset;
-  }
-  a:hover {
-    font-weight: normal;
-  }
-  div.count {
-    display: flex;
+    vertical-align: middle;
+    margin: 0 0.25em;
   }
   div.stats {
     display: flex;
@@ -219,14 +137,6 @@
     display: flex;
     flex-wrap: nowrap;
     margin-bottom: 0.5rem;
-  }
-  div.stats div.stat span {
-    flex-grow: 1;
-  }
-  p {
-    text-align: justify;
-  }
-  h1, h2 {
-    text-align: center;
+    justify-content: space-between;
   }
 </style>

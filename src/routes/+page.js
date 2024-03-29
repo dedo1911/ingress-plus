@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit'
 import { pb } from '$lib/pocketbase'
-import {categories} from "$lib/stores/index.js";
-import sortBy from "lodash.sortby";
+import {categories} from "$lib/stores/index.js"
+import sortBy from "lodash.sortby"
 
 export async function load() {
   try {

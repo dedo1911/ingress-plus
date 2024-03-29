@@ -1,7 +1,7 @@
 <script>
   import { serverAddress } from '$lib/pocketbase'
   import { authData, ownedBadges, badgeSize, siteSettings } from '$lib/stores'
-  import BadgeModal from './BadgeModal.svelte'
+  import BadgeModal from '$lib/components/BadgeModal.svelte'
 
   export let category
   export let index

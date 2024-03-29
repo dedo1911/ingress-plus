@@ -2,7 +2,7 @@
   import { slide } from 'svelte/transition'
   import { pb, serverAddress } from "$lib/pocketbase"
   import { authData, ownedBadges, badgeSize } from "$lib/stores"
-  import Modal from "./Modal.svelte"
+  import Modal from "$lib/components/Modal.svelte"
 
   export let showModal
   export let badge
@@ -46,7 +46,6 @@
 
   const fetchBadge = async () => {
     badgeData = await pb.collection('badges').getFirstListItem(`id="${badge.id}"`)
-    console.log(badgeData)
   }
 
   let ownedCounter = 0

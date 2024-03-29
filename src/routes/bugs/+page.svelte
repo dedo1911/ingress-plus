@@ -3,6 +3,7 @@
     import { pb } from '$lib/pocketbase/index.js'
     import { authData } from '$lib/stores'
     import TimeAgo from 'svelte-timeago/TimeAgo.svelte'
+    import { formatNumber } from "$lib/utils.js"
 
     let itemsPerPage = "20"
     let sorting = "-created"
@@ -15,7 +16,7 @@
         const options = {
             sort: sorting,
             expand: 'tags',
-            fields: 'id,title,expand.tags.name,expand.tags.description,username,faction,created'
+            fields: 'id,title,expand.tags.name,expand.tags.description,username,faction,comments,created'
         }
         const r = await pb.collection('bug_reports_public').getList(page, 1 * itemsPerPage, options)
         totalPages = r.totalPages
@@ -73,6 +74,7 @@
                     <span class="tag" title={tag.description}>{tag.name}</span>
                 {/each}
             </span>
+             <span class="comments">{formatNumber(report.comments)}</span>
              <!--<span class="upvotes" on:click={e => e.preventDefault()}>0</span>-->
         </a>
     {/each}
@@ -125,6 +127,13 @@
     }
     .bugreport .title {
         flex-grow: 1;
+    }
+    .bugreport .comments {
+        background: url("/images/comment.svg") no-repeat right;
+        background-size: contain;
+        min-width: 25px;
+        padding-right: 1.5em;
+        text-align: right;
     }
     .bugreport .upvotes {
         background-color: #9593c3;

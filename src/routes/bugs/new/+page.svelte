@@ -6,8 +6,6 @@
   import { Carta, CartaEditor } from 'carta-md'
   import DOMPurify from 'isomorphic-dompurify'
 
-	import '$lib/styles/editor.scss'
-
   let title = ''
   let ingressVersion = ''
   let description = ''

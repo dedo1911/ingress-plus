@@ -7,10 +7,8 @@
   import { toast } from '@zerodevx/svelte-toast'
   import { Carta, CartaViewer, CartaEditor } from 'carta-md'
   import {onMount} from "svelte"
-  import TimeAgo from 'svelte-timeago/TimeAgo.svelte'
-
-	import '$lib/styles/editor.scss'
-  import AgentName from "../../../components/AgentName.svelte";
+  import AgentName from "$lib/components/AgentName.svelte"
+  import Comment from "$lib/components/Comment.svelte"
 
   $: reloadData($page)
 
@@ -81,9 +79,7 @@
 
 <hr />
 
-<p class="description">
-  <CartaViewer {carta} value={report.description} />
-</p>
+<CartaViewer {carta} value={report.description} theme="ingressplus" />
 
 {#if report.created != report.updated}
 <p class="updated">
@@ -115,13 +111,7 @@
     <p transition:slide class="no-comments">Nothing to show yet...</p>
   {:else}
     {#each comments as comment}
-    <div transition:slide class="comment">
-      <div class="info">
-        <span><AgentName id={comment.user} /></span>
-        <span><TimeAgo date={comment.created} live /></span>
-      </div>
-      <CartaViewer {carta} value={comment.comment} />
-    </div>
+    <Comment {comment} />
     {/each}
   {/if}
 {/if}
@@ -153,9 +143,6 @@
   .version {
     text-align: center;
     font-size: small;
-  }
-  .description {
-    line-height: 2em;
   }
   .tags {
     text-align: center;
@@ -192,28 +179,5 @@
   .no-comments {
     text-align: center;
     font-style: italic;
-  }
-  .comment {
-    display: flex;
-    flex-wrap: wrap;
-    background: #131627;
-    padding: 1em;
-    margin: auto auto 1em;
-    max-width: calc(750px - 2em);
-    border: 1px solid #2b3138;
-    border-radius: 0.5em;
-  }
-  .comment .info {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1em;
-    margin-right: 2em;
-    margin-top: 1em;
-  }
-
-  :global(.comment .carta-viewer) {
-    flex-grow: 1;
   }
 </style>

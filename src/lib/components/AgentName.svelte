@@ -7,10 +7,14 @@
   export let user = null
   export let factionLogo = true
 
-  $: url = user?.public ? `/agent/${user.username}` : '#'
+  $: url = user?.public ? `/agent/${user.username}` : null
 
   onMount(async () => {
     if (id || !user) user = await pb.collection('public_users').getFirstListItem(`id="${id}"`, { requestKey: null })
+    if (!!user.username && user.public === undefined) {
+      const lateUser = await pb.collection('public_users').getFirstListItem(`username="${user.username}"`, { requestKey: null })
+      user.public = lateUser.public
+    }
   })
 
   $: logo = user?.faction === 'machina'
@@ -35,7 +39,11 @@
   a {
     display: inline-flex;
     align-items: center;
-    gap: 0.5em;
+    gap: 0.25em;
     vertical-align: middle;
+    margin-left: 0.25em;
+  }
+  img {
+    width: 32px;
   }
 </style>

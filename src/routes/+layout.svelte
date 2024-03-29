@@ -1,11 +1,12 @@
 <script>
+  import {onMount} from "svelte"
   import { SvelteToast } from '@zerodevx/svelte-toast'
   import {siteSettings} from '$lib/stores'
-  import Header from '../components/Header.svelte'
-  import Footer from '../components/Footer.svelte'
+  import Header from '$lib/components/Header.svelte'
+  import Footer from '$lib/components/Footer.svelte'
 
   import '../style.css'
-  import {onMount} from "svelte";
+	import '$lib/styles/editor.scss'
 
   const options = {
     duration: 2000,
@@ -25,8 +26,6 @@
 </script>
 
 <SvelteToast {options} />
-
-<div class="background" />
 
 <main>
 <Header />

@@ -1,13 +1,9 @@
 <script>
-  import zalgo from '$lib/zalgo'
   import Time from "svelte-time";
+  import AgentName from "$lib/components/AgentName.svelte"
 
   export let data;
   $: media = data.media
-
-  $: factionLogo = media.uploader_faction.toLowerCase() === 'machina'
-          ? 'machina.png'
-          : `${media.uploader_faction.toLowerCase() || 'unaligned'}.svg`
 </script>
 
 <svelte:head>
@@ -35,21 +31,8 @@
   <div style="max-width: 512px">
     <h2>{media.short_description}</h2>
     <div class="user">
-      <div>
-        Discovered by:
-      </div>
-      <div class="icon">
-        <a href="/agent/{media.uploader_ign}">
-          <img src={`/images/${factionLogo}`} height="32" alt={media.uploader_faction} />
-        </a>
-      </div>
-      <div class="title" style="color: var(--color-faction-{media.uploader_faction.toLowerCase() || 'unaligned'})">
-      {#if media.uploader_faction.toLowerCase() === 'machina'}
-          {zalgo(media.uploader_ign)}
-      {:else}
-          <a href="/agent/{media.uploader_ign}">{media.uploader_ign}</a>
-      {/if}
-      </div>
+      Discovered by:
+      <AgentName user={{ faction: media.uploader_faction.toLowerCase(), username: media.uploader_ign }} />
     </div>
     <hr />
     <p class="level">Level <span class={`level level-${media.level}`}>L<span>{media.level}</span></span></p>
@@ -109,16 +92,6 @@
     margin: 1rem 0;
     align-items: center;
     justify-content: center;
-  }
-  div.icon {
-    display: flex;
-    flex-basis: 32px;
-    justify-content: center;
-  }
-  div.title {
-    display: flex;
-    margin-left: 2%;
-    line-height: normal;
   }
   p {
     text-align: center;
