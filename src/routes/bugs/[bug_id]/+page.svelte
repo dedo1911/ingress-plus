@@ -1,7 +1,7 @@
 <script>
   import Time from 'svelte-time/src/Time.svelte.js'
-  import zalgo from '$lib/zalgo'
   import { pb, serverAddress } from '$lib/pocketbase'
+  import { page } from '$app/stores'
   import { slide } from 'svelte/transition'
   import { authData } from '$lib/stores'
   import { toast } from '@zerodevx/svelte-toast'
@@ -12,18 +12,27 @@
 	import '$lib/styles/editor.scss'
   import AgentName from "../../../components/AgentName.svelte";
 
+  $: reloadData($page)
+
   export let data;
+  let report = data.report
   let comments
   let new_comment = ''
-  $: report = data.report
 
   const carta = new Carta({})
+
+  const reloadData = async (pageData) => {
+    report = await pb.collection('bug_reports_public').getFirstListItem(`id="${pageData.params.bug_id}"`, {
+      expand: 'tags',
+    })
+    loadComments()
+  }
 
   const loadComments = async () => {
     comments = await pb.collection('bug_comments').getFullList({
       sort: 'created',
       filter: `bug="${report.id}"`,
-      fields: 'created,comment,user'
+      fields: 'id,created,comment,user'
     })
   }
 
@@ -47,18 +56,13 @@
   <title>Ingress Plus &middot; {report?.title || 'Bug Report'}</title>
 </svelte:head>
 
+{#key report.id}
 <h1>{report.title}</h1>
 
 <p class="created">
   Reported <Time timestamp={report.created} relative live />
   on <Time timestamp={report.created} format="MMMM D, YYYY [at] h:mm A" />
-  by <span class="agent" style="color: var(--color-faction-{report.faction.toLowerCase() || 'unaligned'})">
-    {#if report.faction.toLowerCase() === 'machina'}
-        {zalgo(report.username)}
-    {:else}
-        <a href="/agent/{report.username}">{report.username}</a>
-    {/if}
-    </span>
+  by <AgentName id={report.agent} />
 </p>
 
 {#if report.ingress_version.length > 0}
@@ -68,9 +72,11 @@
 {/if}
 
 <p class="tags">
+  {#key report.id}
   {#each report.expand.tags as tag}
     <span class="tag" title={tag.title}>{tag.name}</span>
   {/each}
+  {/key}
 </p>
 
 <hr />
@@ -117,7 +123,7 @@
       <CartaViewer {carta} value={comment.comment} />
     </div>
     {/each}
-   {/if}
+  {/if}
 {/if}
 
 {#if $authData.isValid === true}
@@ -128,6 +134,8 @@
     </div>
   </div>
 {/if}
+
+{/key}
 
 <style>
   h1 {
