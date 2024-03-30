@@ -6,8 +6,9 @@
   export let id = null
   export let user = null
   export let factionLogo = true
+  export let linkable = true
 
-  $: url = user?.public ? `/agent/${user.username}` : null
+  $: url = linkable && user?.public ? `/agent/${user.username}` : null
 
   onMount(async () => {
     if (id || !user) user = await pb.collection('public_users').getFirstListItem(`id="${id}"`, { requestKey: null })
@@ -25,7 +26,6 @@
 
 {#if user}
   <a href={url} style="color: var(--color-faction-{user.faction || 'unaligned'})"
-
     class:supporter-unaligned={user?.supporter && !user?.faction}
     class:supporter-machina={user?.supporter && user?.faction === 'machina'}
     class:supporter-enlightened={user?.supporter && user?.faction === 'enlightened'}
@@ -47,9 +47,9 @@
     align-items: center;
     gap: 0.25em;
     vertical-align: middle;
-    margin-left: 0.25em;
   }
   img {
+    margin-left: 0.25em;
     width: 32px;
   }
   img.machina {

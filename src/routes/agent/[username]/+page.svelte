@@ -3,7 +3,7 @@
   import { serverAddress } from '$lib/pocketbase'
   import sortBy from 'lodash.sortby'
   import { slide } from 'svelte/transition'
-  import zalgo from '$lib/zalgo'
+  import AgentName from "$lib/components/AgentName.svelte";
 
   const thumbSize = (badgeSize) => {
     if (badgeSize <= 64) return '96x96'
@@ -23,7 +23,6 @@
 
   $: badgeSize.set(Math.min(128, width / 7))
   $: rows = Math.ceil(sortedBadges.length / badgesPerRow)
-  $: username = publicUser?.username || ''
 </script>
 
 <svelte:head>
@@ -32,11 +31,7 @@
 
 <section bind:clientWidth={width} style="--badge-size: {$badgeSize}px">
   <h2 transition:slide style="color: var(--color-faction-{publicUser?.faction || 'unaligned'})">
-    {#if publicUser?.faction === 'machina'}
-      {zalgo(username)}
-    {:else}
-      {username}
-    {/if}
+    <AgentName id={publicUser.id} linkable={false} factionLogo={false} />
   </h2>
 
   <div class="badges">
@@ -70,9 +65,8 @@
     margin: auto;
   }
   div.badges {
-    margin: auto;
     width: fit-content;
-    margin-top: 3em;
+    margin: 3em auto auto;
   }
   div.badges div {
     white-space: nowrap;
