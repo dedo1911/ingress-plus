@@ -25,7 +25,7 @@
 {#if user}
   <a href={url} style="color: var(--color-faction-{user.faction || 'unaligned'})">
     {#if factionLogo}
-      <img src="/images/{logo}" height="32" alt={user?.faction || 'Unaligned'} />
+      <img src="/images/{logo}" height="32" class={user?.faction || 'unaligned'} alt={user?.faction || 'Unaligned'} />
     {/if}
     {#if user.faction === 'machina'}
       {zalgo(user.username)}
@@ -45,5 +45,9 @@
   }
   img {
     width: 32px;
+  }
+  img.machina {
+    width: 21.7px;
+    margin: 0 calc((32px - 21.7px) / 2);
   }
 </style>
