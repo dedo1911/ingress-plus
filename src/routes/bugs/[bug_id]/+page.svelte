@@ -44,6 +44,7 @@
       user: pb.authStore.model.id,
       comment: new_comment,
     })
+    new_comment = ''
     loadComments()
   }
 
