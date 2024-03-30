@@ -6,7 +6,8 @@
 		"dev": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview",
-		"lint": "eslint ."
+		"lint": "eslint .",
+		"commit": "cz"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "3.2.0",
@@ -15,6 +16,7 @@
 		"@sveltejs/vite-plugin-svelte": "3.0.2",
 		"@zerodevx/svelte-toast": "^0.9.5",
 		"carta-md": "^3.6.1",
+		"cz-conventional-changelog": "^3.3.0",
 		"eslint": "8.57.0",
 		"eslint-plugin-svelte": "2.35.1",
 		"isomorphic-dompurify": "^2.6.0",
@@ -25,8 +27,13 @@
 		"svelte-multiselect": "^10.2.0",
 		"svelte-time": "^0.8.2",
 		"svelte-timeago": "^0.1.2",
-		"vite": "5.2.6"
+		"vite": "5.2.7"
 	},
 	"type": "module",
-	"dependencies": {}
+	"dependencies": {},
+	"config": {
+		"commitizen": {
+			"path": "./node_modules/cz-conventional-changelog"
+		}
+	}
 }
