@@ -156,3 +156,68 @@ pre code {
   padding: 0;
   background: none;
 }
+
+@-webkit-keyframes shimmer {
+  0% {
+    background-position: -100% top;
+  }
+  100% {
+    background-position: 200% top;
+  }
+}
+@keyframes glow-unaligned {
+  from {
+    text-shadow: 0 0 0px var(--color-faction-unaligned);
+  }
+    to {
+    text-shadow: 0 0 30px var(--color-faction-unaligned);
+  }
+}
+@keyframes glow-enlightened {
+  from {
+    text-shadow: 0 0 0px var(--color-faction-enlightened);
+  }
+    to {
+    text-shadow: 0 0 30px var(--color-faction-enlightened);
+  }
+}
+@keyframes glow-resistance {
+  from {
+    text-shadow: 0 0 0px var(--color-faction-resistance);
+  }
+    to {
+    text-shadow: 0 0 30px var(--color-faction-resistance);
+  }
+}
+@keyframes glow-machina {
+  from {
+    text-shadow: 0 0 0px var(--color-faction-machina);
+  }
+    to {
+    text-shadow: 0 0 30px var(--color-faction-machina);
+  }
+}
+.supporter-unaligned {
+  background: linear-gradient(90deg, var(--color-faction-unaligned) 0%, #FFFFFF 30%, #FFFFFF 70%, var(--color-faction-unaligned) 100%) no-repeat -100% center;
+  -webkit-background-clip: text;
+  animation: shimmer 2s ease-in-out infinite, glow-unaligned 2s ease-in-out infinite alternate;
+  background-size: 50% 100%;
+}
+.supporter-enlightened {
+  background: linear-gradient(90deg, var(--color-faction-enlightened) 0%, #FFFFFF 30%, #FFFFFF 70%, var(--color-faction-enlightened) 100%) no-repeat -100% center;
+  -webkit-background-clip: text;
+  animation: shimmer 2s ease-in-out infinite, glow-enlightened 2s ease-in-out infinite alternate;
+  background-size: 50% 100%;
+}
+.supporter-resistance {
+  background: linear-gradient(90deg, var(--color-faction-resistance) 0%, #FFFFFF 30%, #FFFFFF 70%, var(--color-faction-resistance) 100%) no-repeat -100% center;
+  -webkit-background-clip: text;
+  animation: shimmer 2s ease-in-out infinite, glow-resistance 2s ease-in-out infinite alternate;
+  background-size: 50% 100%;
+}
+.supporter-machina {
+  background: linear-gradient(90deg, var(--color-faction-machina) 0%, #FFFFFF 30%, #FFFFFF 70%, var(--color-faction-machina) 100%) no-repeat -100% center;
+  -webkit-background-clip: text;
+  animation: shimmer 2s ease-in-out infinite, glow-machina 2s ease-in-out infinite alternate;
+  background-size: 50% 100%;
+}

@@ -11,9 +11,10 @@
 
   onMount(async () => {
     if (id || !user) user = await pb.collection('public_users').getFirstListItem(`id="${id}"`, { requestKey: null })
-    if (!!user.username && user.public === undefined) {
+    if (!!user.username && user.supporter === undefined) {
       const lateUser = await pb.collection('public_users').getFirstListItem(`username="${user.username}"`, { requestKey: null })
       user.public = lateUser.public
+      user.supporter = lateUser.supporter
     }
   })
 
@@ -23,7 +24,12 @@
 </script>
 
 {#if user}
-  <a href={url} style="color: var(--color-faction-{user.faction || 'unaligned'})">
+  <a href={url} style="color: var(--color-faction-{user.faction || 'unaligned'})"
+
+    class:supporter-unaligned={user?.supporter && !user?.faction}
+    class:supporter-machina={user?.supporter && user?.faction === 'machina'}
+    class:supporter-enlightened={user?.supporter && user?.faction === 'enlightened'}
+    class:supporter-resistance={user?.supporter && user?.faction === 'resistance'} >
     {#if factionLogo}
       <img src="/images/{logo}" height="32" class={user?.faction || 'unaligned'} alt={user?.faction || 'Unaligned'} />
     {/if}
