@@ -3,7 +3,7 @@ import { pb } from '$lib/pocketbase'
 import { categories } from '$lib/stores/index.js'
 import sortBy from 'lodash.sortby'
 
-export async function load () {
+export async function load ({ fetch }) {
   try {
     const items = await pb.collection('categories').getFullList({
       sort: '-sorting',
@@ -17,7 +17,8 @@ export async function load () {
         'expand.badges_via_category.title',
         'expand.badges_via_category.description',
         'expand.badges_via_category.unobtainable'
-      ].join(',')
+      ].join(','),
+      fetch
     })
     categories.set(items.map(i => {
       const r = { ...i, badges: i.expand ? sortBy(i.expand.badges_via_category || []).reverse() : [] }
