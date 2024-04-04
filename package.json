@@ -10,30 +10,32 @@
 		"commit": "cz"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "3.2.0",
 		"@sveltejs/adapter-node": "5.0.1",
 		"@sveltejs/kit": "2.5.5",
 		"@sveltejs/vite-plugin-svelte": "3.0.2",
 		"@zerodevx/svelte-toast": "^0.9.5",
 		"carta-md": "^3.6.1",
 		"cz-conventional-changelog": "^3.3.0",
-		"eslint": "8.57.0",
+		"eslint": "^8.0.1",
+		"eslint-config-standard": "^17.1.0",
+		"eslint-plugin-import": "^2.25.2",
+		"eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
+		"eslint-plugin-promise": "^6.0.0",
 		"eslint-plugin-svelte": "2.35.1",
 		"isomorphic-dompurify": "^2.6.0",
 		"lodash.sortby": "^4.7.0",
 		"pocketbase": "0.21.1",
 		"sass": "^1.72.0",
-		"svelte": "4.2.12",
+		"svelte": "^4.2.12",
 		"svelte-multiselect": "^10.2.0",
 		"svelte-time": "^0.8.2",
-		"svelte-timeago": "^0.1.2",
 		"vite": "5.2.7"
 	},
 	"type": "module",
-	"dependencies": {},
 	"config": {
 		"commitizen": {
 			"path": "./node_modules/cz-conventional-changelog"
 		}
-	}
+	},
+	"packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
 }
