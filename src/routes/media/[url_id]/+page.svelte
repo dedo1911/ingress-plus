@@ -1,9 +1,11 @@
 <script>
-  import Time from 'svelte-time'
+  import Time, { dayjs } from 'svelte-time'
   import AgentName from '$lib/components/AgentName.svelte'
 
   export let data
   $: media = data.media
+
+  $: console.log('RELEASE:', dayjs(media.released_at).isBefore(dayjs()))
 </script>
 
 <svelte:head>
@@ -36,7 +38,12 @@
     </div>
     <hr />
     <p class="level">Level <span class={`level level-${media.level}`}>L<span>{media.level}</span></span></p>
-    <p class="released">Released <Time timestamp={media.released_at} relative live /> on <Time timestamp={media.released_at} format="MMMM D, YYYY [at] h:mm A" /></p>
+    <p class="released">
+      { dayjs().isBefore(dayjs(media.released_at)) ? 'Releases' : 'Released' }
+      <Time timestamp={media.released_at} relative live />
+      on
+      <Time timestamp={media.released_at} format="MMMM D, YYYY [at] h:mm A" />
+    </p>
     <p class="link">
       <a href={media.content_url} target="_blank">
         {media.expand?.destination?.name || 'Open Media'}
