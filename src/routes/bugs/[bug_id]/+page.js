@@ -4,7 +4,7 @@ import { pb } from '$lib/pocketbase'
 export async function load ({ fetch, params }) {
   try {
     const report = await pb.collection('bug_reports_public').getFirstListItem(`id="${params.bug_id}"`, {
-      expand: 'tags',
+      expand: 'status',
       fetch
     })
     return {

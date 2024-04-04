@@ -19,7 +19,7 @@
 
   const reloadData = async (pageData) => {
     report = await pb.collection('bug_reports_public').getFirstListItem(`id="${pageData.params.bug_id}"`, {
-      expand: 'tags'
+      expand: 'status'
     })
     await loadComments()
   }
@@ -71,11 +71,7 @@
 {/if}
 
 <p class="tags">
-  {#key report.id}
-  {#each report.expand.tags as tag}
-    <span class="tag" title={tag.title}>{tag.name}</span>
-  {/each}
-  {/key}
+  <span title={report.expand.status.title}>{report.expand.status.name}</span>
 </p>
 
 <hr />
@@ -147,7 +143,7 @@
   .tags {
     text-align: center;
   }
-  .tag {
+  .tags span {
     margin: 0 1em;
     background-color: #9593c3;
     color: #000000;

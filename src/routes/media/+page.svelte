@@ -4,6 +4,9 @@
     import { replaceState } from '$app/navigation'
     import { pb } from '$lib/pocketbase'
 
+    export let data
+    const { topics, destinations } = data
+
     let itemsPerPage = '20'
     let sorting = '-released_at'
     let items = []
@@ -12,9 +15,7 @@
     let totalItems = 1
     let searchFilter = ''
     let topicsFilter = []
-    let topics = []
     let destinationsFilter = []
-    let destinations = []
 
     const fetchMedias = async () => {
       const options = {
@@ -44,8 +45,8 @@
       totalPages = r.totalPages
       totalItems = r.totalItems
       items = r.items
-
-      replaceState(`${window.location.pathname}?${params.toString()}`)
+      const queryString = params.toString()
+      replaceState(`${window.location.pathname}${queryString.length > 0 ? '?' : ''}${queryString}`)
     }
 
     const prevPage = () => {
@@ -66,18 +67,6 @@
     }
 
     onMount(async () => {
-      await Promise.all([
-        (async () => {
-          topics = await pb.collection('media_categories').getFullList({
-            sort: 'name'
-          })
-        })(),
-        (async () => {
-          destinations = await pb.collection('media_destinations').getFullList({
-            sort: 'name'
-          })
-        })()
-      ])
       const params = new Proxy(new URLSearchParams(window.location.search), {
         get: (searchParams, prop) => searchParams.get(prop)
       })

@@ -31,7 +31,7 @@
     }
     const entry = await pb.collection('bug_reports').create({
       reporter: pb.authStore.model.id,
-      tags: ['3jxhx1qd595ldd0'],
+      status: '3jxhx1qd595ldd0',
       title,
       description,
       ingress_version: ingressVersion

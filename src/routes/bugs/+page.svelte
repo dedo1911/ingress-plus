@@ -15,8 +15,8 @@
     const fetchBugs = async () => {
       const options = {
         sort: sorting,
-        expand: 'tags',
-        fields: 'id,title,expand.tags.name,expand.tags.description,username,faction,comments,created'
+        expand: 'status',
+        fields: 'id,title,expand.status.name,expand.status.description,username,faction,comments,created'
       }
       const r = await pb.collection('bug_reports_public').getList(page, 1 * itemsPerPage, options)
       totalPages = r.totalPages
@@ -69,13 +69,9 @@
         <a class="bugreport" href="/bugs/{report.id}">
             <span class="date"><Time timestamp={report.created} relative live /></span>
             <span class="title">{report.title}</span>
-            <span class="tags">
-                {#each report.expand.tags as tag}
-                    <span class="tag" title={tag.description}>{tag.name}</span>
-                {/each}
-            </span>
-             <span class="comments">{formatNumber(report.comments)}</span>
-             <!--<span class="upvotes" on:click={e => e.preventDefault()}>0</span>-->
+            <span class="tag" title={report.expand.status.description}>{report.expand.status.name}</span>
+            <span class="comments">{formatNumber(report.comments)}</span>
+            <!--<span class="upvotes" on:click={e => e.preventDefault()}>0</span>-->
         </a>
     {/each}
 
