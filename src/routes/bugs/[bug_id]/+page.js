@@ -1,10 +1,10 @@
 import { error } from '@sveltejs/kit'
 import { pb } from '$lib/pocketbase'
 
-export async function load({ params }) {
+export async function load ({ params }) {
   try {
     const report = await pb.collection('bug_reports_public').getFirstListItem(`id="${params.bug_id}"`, {
-      expand: 'tags',
+      expand: 'tags'
     })
     return {
       report

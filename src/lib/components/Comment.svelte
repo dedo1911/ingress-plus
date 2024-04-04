@@ -1,8 +1,10 @@
 <script>
   import { slide } from 'svelte/transition'
-  import TimeAgo from 'svelte-timeago/TimeAgo.svelte'
   import { Carta, CartaViewer } from 'carta-md'
-  import AgentName from "$lib/components/AgentName.svelte"
+  import Time from 'svelte-time'
+
+  import AgentName from '$lib/components/AgentName.svelte'
+
   export let comment
   const carta = new Carta({})
 </script>
@@ -10,7 +12,7 @@
 <div transition:slide class="comment">
   <div class="info">
     <AgentName id={comment.user} />
-    <TimeAgo date={comment.created} live />
+    <Time timestamp={comment.created} relative live />
   </div>
   <div class="content">
     <CartaViewer {carta} value={comment.comment} theme="ingressplus" />

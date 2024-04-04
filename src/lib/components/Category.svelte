@@ -10,11 +10,10 @@
   let hasTiers = false
   let tiers = []
 
-  $: width
   $: tiers = category.tiers.split(',').filter(t => t)
   $: hasTiers = tiers.length > 0
   $: badgesPerRow = hasTiers
-    ? Math.max(1, Math.min(tiers.length, Math.floor((width-$badgeSize)/$badgeSize)))
+    ? Math.max(1, Math.min(tiers.length, Math.floor((width - $badgeSize) / $badgeSize)))
     : 6 // Math.max(1, Math.floor((width-$badgeSize)/$badgeSize))
   $: rows = hasTiers
     ? Math.ceil(category.badges.length * tiers.length / badgesPerRow)
@@ -24,9 +23,9 @@
 <div style="--badge-size: {$badgeSize}px">
   <h2>{category.title}</h2>
   <section>
-    {#each {length: rows} as _, r}
+    {#each { length: rows } as _, r}
       <div>
-      {#each {length: badgesPerRow} as _, c}
+      {#each { length: badgesPerRow } as _, c}
         <Badge category={category} index={r * badgesPerRow + c} />
       {/each}
       </div>
@@ -42,7 +41,7 @@
     font-size: 2em;
     text-shadow: 0 0 10px black;
   }
-	section {
+  section {
     width: fit-content;
     margin: auto;
     padding-bottom: calc(var(--badge-size) / 4);

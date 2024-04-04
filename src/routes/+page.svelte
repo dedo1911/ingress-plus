@@ -6,16 +6,15 @@
   let width = 1024
   $: badgeSize.set(Math.min(128, width / 7))
 
-  $: $siteSettings
   $: badgeCategories = $categories.map(c => ({
-      ...c,
-      badges: c.badges.filter(b => $siteSettings.showUnobtainable ? true : !b.unobtainable)
-    }))
+    ...c,
+    badges: c.badges.filter(b => $siteSettings.showUnobtainable ? true : !b.unobtainable)
+  }))
 
   const toggleSiteSettings = (name) => {
     return () => {
       const newValue = !$siteSettings[name]
-      localStorage.setItem(`siteSettings:${name}`, newValue)
+      window.localStorage.setItem(`siteSettings:${name}`, newValue)
       siteSettings.set({
         ...$siteSettings,
         [name]: newValue

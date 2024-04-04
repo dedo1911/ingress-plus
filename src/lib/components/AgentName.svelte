@@ -1,6 +1,7 @@
 <script>
-  import {onMount} from "svelte"
-  import { pb } from "$lib/pocketbase"
+  import { onMount } from 'svelte'
+
+  import { pb } from '$lib/pocketbase'
   import zalgo from '$lib/zalgo'
 
   export let id = null
@@ -53,7 +54,7 @@
     width: 32px;
   }
   img.machina {
-    width: 21.7px;
-    margin: 0 calc((32px - 21.7px) / 2);
+    width: 22px;
+    margin: 0 calc((32px - 22px) / 2);
   }
 </style>

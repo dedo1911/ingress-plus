@@ -5,4 +5,7 @@ module.exports = {
         'eslint-config-standard',
         'plugin:svelte/recommended',
     ],
+    rules: {
+        'svelte/no-at-html-tags': 'off',
+    }
 }

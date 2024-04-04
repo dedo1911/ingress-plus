@@ -1,43 +1,43 @@
 <script>
-    import { onMount } from 'svelte';
-    import { pb } from '$lib/pocketbase/index.js'
+    import { onMount } from 'svelte'
+    import Time from 'svelte-time'
+    import { pb } from '$lib/pocketbase'
     import { authData } from '$lib/stores'
-    import TimeAgo from 'svelte-timeago/TimeAgo.svelte'
-    import { formatNumber } from "$lib/utils.js"
+    import { formatNumber } from '$lib/utils.js'
 
-    let itemsPerPage = "20"
-    let sorting = "-created"
+    const itemsPerPage = '20'
+    const sorting = '-created'
     let items = []
     let page = 1
     let totalPages = 1
     let totalItems = 1
 
     const fetchBugs = async () => {
-        const options = {
-            sort: sorting,
-            expand: 'tags',
-            fields: 'id,title,expand.tags.name,expand.tags.description,username,faction,comments,created'
-        }
-        const r = await pb.collection('bug_reports_public').getList(page, 1 * itemsPerPage, options)
-        totalPages = r.totalPages
-        totalItems = r.totalItems
-        items = r.items
+      const options = {
+        sort: sorting,
+        expand: 'tags',
+        fields: 'id,title,expand.tags.name,expand.tags.description,username,faction,comments,created'
+      }
+      const r = await pb.collection('bug_reports_public').getList(page, 1 * itemsPerPage, options)
+      totalPages = r.totalPages
+      totalItems = r.totalItems
+      items = r.items
     }
 
     const prevPage = () => {
-        if (page <= 1) return
-        page--
-        fetchBugs()
+      if (page <= 1) return
+      page--
+      fetchBugs()
     }
 
     const nextPage = () => {
-        if (page >= totalPages) return
-        page++
-        fetchBugs()
+      if (page >= totalPages) return
+      page++
+      fetchBugs()
     }
 
     onMount(() => {
-        fetchBugs()
+      fetchBugs()
     })
 </script>
 
@@ -67,7 +67,7 @@
 <div class="container">
     {#each items as report}
         <a class="bugreport" href="/bugs/{report.id}">
-            <span class="date"><TimeAgo date={report.created} live /></span>
+            <span class="date"><Time timestamp={report.created} relative live /></span>
             <span class="title">{report.title}</span>
             <span class="tags">
                 {#each report.expand.tags as tag}

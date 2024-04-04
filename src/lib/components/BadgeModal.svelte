@@ -1,8 +1,9 @@
 <script>
   import { slide } from 'svelte/transition'
-  import { pb, serverAddress } from "$lib/pocketbase"
-  import { authData, ownedBadges, badgeSize } from "$lib/stores"
-  import Modal from "$lib/components/Modal.svelte"
+
+  import { pb, serverAddress } from '$lib/pocketbase'
+  import { authData, ownedBadges, badgeSize } from '$lib/stores'
+  import Modal from '$lib/components/Modal.svelte'
 
   export let showModal
   export let badge
@@ -12,31 +13,26 @@
   let content
   let badgeData
 
-  $: if (showModal) {
-    content?.scrollTo(0, 0)
-    fetchBadge()
-  }
-
   const toggleOwned = async () => {
     if (!$authData.isValid) return
     if (owned) {
       const el = $ownedBadges.find(
         (b) => b.badge === badge.id && b.tier >= tier
       )
-      await pb.collection("user_badges").delete(el.id)
+      await pb.collection('user_badges').delete(el.id)
       ownedBadges.update((bs) => bs.filter((b) => b.id !== el.id))
     } else {
       const otherTier = $ownedBadges.find((b) => b.badge === badge.id)
       if (otherTier) {
         const el = await pb
-          .collection("user_badges")
+          .collection('user_badges')
           .update(otherTier.id, { ...otherTier, tier })
         ownedBadges.update((bs) => [...bs.filter((b) => b.id !== el.id), el])
       } else {
-        const el = await pb.collection("user_badges").create({
+        const el = await pb.collection('user_badges').create({
           user: pb.authStore.model.id,
           badge: badge.id,
-          tier: tier,
+          tier
         })
         ownedBadges.update((bs) => [...bs, el])
       }
@@ -53,10 +49,10 @@
   const updateCounter = async () => {
     try {
       const owned = await pb.collection('owned_badges')
-          .getFullList({
-            filter: `badge.id = '${badge.id}' && tier >= ${tier}`,
-            sort: '-tier'
-          })
+        .getFullList({
+          filter: `badge.id = '${badge.id}' && tier >= ${tier}`,
+          sort: '-tier'
+        })
       ownedCounter = owned.reduce((acc, o) => acc + o.count, 0)
     } catch {
       ownedCounter = 0
@@ -66,12 +62,17 @@
   $: {
     if (showModal) updateCounter()
   }
+
+  $: if (showModal) {
+    content?.scrollTo(0, 0)
+    fetchBadge()
+  }
 </script>
 
 <Modal bind:showModal>
   <header>
     {#if $authData.isValid && !badge.unobtainable }
-      <button on:click={toggleOwned} title={owned ? "Mark not owned" : "Mark owned"}>
+      <button on:click={toggleOwned} title={owned ? 'Mark not owned' : 'Mark owned'}>
           <img
             src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
             alt="Download"

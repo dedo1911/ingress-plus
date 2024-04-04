@@ -1,8 +1,7 @@
-
 <section>
     <div class="header">
         <a href="/media">
-            <img src='/images/mediagress.png' alt='Mediagress' height="75" width="75" style="margin-right: 1em" />
+            <img src='/images/mediagress.png' alt='Mediagress' height="75" style="margin-right: 1em" />
             <h1>Mediagress</h1>
         </a>
         <div>

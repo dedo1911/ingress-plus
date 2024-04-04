@@ -1,7 +1,8 @@
 <script>
-  import { afterNavigate } from '$app/navigation'
   import { onMount } from 'svelte'
   import { slide, fly } from 'svelte/transition'
+
+  import { afterNavigate } from '$app/navigation'
   import { pb } from '$lib/pocketbase'
   import { authData, ownedBadges } from '$lib/stores'
 
@@ -12,11 +13,10 @@
 
   const login = async () => {
     menuOpen = false
-    let w = window.open()
     const user = await pb.collection('users').authWithOAuth2({
       provider: 'google',
       urlCallback: (url) => {
-          w.location.href = url
+        window.open().location.href = url
       }
     })
 
@@ -40,13 +40,13 @@
 
   const openTelegram = () => {
     menuOpen = false
-    window.location.href = "https://t.me/Ingress_Plus"
+    window.location.href = 'https://t.me/Ingress_Plus'
   }
 
   const refreshOwnedBadges = async () => ownedBadges.set(
     await pb.collection('user_badges').getFullList({
       expand: 'badge,badge.category',
-      filter: `user="${pb.authStore.baseModel.id}"`,
+      filter: `user="${pb.authStore.baseModel.id}"`
     }))
 
   onMount(async () => {

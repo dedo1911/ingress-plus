@@ -1,92 +1,92 @@
 <script>
-    import { pb } from '$lib/pocketbase/index.js'
-    import {onMount} from "svelte"
-    import MultiSelect from "svelte-multiselect"
-    import {replaceState} from "$app/navigation"
+    import { onMount } from 'svelte'
+    import MultiSelect from 'svelte-multiselect'
+    import { replaceState } from '$app/navigation'
+    import { pb } from '$lib/pocketbase'
 
-    let itemsPerPage = "20"
-    let sorting = "-released_at"
+    let itemsPerPage = '20'
+    let sorting = '-released_at'
     let items = []
     let page = 1
     let totalPages = 1
     let totalItems = 1
-    let searchFilter = ""
+    let searchFilter = ''
     let topicsFilter = []
     let topics = []
     let destinationsFilter = []
     let destinations = []
 
     const fetchMedias = async () => {
-        const options = {
-            sort: sorting,
-        }
-        const params = new URLSearchParams()
-        if (sorting !== '-released_at') {
-            params.set('s', sorting)
-        }
-        let filter = []
-        if (searchFilter.length > 0) {
-            filter.push(`(short_description ~ '${searchFilter}' || description ~ '${searchFilter}')`)
-            params.set('q', searchFilter)
-        }
-        if (topicsFilter.length > 0) {
-            filter.push(`(${topicsFilter.map(t => `topic ~ '${t.value}'`).join(' && ')})`)
-            params.set('t', topicsFilter.map(t => t.value))
-        }
-        if (destinationsFilter.length > 0) {
-            filter.push(`(${destinationsFilter.map(t => `destination ~ '${t.value}'`).join(' || ')})`)
-            params.set('d', destinationsFilter.map(d => d.value))
-        }
-        if (filter.length > 0) {
-            options.filter = filter.join(' && ')
-        }
-        const r = await pb.collection('medias').getList(page, 1 * itemsPerPage, options)
-        totalPages = r.totalPages
-        totalItems = r.totalItems
-        items = r.items
+      const options = {
+        sort: sorting
+      }
+      const params = new URLSearchParams()
+      if (sorting !== '-released_at') {
+        params.set('s', sorting)
+      }
+      const filter = []
+      if (searchFilter.length > 0) {
+        filter.push(`(short_description ~ '${searchFilter}' || description ~ '${searchFilter}')`)
+        params.set('q', searchFilter)
+      }
+      if (topicsFilter.length > 0) {
+        filter.push(`(${topicsFilter.map(t => `topic ~ '${t.value}'`).join(' && ')})`)
+        params.set('t', topicsFilter.map(t => t.value))
+      }
+      if (destinationsFilter.length > 0) {
+        filter.push(`(${destinationsFilter.map(t => `destination ~ '${t.value}'`).join(' || ')})`)
+        params.set('d', destinationsFilter.map(d => d.value))
+      }
+      if (filter.length > 0) {
+        options.filter = filter.join(' && ')
+      }
+      const r = await pb.collection('medias').getList(page, 1 * itemsPerPage, options)
+      totalPages = r.totalPages
+      totalItems = r.totalItems
+      items = r.items
 
-        replaceState(`${window.location.pathname}?${params.toString()}`)
+      replaceState(`${window.location.pathname}?${params.toString()}`)
     }
 
     const prevPage = () => {
-        if (page <= 1) return
-        page--
-        fetchMedias()
+      if (page <= 1) return
+      page--
+      fetchMedias()
     }
 
     const nextPage = () => {
-        if (page >= totalPages) return
-        page++
-        fetchMedias()
+      if (page >= totalPages) return
+      page++
+      fetchMedias()
     }
 
     const executeSearch = async () => {
-        page = 1
-        await fetchMedias()
+      page = 1
+      await fetchMedias()
     }
 
     onMount(async () => {
-        await Promise.all([
-            (async () => {
-                topics = await pb.collection("media_categories").getFullList({
-                    sort: 'name'
-                })
-            })(),
-            (async () => {
-                destinations = await pb.collection("media_destinations").getFullList({
-                    sort: 'name'
-                })
-            })()
-        ])
-        const params = new Proxy(new URLSearchParams(window.location.search), {
-            get: (searchParams, prop) => searchParams.get(prop),
-        })
-        if (params.s) sorting = params.s
-        if (params.q) searchFilter = params.q
-        if (params.d) destinationsFilter = params.d.split(',').map(d => destinations.find(d2 => d2.id === d)).map(d => ({ label: d.name, value: d.id }))
-        if (params.t) topicsFilter = params.t.split(',').map(t => topics.find(t2 => t2.id === t)).map(t => ({ label: t.name, value: t.id }))
+      await Promise.all([
+        (async () => {
+          topics = await pb.collection('media_categories').getFullList({
+            sort: 'name'
+          })
+        })(),
+        (async () => {
+          destinations = await pb.collection('media_destinations').getFullList({
+            sort: 'name'
+          })
+        })()
+      ])
+      const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop)
+      })
+      if (params.s) sorting = params.s
+      if (params.q) searchFilter = params.q
+      if (params.d) destinationsFilter = params.d.split(',').map(d => destinations.find(d2 => d2.id === d)).map(d => ({ label: d.name, value: d.id }))
+      if (params.t) topicsFilter = params.t.split(',').map(t => topics.find(t2 => t2.id === t)).map(t => ({ label: t.name, value: t.id }))
 
-        return fetchMedias()
+      return fetchMedias()
     })
 </script>
 
@@ -126,7 +126,7 @@
             </a>
         {/each}
     </div>
-    {#if items.length == 0 }
+    {#if items.length === 0 }
         <p class="empty">Nothing to show!</p>
     {/if}
     <div class="paginator">

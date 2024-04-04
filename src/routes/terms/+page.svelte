@@ -1,5 +1,5 @@
 <svelte:head>
-    <title>Ingress Plus &middot; Terms of use</title> 
+    <title>Ingress Plus &middot; Terms of use</title>
 </svelte:head>
 
 <div>

@@ -1,4 +1,3 @@
-
 <section>
     <slot />
 </section>

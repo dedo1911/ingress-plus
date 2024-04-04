@@ -1,16 +1,16 @@
 <script>
+  import { slide } from 'svelte/transition'
+  import sortBy from 'lodash.sortby'
   import { badgeSize } from '$lib/stores'
   import { serverAddress } from '$lib/pocketbase'
-  import sortBy from 'lodash.sortby'
-  import { slide } from 'svelte/transition'
-  import AgentName from "$lib/components/AgentName.svelte";
+  import AgentName from '$lib/components/AgentName.svelte'
 
   const thumbSize = (badgeSize) => {
     if (badgeSize <= 64) return '96x96'
     if (badgeSize <= 128) return '128x128'
     return '256x256'
   }
-  export let data;
+  export let data
   $: publicUser = data.publicUser
   $: sortedBadges = sortBy((data?.ownedBadges || []).filter(b => b.expand?.badge?.expand?.category?.profile_visible || false), [
     'expand.badge.expand.category.sorting',
@@ -26,7 +26,7 @@
 </script>
 
 <svelte:head>
-    <title>Ingress Plus &middot; {publicUser?.username || 'Agent Profile'}</title> 
+    <title>Ingress Plus &middot; {publicUser?.username || 'Agent Profile'}</title>
 </svelte:head>
 
 <section bind:clientWidth={width} style="--badge-size: {$badgeSize}px">
@@ -35,9 +35,9 @@
   </h2>
 
   <div class="badges">
-    {#each {length: rows} as _, r}
+    {#each { length: rows } as _, r}
       <div>
-      {#each {length: badgesPerRow} as _, c}
+      {#each { length: badgesPerRow } as _, c}
         {@const badge = sortedBadges[r * badgesPerRow + c]}
         {#if badge}
           <img height="{$badgeSize}" width="{$badgeSize}" alt="{badge.expand.badge.title}"
@@ -60,7 +60,7 @@
     justify-content: center;
     cursor: pointer;
   }
-	section {
+  section {
     max-width: 1200px;
     margin: auto;
   }

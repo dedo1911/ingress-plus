@@ -1,29 +1,27 @@
 <script>
-  import Time from 'svelte-time/src/Time.svelte.js'
-  import { pb, serverAddress } from '$lib/pocketbase'
-  import { page } from '$app/stores'
+  import { onMount } from 'svelte'
   import { slide } from 'svelte/transition'
-  import { authData } from '$lib/stores'
-  import { toast } from '@zerodevx/svelte-toast'
+  import Time from 'svelte-time'
   import { Carta, CartaViewer, CartaEditor } from 'carta-md'
-  import {onMount} from "svelte"
-  import AgentName from "$lib/components/AgentName.svelte"
-  import Comment from "$lib/components/Comment.svelte"
+  import { toast } from '@zerodevx/svelte-toast'
+  import { page } from '$app/stores'
+  import { pb, serverAddress } from '$lib/pocketbase'
+  import { authData } from '$lib/stores'
+  import AgentName from '$lib/components/AgentName.svelte'
+  import Comment from '$lib/components/Comment.svelte'
 
-  $: reloadData($page)
-
-  export let data;
+  export let data
   let report = data.report
   let comments
-  let new_comment = ''
+  let newComment = ''
 
   const carta = new Carta({})
 
   const reloadData = async (pageData) => {
     report = await pb.collection('bug_reports_public').getFirstListItem(`id="${pageData.params.bug_id}"`, {
-      expand: 'tags',
+      expand: 'tags'
     })
-    loadComments()
+    await loadComments()
   }
 
   const loadComments = async () => {
@@ -35,20 +33,22 @@
   }
 
   const postComment = async () => {
-    if (new_comment.length < 3 || new_comment.length > 1024) {
-      toast.push('Invalid comment', { classes: [ 'errorToast' ]})
+    if (newComment.length < 3 || newComment.length > 1024) {
+      toast.push('Invalid comment', { classes: ['errorToast'] })
       return
     }
-    await pb.collection("bug_comments").create({
+    await pb.collection('bug_comments').create({
       bug: report.id,
       user: pb.authStore.model.id,
-      comment: new_comment,
+      comment: newComment
     })
-    new_comment = ''
-    loadComments()
+    newComment = ''
+    await loadComments()
   }
 
   onMount(loadComments)
+
+  $: reloadData($page)
 </script>
 
 <svelte:head>
@@ -82,7 +82,7 @@
 
 <CartaViewer {carta} value={report.description} theme="ingressplus" />
 
-{#if report.created != report.updated}
+{#if report.created !== report.updated}
 <p class="updated">
   Updated <Time timestamp={report.updated} relative live />
   on <Time timestamp={report.updated} format="MMMM D, YYYY [at] h:mm A" />
@@ -104,7 +104,6 @@
   <hr />
 {/if}
 
-
 <h2>Comments</h2>
 
 {#if comments}
@@ -119,7 +118,7 @@
 
 {#if $authData.isValid === true}
   <div transition:slide class="new-comment">
-    <CartaEditor {carta} theme="ingressplus" bind:value={new_comment} placeholder="Comment..." />
+    <CartaEditor {carta} theme="ingressplus" bind:value={newComment} placeholder="Comment..." />
     <div class="new-comment-button">
       <button on:click={postComment}>Comment</button>
     </div>

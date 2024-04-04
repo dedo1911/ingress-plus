@@ -1,6 +1,5 @@
-
 const chars = {
-  0 : [ /* up */
+  0: [ /* up */
     '\u030d', /*     ̍     */
     '\u030e', /*     ̎     */
     '\u0304', /*     ̄     */
@@ -50,9 +49,9 @@ const chars = {
     '\u033e', /*     ̾     */
     '\u035b', /*     ͛     */
     '\u0346', /*     ͆     */
-    '\u031a'  /*     ̚     */
+    '\u031a' /*     ̚     */
   ],
-  1 : [ /* down */
+  1: [ /* down */
     '\u0316', /*     ̖     */
     '\u0317', /*     ̗     */
     '\u0318', /*     ̘     */
@@ -92,9 +91,9 @@ const chars = {
     '\u0356', /*     ͖     */
     '\u0359', /*     ͙     */
     '\u035a', /*     ͚     */
-    '\u0323'  /*     ̣     */
+    '\u0323' /*     ̣     */
   ],
-  2 : [ /* mid */
+  2: [ /* mid */
     '\u0315', /*     ̕     */
     '\u031b', /*     ̛     */
     '\u0340', /*     ̀     */
@@ -122,16 +121,17 @@ const chars = {
 }
 
 const random = (len) => {
-  if (len == 1) return 0
+  if (len === 1) return 0
   return len
     ? Math.floor(Math.random() * len + 1) - 1
     : Math.random()
 }
+
 const generate = (str) => {
-  const str_arr = str.split('')
-  const output = str_arr.map((a) => {
-    if (a === " ") return a
-    for (let i = 0, l = random(16); i<l; i++) {
+  const strArr = str.split('')
+  const output = strArr.map((a) => {
+    if (a === ' ') return a
+    for (let i = 0, l = random(16); i < l; i++) {
       const rand = random(3)
       a += chars[rand][random(chars[rand].length)]
     }

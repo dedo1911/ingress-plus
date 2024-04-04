@@ -1,12 +1,12 @@
 <script>
+  import { slide } from 'svelte/transition'
+  import sortBy from 'lodash.sortby'
+  import { toast } from '@zerodevx/svelte-toast'
   import { goto } from '$app/navigation'
   import { browser } from '$app/environment'
   import { badgeSize, authData, ownedBadges } from '$lib/stores'
   import { pb, serverAddress } from '$lib/pocketbase'
-  import sortBy from 'lodash.sortby'
-  import { slide } from 'svelte/transition'
   import zalgo from '$lib/zalgo'
-  import { toast } from '@zerodevx/svelte-toast'
 
   const thumbSize = (badgeSize) => {
     if (badgeSize <= 64) return '96x96'
@@ -51,7 +51,7 @@
     } catch (err) {
       $authData.baseModel.username = oldUsername
       console.error(username, err)
-      toast.push('An error has occurred.', { classes: [ 'errorToast' ]})
+      toast.push('An error has occurred.', { classes: ['errorToast'] })
       return
     }
     editVisible = false
@@ -60,25 +60,25 @@
   $: factionLogo = $authData?.baseModel?.faction === 'machina'
     ? 'machina.png'
     : `${$authData?.baseModel?.faction || 'unaligned'}.svg`
-  
+
   const copyProfileLink = async () => {
     try {
       await navigator.clipboard.writeText(`https://ingress.plus/agent/${newUsername}`)
-      toast.push('Copied to clipboard!', { classes: [ 'successToast' ]})
+      toast.push('Copied to clipboard!', { classes: ['successToast'] })
     } catch (err) {
       console.error(err)
-      toast.push('An error has occurred.', { classes: [ 'errorToast' ]})
+      toast.push('An error has occurred.', { classes: ['errorToast'] })
     }
   }
 </script>
 
 <svelte:head>
-    <title>Ingress Plus &middot; {username || 'Agent Profile'}</title> 
+    <title>Ingress Plus &middot; {username || 'Agent Profile'}</title>
 </svelte:head>
 
 <section bind:clientWidth={width} style="--badge-size: {$badgeSize}px">
   {#if !editVisible}
-    <h2 transition:slide style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" on:click={() => editVisible = true}>
+    <h2 transition:slide style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" on:click={() => (editVisible = true)}>
       {#if $authData?.baseModel?.faction === 'machina'}
         {zalgo(username)}
       {:else}
@@ -90,7 +90,7 @@
       <img src="/images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} on:click={toggleFaction} />
       <input type="text" bind:value={newUsername} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" />
       <div class="actions">
-        <img src={$authData.baseModel.public ? '/images/public.svg':'/images/private.svg'} alt={$authData.baseModel.public ? 'Public' : 'Private'} height="32" on:click={togglePublic} />
+        <img src={$authData.baseModel.public ? '/images/public.svg' : '/images/private.svg'} alt={$authData.baseModel.public ? 'Public' : 'Private'} height="32" on:click={togglePublic} />
         <img src="/images/accept.svg" height="32" alt="Save" on:click={saveUsername} />
       </div>
     </div>
@@ -105,9 +105,9 @@
   {/if}
 
   <div class="badges">
-    {#each {length: rows} as _, r}
+    {#each { length: rows } as _, r}
       <div>
-      {#each {length: badgesPerRow} as _, c}
+      {#each { length: badgesPerRow } as _, c}
         {@const badge = sortedBadges[r * badgesPerRow + c]}
         {#if badge}
           <img height="{$badgeSize}" width="{$badgeSize}" alt="{badge.expand.badge.title}"

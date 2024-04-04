@@ -40,7 +40,7 @@ a:link, a:visited, a:hover, a:active {
   --color-faction-enlightened: #00b056;
   --color-faction-resistance: #00adef;
   --color-faction-machina: #ff2020;
-  
+
   --toastBarHeight: 0;
   --toastContainerTop: auto;
   --toastContainerRight: auto;
@@ -167,7 +167,7 @@ pre code {
 }
 @keyframes glow-unaligned {
   from {
-    text-shadow: 0 0 0px var(--color-faction-unaligned);
+    text-shadow: 0 0 0 var(--color-faction-unaligned);
   }
     to {
     text-shadow: 0 0 30px var(--color-faction-unaligned);
@@ -175,7 +175,7 @@ pre code {
 }
 @keyframes glow-enlightened {
   from {
-    text-shadow: 0 0 0px var(--color-faction-enlightened);
+    text-shadow: 0 0 0 var(--color-faction-enlightened);
   }
     to {
     text-shadow: 0 0 30px var(--color-faction-enlightened);
@@ -183,7 +183,7 @@ pre code {
 }
 @keyframes glow-resistance {
   from {
-    text-shadow: 0 0 0px var(--color-faction-resistance);
+    text-shadow: 0 0 0 var(--color-faction-resistance);
   }
     to {
     text-shadow: 0 0 30px var(--color-faction-resistance);
@@ -191,7 +191,7 @@ pre code {
 }
 @keyframes glow-machina {
   from {
-    text-shadow: 0 0 0px var(--color-faction-machina);
+    text-shadow: 0 0 0 var(--color-faction-machina);
   }
     to {
     text-shadow: 0 0 30px var(--color-faction-machina);

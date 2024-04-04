@@ -1,10 +1,10 @@
 <script>
+  import Time from 'svelte-time'
   import { serverAddress } from '$lib/pocketbase'
-  import TimeAgo from 'svelte-timeago/TimeAgo.svelte'
-  import AgentName from "$lib/components/AgentName.svelte"
-  import { formatNumber } from "$lib/utils.js"
+  import AgentName from '$lib/components/AgentName.svelte'
+  import { formatNumber } from '$lib/utils.js'
 
-  export let data;
+  export let data
   $: s = data.statistics
   $: statistics = s[0][0]
   $: topBadges = s[1].items
@@ -30,7 +30,7 @@
     </div>
     <div class="stat">
       <span>Last agent signup:</span>
-      <strong><TimeAgo date={statistics.user_last_created} live /></strong>
+      <strong><Time relative live timestamp={statistics.user_last_created} /></strong>
     </div>
     <div class="stat">
       <span>Total owned badges:</span>
@@ -42,7 +42,7 @@
     </div>
     <div class="stat">
       <span>Collected media:</span>
-      <strong>{formatNumber(statistics.total_media)} <small>(≈ {parseInt(statistics.total_media / statistics.estimate_total_media * 1000)/10} %)</small></strong>
+      <strong>{formatNumber(statistics.total_media)} <small>(≈ {parseInt(statistics.total_media / statistics.estimate_total_media * 1000) / 10} %)</small></strong>
     </div>
     <div class="stat">
       <span>Unique agents contributing to media uploads:</span>

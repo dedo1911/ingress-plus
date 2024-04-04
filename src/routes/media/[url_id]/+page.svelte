@@ -1,8 +1,8 @@
 <script>
-  import Time from "svelte-time";
-  import AgentName from "$lib/components/AgentName.svelte"
+  import Time from 'svelte-time'
+  import AgentName from '$lib/components/AgentName.svelte'
 
-  export let data;
+  export let data
   $: media = data.media
 </script>
 

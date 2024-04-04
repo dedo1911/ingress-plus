@@ -19,11 +19,10 @@
   let title = ''
   let showModal = false
 
-  $: index
   $: tiers = category.tiers.split(',').filter(t => t)
   $: hasTiers = tiers.length > 0
   $: badge = hasTiers
-    ? category.badges[Math.floor(index/tiers.length)]
+    ? category.badges[Math.floor(index / tiers.length)]
     : category.badges[index]
   $: tier = hasTiers
     ? index % tiers.length

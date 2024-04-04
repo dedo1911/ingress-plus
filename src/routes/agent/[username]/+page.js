@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit'
 import { pb } from '$lib/pocketbase'
 
-export async function load({ params }) {
+export async function load ({ params }) {
   try {
     const publicUser = await pb.collection('public_users').getFirstListItem(`username="${params.username}"`)
     const ownedBadges = await pb.collection('user_badges').getFullList({
