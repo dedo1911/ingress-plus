@@ -46,7 +46,7 @@
   const refreshOwnedBadges = async () => ownedBadges.set(
     await pb.collection('user_badges').getFullList({
       expand: 'badge,badge.category',
-      filter: `user="${pb.authStore.baseModel.id}"`
+      filter: `user="${pb.authStore.model.id}"`
     }))
 
   onMount(async () => {
