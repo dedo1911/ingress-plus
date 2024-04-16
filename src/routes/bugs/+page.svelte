@@ -88,11 +88,16 @@
 </div>
 
 <p class="help">
-    You can use this page to quickly search through bug reports that were submitted by other players, upvote and comment on them as well as create a bug report yourself. Please note that this Bug Tracker is run by the community and not by Niantic. Submitting bug reports does not mean that they are sent to or read by Niantic, <a href="https://niantic.helpshift.com/hc/en/3-ingress/faq/419-how-to-file-a-bug-report/" target="_blank"please make sure to also submit a Bug Report to them directly.</a>
+    You can use this page to quickly search through bug reports that were submitted by other players, upvote and comment on them as well as
+    create a bug report yourself. Please note that this Bug Tracker is run by the community and not by Niantic. Submitting bug reports does
+    not mean that they are sent to or read by Niantic,
+    <a href="https://niantic.helpshift.com/hc/en/3-ingress/faq/419-how-to-file-a-bug-report/" target="_blank">please make sure to also submit a Bug Report to them directly.</a>
 </p>
 
 <p class="help">
-    This Bug Tracker is currently in <strong>alpha</strong>! Please send us feedback to our <a href="https://t.me/Ingress_Plus" target="_blank">Telegram channel</a> or <a href="https://github.com/dedo1911/ingress-plus/issues" target="_blank"create an issue on GitHub if you have a Feature Request or notice any problems.</a
+    This Bug Tracker is currently in <strong>alpha</strong>! Please send us feedback to our
+    <a href="https://t.me/Ingress_Plus" target="_blank">Telegram channel</a> or
+    <a href="https://github.com/dedo1911/ingress-plus/issues" target="_blank">create an issue on GitHub if you have a Feature Request or notice any problems.</a>
 </p>
 
 <hr />
