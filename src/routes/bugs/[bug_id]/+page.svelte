@@ -33,8 +33,8 @@
   }
 
   const postComment = async () => {
-    if (newComment.length < 3 || newComment.length > 1024) {
-      toast.push('Invalid comment', { classes: ['errorToast'] })
+    if (newComment.length < 3) {
+      toast.push('Comment too short', { classes: ['errorToast'] })
       return
     }
     await pb.collection('bug_comments').create({
