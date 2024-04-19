@@ -44,9 +44,9 @@
 
 <div>
   <input type="text" placeholder="Title" bind:value={title} />
-  <input type="text" placeholder="Ingress version" bind:value={ingressVersion} />
+  <input type="text" placeholder="Ingress version (2.XXX.X)" bind:value={ingressVersion} />
   <hr />
-  <h2>Description</h2>
+  <h2>Description of the bug</h2>
   <CartaEditor {carta} theme='ingressplus' bind:value={description} placeholder="Type here..." />
   <div class="actions">
     <button on:click={publishReport}>Submit</button>

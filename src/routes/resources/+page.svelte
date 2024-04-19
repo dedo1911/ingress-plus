@@ -6,6 +6,7 @@
     <h1>Resources</h1>
     <p>This page will list commonly used resources that will help you get the best out of Ingress! If you have a suggestion for this list <a target="_blank" rel="noopener noreferrer" href="https://t.me/+HCFL_U0Xq2lhOTI0">join the Ingress.Plus chat on Telegram</a> or <a target="_blank" rel="noopener noreferrer" href="https://github.com/dedo1911/ingress-plus">edit this site via GitHub</a> and create a pull request!</p>
     <hr>
+<!--- TODO: Add Website icon to header--->
     <h2>Websites</h2>
     <ul>
         <li><a target="_blank" rel="noopener noreferrer" href="https://ingress.plus">Ingress.Plus</a>
@@ -93,6 +94,7 @@
         </li>
     </ul>
     <hr>
+<!---TODO: Add Telegram icon to header--->
     <h2>Telegram</h2>
     <h3>Ingress.Plus</h3>
     <p>You can find the Telegram channels and group for our own site here!</p>
@@ -184,6 +186,14 @@
         <li><a target="_blank" rel="noopener noreferrer" href="https://t.me/+QED-TBCaLHB16PgY">[Global] #MissionProject</a>
             <ul>
                 <li>1.8k members</li>
+            </ul>
+        </li>
+    </ul>
+    <h3>Other channels</h3>
+    <p>This section is for channels on Telegram that don't fall under news directly.</p>
+    <ul>
+        <li><a target="_blank" rel="noopener noreferrer" href="https://t.me/PasscodesIngress">Passcodes Ingress PRIME✳️</a> - @PasscodesIngress<ul>
+                <li>Posts Passcodes for the Scanner that can be redeemed for items</li>
             </ul>
         </li>
     </ul>
