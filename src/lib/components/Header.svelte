@@ -73,6 +73,11 @@
     <span class:open={menuOpen} on:click={toggleMenu} />
     {#if menuOpen}
       <ul transition:slide>
+          <a href="/">
+            <li class="{pathname === '/' ? 'active' : ''}">
+              <img src="/images/medal.svg" alt="Badges" /> Badges
+            </li>
+          </a>
         <a href="/media">
           <li class="{pathname === '/media' ? 'active' : ''}">
             <img src="/images/mediagress.png" alt="Mediagress" /> Mediagress
@@ -81,6 +86,11 @@
         <a href="/bugs">
           <li class="{pathname === '/bugs' ? 'active' : ''}">
             <img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker
+          </li>
+        </a>
+        <a href="/resources">
+          <li class="{pathname === '/resources' ? 'active' : ''}">
+            <img src="/images/resources.svg" alt="Resources" /> Resources
           </li>
         </a>
         <a href="/stats">
@@ -104,6 +114,11 @@
   </nav>
   <nav data-nav="large">
     <ul>
+        <a href="/">
+          <li class="{pathname === '/' ? 'active' : ''}">
+            <img src="/images/medal.svg" alt="Badges" /> Badges
+          </li>
+        </a>
       <a href="/media">
         <li class="{pathname === '/media' ? 'active' : ''}">
           <img src="/images/mediagress.png" alt="Mediagress" /> Mediagress
@@ -112,6 +127,11 @@
       <a href="/bugs">
         <li class="{pathname === '/bugs' ? 'active' : ''}">
           <img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker
+        </li>
+      </a>
+      <a href="/resources">
+        <li class="{pathname === '/resources' ? 'active' : ''}">
+          <img src="/images/resources.svg" alt="Resources" /> Resources
         </li>
       </a>
       <a href="/stats">
