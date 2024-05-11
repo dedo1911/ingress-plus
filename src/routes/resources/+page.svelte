@@ -198,6 +198,11 @@
             <li>Another channel that posts Passcodes for the Scanner</li>
         </ul>
     </li>
+    <li><a target="_blank" rel="noopener noreferrer" href="https://t.me/IngressAuctions">Ingress Auctions</a> - @IngressAuctions<ul>
+            <li>Agents can auction off passcodes and Swag as well as bid on them</li>
+            <li>Related Group: <a target="_blank" rel="noopener noreferrer" href="https://t.me/+Fc80IkrGA6k5NDcy">Ingress Auctions Chat</a></li>
+        </ul>
+    </li>
 </ul>
 <h3>Bots</h3>
 <p>This section lists Telegram bots that are great to have in your repertoire.</p>
