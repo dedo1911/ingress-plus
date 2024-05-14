@@ -100,6 +100,11 @@
     <a href="https://github.com/dedo1911/ingress-plus/issues" target="_blank">create an issue on GitHub if you have a Feature Request or notice any problems.</a>
 </p>
 
+<p class="help">
+    Want to report a bug for the Ingress.Plus site? <a href="https://github.com/dedo1911/ingress-plus/issues" target="_blank">Please submit an issue to our GitHub instead!</a>
+    We will delete and repost bugs for our site there to keep this Bug Tracker for Ingress only.
+</p>
+
 <hr />
 <div class="container">
     {#key refetch}
