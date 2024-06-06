@@ -28,7 +28,7 @@
         .carta-toolbar {
             background-color: $background;
             height: 2.5rem;
-            
+
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
 
@@ -44,7 +44,7 @@
                 }
             }
         }
-        
+
         .carta-toolbar-left button {
             border-width: 0;
             border-radius: 0;
@@ -68,7 +68,7 @@
             .carta-active {
                 background-color: $background;
                 color: white;
-                
+
                 box-shadow: inset 0 -10px 10px -8px #b74a83;
             }
         }
@@ -83,7 +83,7 @@
             border-radius: 6px;
             min-width: 180px;
             background: $background;
-            
+
             button {
                 border: 0;
                 display: flex;
@@ -110,10 +110,6 @@
                     font-size: 0.85rem;
                 }
             }
-        }
-
-        [class*='shj-lang-'] {
-            background: transparent;
         }
     }
 
@@ -199,5 +195,13 @@
     &.carta-slash .carta-snippet-description {
         font-size: 0.8rem;
         text-overflow: ellipsis;
+    }
+
+    textarea.carta-font-code {
+        color: white;
+    }
+
+    div.carta-highlight {
+        visibility: hidden;
     }
 }

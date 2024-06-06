@@ -1,6 +1,6 @@
 <script>
   import { toast } from '@zerodevx/svelte-toast'
-  import { Carta, CartaEditor } from 'carta-md'
+  import { Carta, MarkdownEditor } from 'carta-md'
   import DOMPurify from 'isomorphic-dompurify'
   import { pb } from '$lib/pocketbase'
   import { goto } from '$app/navigation'
@@ -47,7 +47,7 @@
   <input type="text" placeholder="Ingress version (2.XXX.X)" bind:value={ingressVersion} />
   <hr />
   <h2>Description of the bug</h2>
-  <CartaEditor {carta} theme='ingressplus' bind:value={description} placeholder="Type here..." />
+  <MarkdownEditor {carta} theme='ingressplus' bind:value={description} placeholder="Type here..." />
   <div class="actions">
     <button on:click={publishReport}>Submit</button>
   </div>

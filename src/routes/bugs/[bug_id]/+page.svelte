@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { slide } from 'svelte/transition'
   import Time from 'svelte-time'
-  import { Carta, CartaViewer, CartaEditor } from 'carta-md'
+  import { Carta, CartaViewer, MarkdownEditor } from 'carta-md'
   import { toast } from '@zerodevx/svelte-toast'
   import { page } from '$app/stores'
   import { pb, serverAddress } from '$lib/pocketbase'
@@ -114,7 +114,7 @@
 
 {#if $authData.isValid === true}
   <div transition:slide class="new-comment">
-    <CartaEditor {carta} theme="ingressplus" bind:value={newComment} placeholder="Comment..." />
+    <MarkdownEditor {carta} theme="ingressplus" bind:value={newComment} placeholder="Comment..." />
     <div class="new-comment-button">
       <button on:click={postComment}>Comment</button>
     </div>
