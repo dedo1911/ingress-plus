@@ -3,10 +3,10 @@
 </svelte:head>
 <div>
 
-<h1>Resources</h1>
+<h1><img src="/images/resources.svg" alt="Resources icon" />Resources</h1>
 <p>This page will list commonly used resources that will help you get the best out of Ingress! If you have a suggestion for this list <a target="_blank" rel="noopener noreferrer" href="https://t.me/+HCFL_U0Xq2lhOTI0">join the Ingress.Plus chat on Telegram</a> or <a target="_blank" rel="noopener noreferrer" href="https://github.com/dedo1911/ingress-plus">edit this site via GitHub</a> and create a pull request!</p>
 <hr>
-<h2>Websites</h2>
+<h2><img src="/images/public.svg" alt="Website icon" />Websites</h2>
 <ul>
     <li><a target="_blank" rel="noopener noreferrer" href="https://ingress.plus">Ingress.Plus</a>
         <ul>
@@ -93,7 +93,7 @@
     </li>
 </ul>
 <hr>
-<h2>Telegram</h2>
+<h2><img src="/images/telegram.svg" alt="Telegram icon" />Telegram</h2>
 <h3>Ingress.Plus</h3>
 <p>You can find the Telegram channels and group for our own site here! <a target="_blank" rel="noopener noreferrer" href="https://t.me/addlist/1rl0tCCJ-DI1MmY6">Click here to join them all at once</a>.</p>
 <ul>
@@ -239,5 +239,10 @@
   h2,
   h3 {
     text-align: center;
+  }
+  img {
+      height: 1em;
+      vertical-align: sub;
+      margin: 0 0.25em;
   }
 </style>

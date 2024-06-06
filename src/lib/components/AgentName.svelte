@@ -25,6 +25,7 @@
     : `${user?.faction || 'unaligned'}.svg`
 </script>
 
+<!-- Add additional icon depending on verification level? (none/basic/advanced/strong) /.ixm -->
 {#if user}
   <a href={url} style="color: var(--color-faction-{user.faction || 'unaligned'})"
     class:supporter-unaligned={user?.supporter && !user?.faction}
