@@ -1,6 +1,6 @@
 <footer>
   <p>
-    If you like this website consider buying me a
+    If you like this website consider buying us a
     <a href="https://ko-fi.com/dedo1911" target="_blank"
       ><img src="/images/kofi.png" alt="Ko-fi" /> Ko-fi
     </a>
@@ -8,13 +8,14 @@
   </p>
   <p class="small">
     Ingress Fan-site. Not officially affiliated with Ingress or Niantic Labs!
-    All images shown on this website are property of their respective owners.
+    All images and icons shown on this website are property of their respective owners.
     <br />
+    <a href="/attributions">Attributions</a> &mdash;
     <a href="/terms">Terms of use</a> &mdash;
     <a href="/privacy">Privacy policy</a>
   </p>
   <p class="small">
-    Made with <img src="/images/heart.svg" alt="Love" /> with
+    Made with <img src="/images/heart.svg" alt="Love" /> using
     <a href="https://svelte.dev" target="_blank"
       ><img src="/images/svelte.svg" alt="Svelte" /> Svelte
     </a>
