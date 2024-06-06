@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte'
   import { slide } from 'svelte/transition'
-  import Time from 'svelte-time'
+  import Time, { dayjs } from 'svelte-time'
   import { Carta, CartaViewer, MarkdownEditor } from 'carta-md'
   import { toast } from '@zerodevx/svelte-toast'
   import { page } from '$app/stores'
@@ -53,6 +53,18 @@
 
 <svelte:head>
   <title>Ingress Plus &middot; {report?.title || 'Bug Report'}</title>
+
+  <meta property="og:site_name" content="Ingress Plus">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content={`Ingress Plus: ${report?.title || 'Bug Report'}`}>
+  <meta property="og:url" content={report ? `https://ingress.plus/bugs/${report.id}` : ''}>
+  <meta property="og:description" content={`Report created on ${dayjs(report.created).format("DD/MM/YYYY HH:mm:ss")} by ${report.agent}`}>
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:domain" content="ingress.plus">
+  <meta property="twitter:url" content={report ? `https://ingress.plus/bugs/${report.id}` : ''}>
+  <meta name="twitter:title" content={`Ingress Plus: ${report?.title || 'Media'}`}>
+  <meta name="twitter:description" content={`Report created on ${dayjs(report.created).format("DD/MM/YYYY HH:mm:ss")} by ${report.agent}`}>
 </svelte:head>
 
 {#key report.id}
