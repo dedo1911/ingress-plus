@@ -91,6 +91,11 @@
             <li>A collection of tools designed to make Wayfarer better</li>
         </ul>
     </li>
+    <li><a target="_blank" rel="noopener noreferrer" href="https://missionday.site/">Mission Day Sites</a>
+        <ul>
+            <li>Lists all upcoming Mission Day events and their details</li>
+        </ul>
+    </li>
 </ul>
 <hr>
 <h2><img src="/images/telegram.svg" alt="Telegram icon" />Telegram</h2>
