@@ -61,6 +61,11 @@
     ? 'machina.png'
     : `${$authData?.baseModel?.faction || 'unaligned'}.svg`
 
+  let verification = '';
+       $: {
+         verification = $authData?.baseModel?.verification || '';
+       }
+
   const copyProfileLink = async () => {
     try {
       await navigator.clipboard.writeText(`https://ingress.plus/agent/${newUsername}`)
@@ -85,6 +90,14 @@
         {username}
       {/if}
     </h2>
+<!-- TODO: Slide for verification text looks broken -->
+  {#if $authData?.baseModel?.verification != ''}
+      <p transition:slide>Your Verification level is "<b>{verification.toUpperCase()}</b>"</p>
+      {:else}
+      <!-- Enable once verification is not manual:
+      <p transition:slide>You are currently not verified.</p>
+      -->
+      {/if}
   {:else}
     <div transition:slide class="editbox">
       <img src="/images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} on:click={toggleFaction} />
@@ -120,9 +133,19 @@
 </section>
 
 <style>
+    p {
+        text-align: center;
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+    .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+}
   h2 {
     text-align: center;
-    margin: calc(var(--badge-size) / 2) 0;
+    margin: calc(var(--badge-size) / 6) 0;
     font-size: 1.75em;
     text-shadow: 0 0 10px black;
     display: flex;
