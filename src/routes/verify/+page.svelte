@@ -11,7 +11,7 @@
 
 </script>
 
-<p>Your Verification level is "<b>{verification.toUpperCase()}</b>"</p>
+<p><img src="/images/verification/verified.svg"/>Your Verification level is "<b>{verification.toUpperCase()}</b>"</p>
 
 <style>
 p {
@@ -24,4 +24,11 @@ p {
     margin-left: auto;
     margin-right: auto;
   }
+
+  img {
+      height: 1em;
+      vertical-align: sub;
+      margin: 0 0.25em;
+  }
+
 </style>
