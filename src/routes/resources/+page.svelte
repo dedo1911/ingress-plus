@@ -4,9 +4,22 @@
 <div>
 
 <h1><img src="/images/resources.svg" alt="Resources icon" />Resources</h1>
-<p>This page will list commonly used resources that will help you get the best out of Ingress! If you have a suggestion for this list <a target="_blank" rel="noopener noreferrer" href="https://t.me/+HCFL_U0Xq2lhOTI0">join the Ingress.Plus chat on Telegram</a> or <a target="_blank" rel="noopener noreferrer" href="https://github.com/dedo1911/ingress-plus">edit this site via GitHub</a> and create a pull request!</p>
+<p>This page will list commonly used resources that will help you get the best out of Ingress!
+    If you have a suggestion for this list <a target="_blank" rel="noopener noreferrer" href="https://t.me/+HCFL_U0Xq2lhOTI0">join the Ingress.Plus chat on Telegram</a> or <a target="_blank" rel="noopener noreferrer" href="https://github.com/dedo1911/ingress-plus">edit this site via GitHub</a> and create a pull request!</p>
 <hr>
-<h2><img src="/images/public.svg" alt="Website icon" />Websites</h2>
+<p>Table of contents:</p>
+<ul>
+    <li><a href="#websites"><img src="/images/public.svg" alt="Website icon"/>Websites</a></li>
+    <li><a href="#telegram"><img src="/images/telegram.svg" alt="Telegram icon" />Telegram</a></li>
+        <ul>
+            <li><a href="#tg-ingress_plus">Ingress.Plus</a></li>
+            <li><a href="#tg-news_channels">News channels</a></li>
+            <li><a href="#tg-groups">Groups</a></li>
+            <li><a href="#tg-other">Other channels</a></li>
+            <li><a href="#tg-bots">Bots</a></li>
+        </ul>
+</ul>
+<h2><a name="websites"></a><img src="/images/public.svg" alt="Website icon"/>Websites</h2>
 <ul>
     <li><a target="_blank" rel="noopener noreferrer" href="https://ingress.plus">Ingress.Plus</a>
         <ul>
@@ -98,8 +111,8 @@
     </li>
 </ul>
 <hr>
-<h2><img src="/images/telegram.svg" alt="Telegram icon" />Telegram</h2>
-<h3>Ingress.Plus</h3>
+<h2><a name="telegram"></a><img src="/images/telegram.svg" alt="Telegram icon" />Telegram</h2>
+<h3><a name="tg-ingress_plus"></a>Ingress.Plus</h3>
 <p>You can find the Telegram channels and group for our own site here! <a target="_blank" rel="noopener noreferrer" href="https://t.me/addlist/1rl0tCCJ-DI1MmY6">Click here to join them all at once</a>.</p>
 <ul>
     <li><a target="_blank" rel="noopener noreferrer" href="https://t.me/Ingress_Plus">Ingress.Plus - @Ingress_Plus</a>
@@ -123,7 +136,7 @@
         </ul>
     </li>
 </ul>
-<h3>News channels</h3>
+<h3><a name="tg-news_channels"></a>News channels</h3>
 <p>This section lists channels that you can follow to receive news and updates about Ingress.</p>
 <ul>
     <li><a target="_blank" rel="noopener noreferrer" href="https://t.me/NianticOfficial">Ingress - @NianticOfficial</a>
@@ -159,7 +172,7 @@
         </ul>
     </li>
 </ul>
-<h3>Groups</h3>
+<h3><a name="tg-groups"></a>Groups</h3>
 <p>This section lists crossfaction groups with different purposes that you can join.</p>
 <ul>
     <li><a target="_blank" rel="noopener noreferrer" href="https://t.me/+TyFsSXWUopcJCyca">Discussions - Ingress Updates [ENG]</a>
@@ -192,7 +205,7 @@
         </ul>
     </li>
 </ul>
-<h3>Other channels</h3>
+<h3><a name="tg-other"></a>Other channels</h3>
 <p>This section is for channels on Telegram that don't fall under news directly.</p>
 <ul>
     <li><a target="_blank" rel="noopener noreferrer" href="https://t.me/PasscodesIngress">Passcodes Ingress PRIME✳️</a> - @PasscodesIngress<ul>
@@ -209,7 +222,7 @@
         </ul>
     </li>
 </ul>
-<h3>Bots</h3>
+<h3><a name="tg-bots"></a>Bots</h3>
 <p>This section lists Telegram bots that are great to have in your repertoire.</p>
 <p>Note: “Inline” bots can be used in any chat by typing the username of the bot at the beginning of a message. Some bots work inline only.</p>
 <ul>

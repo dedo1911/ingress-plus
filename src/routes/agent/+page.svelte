@@ -85,9 +85,9 @@
   {#if !editVisible}
     <h2 transition:slide style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" on:click={() => (editVisible = true)}>
       {#if $authData?.baseModel?.faction === 'machina'}
-        {zalgo(username)}
+      <img src="/images/{factionLogo}" height="40" alt={$authData?.baseModel?.faction || 'unaligned'}/>{zalgo(username)}
       {:else}
-        {username}
+         <img src="/images/{factionLogo}" height="40" alt={$authData?.baseModel?.faction || 'unaligned'}/>{username}
       {/if}
     </h2>
 <!-- TODO: Slide for verification text looks broken -->
