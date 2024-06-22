@@ -73,8 +73,8 @@
     <span class:open={menuOpen} on:click={toggleMenu} />
     {#if menuOpen}
       <ul transition:slide>
-          <a href="/">
-            <li class="{pathname === '/' ? 'active' : ''}">
+          <a href="/badges">
+            <li class="{pathname === '/badges' ? 'active' : ''}">
               <img src="/images/medal.svg" alt="Badges" /> Badges
             </li>
           </a>
@@ -102,7 +102,7 @@
         {#if $authData.isValid }
         <a href="/agent">
           <li class="{pathname === '/agent' ? 'active' : ''}">
-            <img src="/images/user.svg" alt="{$authData.model.username}" /> {$authData.baseModel.username}
+            <img src="{$authData?.baseModel?.avatar}" alt="{$authData.model.username}" /> {$authData.baseModel.username}
           </li>
         </a>
         <li on:click={logout}><img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout</li>
@@ -114,8 +114,8 @@
   </nav>
   <nav data-nav="large">
     <ul>
-        <a href="/">
-          <li class="{pathname === '/' ? 'active' : ''}">
+        <a href="/badges">
+          <li class="{pathname === '/badges' ? 'active' : ''}">
             <img src="/images/medal.svg" alt="Badges" /> Badges
           </li>
         </a>
@@ -143,7 +143,7 @@
       {#if $authData.isValid }
         <a href="/agent" transition:fly={{ y: 50, duration: 500 }}>
           <li class="{pathname === '/agent' ? 'active' : ''}">
-            <img src="/images/user.svg" alt="{$authData.model.username}" /> {$authData.baseModel.username}
+            <img src="{$authData?.baseModel?.avatar}" alt="{$authData.model.username}" /> {$authData.baseModel.username}
           </li>
         </a>
         <li on:click={logout} transition:fly={{ y: 50, duration: 500 }}>

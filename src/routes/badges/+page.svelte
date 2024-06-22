@@ -1,30 +1,80 @@
-<!--- Placeholder page --->
+<script async>
+  import { fly } from 'svelte/transition'
+  import { categories, badgeSize, siteSettings, authData } from '$lib/stores'
+  import Category from '$lib/components/Category.svelte'
+
+  let width = 1024
+  $: badgeSize.set(Math.min(128, width / 7))
+
+  $: badgeCategories = $categories.map(c => ({
+    ...c,
+    badges: c.badges.filter(b => $siteSettings.showUnobtainable ? true : !b.unobtainable)
+  }))
+
+  const toggleSiteSettings = (name) => {
+    return () => {
+      const newValue = !$siteSettings[name]
+      window.localStorage.setItem(`siteSettings:${name}`, newValue)
+      siteSettings.set({
+        ...$siteSettings,
+        [name]: newValue
+      })
+    }
+  }
+</script>
+
 <svelte:head>
     <title>Ingress Plus &middot; Badges</title>
 </svelte:head>
 
-<img src="/images/glasses.svg" class="center" width="10%" alt="Glasses" />
-<p>🌽 :Glasses are really versatile. First, you can have glasses-wearing girls take them off and suddenly become beautiful, or have girls wearing glasses flashing those cute grins, or have girls stealing the protagonist's glasses and putting them on like, "Haha, got your glasses!" That's just way too cute! Also, boys with glasses! I really like when their glasses have that suspicious looking gleam, and it's amazing how it can look really cool or just be a joke. I really like how it can fulfill all those abstract needs. Being able to switch up the styles and colors of glasses based on your mood is a lot of fun too! It's actually so much fun! You have those half rim glasses, or the thick frame glasses, everything! It's like you're enjoying all these kinds of glasses at a buffet. I really want Luna to try some on or Marine to try some on to replace her eyepatch. We really need glasses to become a thing in hololive and start selling them for HoloComi. Don't. You. Think. We. Really. Need. To. Officially. Give. Everyone. Glasses?</p>
-<!--- The better Lorum Ipsum /.ixm --->
+<section bind:clientWidth={width}>
+    <div class="controls">
+      <button on:click={toggleSiteSettings('showUnobtainable')}>
+        <img src={`/images/${$siteSettings.showUnobtainable ? 'hide' : 'show'}.svg`} height="24" alt="Show unobtainable badges" />
+        {$siteSettings.showUnobtainable ? 'Hide' : 'Show'} unobtainable badges
+      </button>
+      {#if $authData.isValid === true}
+        <button on:click={toggleSiteSettings('opaqueOwned')} transition:fly={{ x: 50, duration: 500 }}>
+          <img src="/images/shuffle.svg" height="24" alt="Invert highlights" />
+          Highlight {$siteSettings.opaqueOwned ? 'obtained' : 'unobtained'}
+        </button>
+      {/if}
+    </div>
+
+  {#each badgeCategories as category}
+    {#if category.badges.length > 0 }
+      <Category {width} {category} />
+    {/if}
+  {/each}
+
+</section>
 
 <style>
-  div {
-    max-width: 1000px;
+  section {
+    max-width: 1200px;
     margin: auto;
-    padding: 0 1em;
-    line-height: 1.2em;
   }
-  p {
-    text-align: center;
-    margin-left: 5%;
-    margin-right: 5%;
+  div.controls {
+    display: flex;
+    margin: 1em;
+    justify-content: flex-end;
   }
-  h1, h2, h3 {
-    text-align: center;
+  div.controls button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #FFF;
+    margin: 1em 0 1em 1em;
+    padding-bottom: 0.5em;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0);
+    transition: border 0.3s ease-in-out;
   }
-  .center {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+  div.controls button img {
+    margin-right: 0.5em;
+  }
+  div.controls button:hover {
+    border-bottom: 1px solid rgba(255, 255, 255, 1);
   }
 </style>
