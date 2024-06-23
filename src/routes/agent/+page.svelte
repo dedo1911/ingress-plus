@@ -83,23 +83,25 @@
 
 <section bind:clientWidth={width} style="--badge-size: {$badgeSize}px">
   {#if !editVisible}
-    <h2 transition:slide style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" on:click={() => (editVisible = true)}>
+  <div in:slide={{ delay: 200, duration: 200 }} out:slide={{ duration: 200 }} >
+    <h2 style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" on:click={() => (editVisible = true)}>
       {#if $authData?.baseModel?.faction === 'machina'}
       <img src="/images/{factionLogo}" height="40" alt={$authData?.baseModel?.faction || 'unaligned'}/>{zalgo(username)}
       {:else}
          <img src="/images/{factionLogo}" height="40" alt={$authData?.baseModel?.faction || 'unaligned'}/>{username}
       {/if}
     </h2>
-<!-- TODO: Slide for verification text looks broken -->
   {#if $authData?.baseModel?.verification != ''}
-      <p transition:slide>Your Verification level is "<b>{verification.toUpperCase()}</b>"</p>
+      <p>Your Verification level is "<b>{verification.toUpperCase()}</b>"</p>
       {:else}
       <!-- Enable once verification is not manual:
       <p transition:slide>You are currently not verified.</p>
       -->
       {/if}
+  </div>
   {:else}
-    <div transition:slide class="editbox">
+  <div in:slide={{ delay: 200, duration: 200 }} out:slide={{ duration: 200 }} >
+    <div class="editbox">
       <img src="/images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} on:click={toggleFaction} />
       <input type="text" bind:value={newUsername} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" />
       <div class="actions">
@@ -108,13 +110,14 @@
       </div>
     </div>
     {#if $authData.baseModel.public}
-      <p transition:slide class="publicNotice">
+      <p class="publicNotice">
         Your profile is public and will be visible at:<br />
         <span on:click={copyProfileLink}>
           https://ingress.plus/agent/{newUsername}
         </span>
       </p>
     {/if}
+  </div>
   {/if}
 
   <div class="badges">

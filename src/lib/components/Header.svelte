@@ -75,8 +75,8 @@
       <ul transition:slide>
       {#if $authData.isValid }
           <a href="/agent">
-            <li class="{pathname === '/agent' ? 'active' : ''}">
-              <img src="{$authData?.baseModel?.avatar}" alt="{$authData.model.username}" /> {$authData.baseModel.username}
+            <li class="{pathname === '/agent' ? 'active' : '{$authData.model.username}'}">
+              <img src="{$authData?.baseModel?.avatar}" alt="" /> {$authData.baseModel.username}
             </li>
           </a>
           {/if}
@@ -119,7 +119,7 @@
     {#if $authData.isValid }
     <a href="/agent" transition:fly={{ y: 50, duration: 500 }}>
       <li class="{pathname === '/agent' ? 'active' : ''}">
-        <img src="{$authData?.baseModel?.avatar}" alt="{$authData.model.username}" /> {$authData.baseModel.username}
+        <img src="{$authData?.baseModel?.avatar}" alt="" /> {$authData.baseModel.username}
       </li>
     </a>
         {/if}

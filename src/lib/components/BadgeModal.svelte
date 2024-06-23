@@ -75,7 +75,7 @@
       <button on:click={toggleOwned} title={owned ? 'Mark not owned' : 'Mark owned'}>
           <img
             src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
-            alt="Download"
+            alt="Checkbox"
             height="32"
             width="32"
           />
@@ -108,7 +108,7 @@
     {/if}
 
     <button on:click={() => (showModal = false)}>Done</button>
-    {#if !badge.unobtainable && ownedCounter > 0 }
+    {#if ownedCounter > 0 }
       <small transition:slide>{ownedCounter} {ownedCounter === 1 ? 'agent has' : 'agents have'} this badge!</small>
     {/if}
   </section>
