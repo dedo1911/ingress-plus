@@ -10,6 +10,7 @@
     Ingress Fan-site. Not officially affiliated with Ingress or Niantic Labs!
     All images and icons shown on this website are property of their respective owners.
     <br />
+    <a href="/about">About</a> &mdash;
     <a href="/attributions">Attributions</a> &mdash;
     <a href="/terms">Terms of use</a> &mdash;
     <a href="/privacy">Privacy policy</a>
