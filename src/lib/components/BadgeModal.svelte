@@ -71,17 +71,53 @@
 
 <Modal bind:showModal>
   <header>
-    {#if $authData.isValid && !badge.unobtainable }
-      <button on:click={toggleOwned} title={owned ? 'Mark not owned' : 'Mark owned'}>
-          <img
-            src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
-            alt="Checkbox"
-            height="32"
-            width="32"
-          />
-      </button>
+    {#if $authData.isValid}
+
+    {#if badge.unobtainable}
+    <span>
+    <div class="tooltip">
+        <img
+        src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
+        alt="Checkbox"
+        height="32"
+        width="32"
+        />
+        <p class="tooltiptext">This badge is not available in the game.<br>
+        It can therefore not be marked as obtained.</p>
+      </div>
+    </span>
+
+    <!-- Locked tier black magic I dont understand /.ixm
+    {:else if [tier] >= badge.locked_tier}
+    <span>
+    <div class="tooltip">
+        <img
+        src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
+        alt="Checkbox"
+        height="32"
+        width="32"
+        />
+        <span class="tooltiptext">This badge tier is not yet available in the game.<br>
+        It can therefore not be marked as obtained.<br>
+        If this is a mistake, please contact the admins.</span>
+      </div>
+    </span>
+    --->
+
     {:else}
-      <span>&nbsp;</span>
+    <button on:click={toggleOwned} title={owned ? 'Mark not owned' : 'Mark owned'}>
+        <img
+          src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
+          alt="Checkbox"
+          height="32"
+          width="32"
+        />
+    </button>
+    {/if}
+
+    {:else}
+    <span>&nbsp;</span>
+
     {/if}
     <img
       height={$badgeSize * 2}
@@ -173,5 +209,32 @@
     font-size: small;
     float: right;
     padding: 1em 0 0 0;
+  }
+  .tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: default;
+  }
+
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    padding: 0.25em 0.5em;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 0.25em;
+    white-space: nowrap;
+
+    position: absolute;
+    z-index: 1;
+    top: 100%;
+    left: 100%;
+    transition-property: visibility;
+    transition-delay: 0s;
+  }
+
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+    transition-delay: 0.3s;
   }
 </style>
