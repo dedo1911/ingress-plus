@@ -12,10 +12,18 @@
 <a href="/resources"><img src="/images/homepage/cat_resources.png"></a>
 
 <style>
+    h1 {
+        text-align: center;
+        max-width: 800px;
+        margin-left: 5%;
+        margin-right: 5%;
+    }
     p {
         text-align: center;
         margin: 2em auto;
         max-width: 800px;
+        margin-left: 5%;
+        margin-right: 5%;
     }
     img {
         display: block;

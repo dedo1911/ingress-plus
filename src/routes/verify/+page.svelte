@@ -59,6 +59,7 @@ p {
       border: 1px solid white;
       margin-top:2em;
       display: block;
+      width: 200px;
       margin-left: auto;
       margin-right: auto;
   }
