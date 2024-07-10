@@ -30,7 +30,7 @@ $: {
 </svelte:head>
 
 {#if $authData.isValid }
-<img class="profilepicture" src="{$authData?.baseModel?.avatar.slice(0, -6)}" width=10% /><br>
+<img class="profilepicture" src="{$authData?.baseModel?.avatar.slice(0, -6)}" /><br>
 <p>Your username is "<b>{username}</b>".
 <p>Your faction is <b>{faction.toUpperCase()}</b>.
 <p><img class="badge" src="/images/verification/verified.svg"/>Your Verification level is "<b>{verification.toUpperCase()}</b>".</p>
