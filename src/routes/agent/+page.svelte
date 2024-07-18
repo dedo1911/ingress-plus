@@ -92,11 +92,9 @@
       {/if}
     </h2>
   {#if $authData?.baseModel?.verification != ''}
-      <p>Your Verification level is "<b>{verification.toUpperCase()}</b>"</p>
+      <p>Your Verification level is "<a href="/verify"><b>{verification.toUpperCase()}</b></a>"</p>
       {:else}
-      <!-- Enable once verification is not manual:
-      <p transition:slide>You are currently not verified.</p>
-      -->
+      <p>You are currently not <a href="/verify">verified</a>.</p>
       {/if}
   </div>
   {:else}
