@@ -212,7 +212,7 @@
             <li>Posts Passcodes for the Scanner that can be redeemed for items</li>
         </ul>
     </li>
-    <li>Ingress Passcodes - @ingresscodes<ul>
+    <li><a target="_blank" rel="noopener noreferrer" href="https://t.me/ingresscodes">Ingress Passcodes</a> - @ingresscodes<ul>
             <li>Another channel that posts Passcodes for the Scanner</li>
         </ul>
     </li>
