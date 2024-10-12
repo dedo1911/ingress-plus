@@ -42,54 +42,33 @@
     <title>Ingress Plus</title>
 </svelte:head>
 
-<section bind:clientWidth={width}>
-    <div class="controls">
-      <button on:click={toggleSiteSettings('showUnobtainable')}>
-        <img src={`/images/${$siteSettings.showUnobtainable ? 'hide' : 'show'}.svg`} height="24" alt="Show unobtainable badges" />
-        {$siteSettings.showUnobtainable ? 'Hide' : 'Show'} unobtainable badges
-      </button>
-      {#if $authData.isValid === true}
-        <button on:click={toggleSiteSettings('opaqueOwned')} transition:fly={{ x: 50, duration: 500 }}>
-          <img src="/images/shuffle.svg" height="24" alt="Invert highlights" />
-          Highlight {$siteSettings.opaqueOwned ? 'obtained' : 'unobtained'}
-        </button>
-      {/if}
-    </div>
-
-  {#each badgeCategories as category}
-    {#if category.badges.length > 0 }
-      <Category {width} {category} />
-    {/if}
-  {/each}
-
-</section>
+<h1>Welcome to Ingress Plus!</h1>
+<p>Ingress Plus is a fan site for the Niantic game <a target="_blank" rel="noopener noreferrer" href="https://www.ingress.com">Ingress Prime</a>.
+    Users of this site can create a profile with badges they own in the game to share, submit Ingress media
+    and raise bug reports for community awareness (ensure you raise in app firstly). <i>We are not affiliated with Ingress or Niantic.</i></p>
+<a href="/badges"><img src="/images/homepage/cat_badges.png"></a>
+<a href="/media"><img src="/images/homepage/cat_mediagress.png"></a>
+<a href="/bugs"><img src="/images/homepage/cat_bug_tracker.png"></a>
+<a href="/resources"><img src="/images/homepage/cat_resources.png"></a>
 
 <style>
-  section {
-    max-width: 1200px;
-    margin: auto;
-  }
-  div.controls {
-    display: flex;
-    margin: 1em;
-    justify-content: flex-end;
-  }
-  div.controls button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #FFF;
-    margin: 1em 0 1em 1em;
-    padding-bottom: 0.5em;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0);
-    transition: border 0.3s ease-in-out;
-  }
-  div.controls button img {
-    margin-right: 0.5em;
-  }
-  div.controls button:hover {
-    border-bottom: 1px solid rgba(255, 255, 255, 1);
-  }
+    h1 {
+        text-align: center;
+        margin: 1em auto;
+        max-width: 800px;
+    }
+    p {
+        text-align: center;
+        margin: 2em auto;
+        max-width: 800px;
+    }
+    img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        margin: 2em auto;
+        width: 90%;
+        max-width: 700px;
+    }
+
 </style>

@@ -90,6 +90,11 @@
 
 <CartaViewer {carta} value={report.description} theme="ingressplus" />
 
+{#if report.reproduction_steps.length > 0}
+<hr />
+<CartaViewer {carta} value={report.reproduction_steps} theme="ingressplus" />
+{/if}
+
 {#if report.created !== report.updated}
 <p class="updated">
   Updated <Time timestamp={report.updated} relative live />

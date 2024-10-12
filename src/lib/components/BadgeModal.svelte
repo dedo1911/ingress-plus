@@ -1,6 +1,6 @@
 <script>
   import { slide } from 'svelte/transition'
-
+  import { toast } from '@zerodevx/svelte-toast'
   import { pb, serverAddress } from '$lib/pocketbase'
   import { authData, ownedBadges, badgeSize } from '$lib/stores'
   import Modal from '$lib/components/Modal.svelte'
@@ -71,17 +71,44 @@
 
 <Modal bind:showModal>
   <header>
-    {#if $authData.isValid && !badge.unobtainable }
-      <button on:click={toggleOwned} title={owned ? 'Mark not owned' : 'Mark owned'}>
-          <img
-            src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
-            alt="Download"
-            height="32"
-            width="32"
-          />
-      </button>
+    {#if $authData.isValid}
+
+    {#if badge.unobtainable}
+    <span>
+        <img
+        src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
+        alt="Checkbox"
+        height="32"
+        width="32"
+        />
+    </span>
+
+    <!-- Locked tier black magic I dont understand /.ixm
+    {:else if [tier] >= badge.locked_tier}
+    <span>
+        <img
+        src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
+        alt="Checkbox"
+        height="32"
+        width="32"
+        />
+    </span>
+    --->
+
     {:else}
-      <span>&nbsp;</span>
+    <button on:click={toggleOwned} title={owned ? 'Mark not owned' : 'Mark owned'}>
+        <img
+          src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
+          alt="Checkbox"
+          height="32"
+          width="32"
+        />
+    </button>
+    {/if}
+
+    {:else}
+    <span>&nbsp;</span>
+
     {/if}
     <img
       height={$badgeSize * 2}
@@ -108,7 +135,7 @@
     {/if}
 
     <button on:click={() => (showModal = false)}>Done</button>
-    {#if !badge.unobtainable && ownedCounter > 0 }
+    {#if ownedCounter > 0 }
       <small transition:slide>{ownedCounter} {ownedCounter === 1 ? 'agent has' : 'agents have'} this badge!</small>
     {/if}
   </section>

@@ -95,7 +95,7 @@
 </p>
 
 <p class="help">
-    This Bug Tracker is currently in <strong>alpha</strong>! Please send us feedback to our
+    This Bug Tracker is currently in <strong>beta</strong>! Please send us feedback to our
     <a href="https://t.me/Ingress_Plus" target="_blank">Telegram channel</a> or
     <a href="https://github.com/dedo1911/ingress-plus/issues" target="_blank">create an issue on GitHub if you have a Feature Request or notice any problems.</a>
 </p>

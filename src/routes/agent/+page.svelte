@@ -61,6 +61,11 @@
     ? 'machina.png'
     : `${$authData?.baseModel?.faction || 'unaligned'}.svg`
 
+  let verification = '';
+       $: {
+         verification = $authData?.baseModel?.verification || '';
+       }
+
   const copyProfileLink = async () => {
     try {
       await navigator.clipboard.writeText(`https://ingress.plus/agent/${newUsername}`)
@@ -78,15 +83,23 @@
 
 <section bind:clientWidth={width} style="--badge-size: {$badgeSize}px">
   {#if !editVisible}
-    <h2 transition:slide style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" on:click={() => (editVisible = true)}>
+  <div in:slide={{ delay: 200, duration: 200 }} out:slide={{ duration: 200 }} >
+    <h2 style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" on:click={() => (editVisible = true)}>
       {#if $authData?.baseModel?.faction === 'machina'}
-        {zalgo(username)}
+      <img src="/images/{factionLogo}" height="40" alt={$authData?.baseModel?.faction || 'unaligned'}/>{zalgo(username)}
       {:else}
-        {username}
+         <img src="/images/{factionLogo}" height="40" alt={$authData?.baseModel?.faction || 'unaligned'}/>{username}
       {/if}
     </h2>
+  {#if $authData?.baseModel?.verification != ''}
+      <p>Your Verification level is "<a href="/verify"><b>{verification.toUpperCase()}</b></a>"</p>
+      {:else}
+      <p>You are currently not <a href="/verify">verified</a>.</p>
+      {/if}
+  </div>
   {:else}
-    <div transition:slide class="editbox">
+  <div in:slide={{ delay: 200, duration: 200 }} out:slide={{ duration: 200 }} >
+    <div class="editbox">
       <img src="/images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} on:click={toggleFaction} />
       <input type="text" bind:value={newUsername} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" />
       <div class="actions">
@@ -95,13 +108,14 @@
       </div>
     </div>
     {#if $authData.baseModel.public}
-      <p transition:slide class="publicNotice">
+      <p class="publicNotice">
         Your profile is public and will be visible at:<br />
         <span on:click={copyProfileLink}>
           https://ingress.plus/agent/{newUsername}
         </span>
       </p>
     {/if}
+  </div>
   {/if}
 
   <div class="badges">
@@ -120,9 +134,19 @@
 </section>
 
 <style>
+    p {
+        text-align: center;
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+    .center {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+}
   h2 {
     text-align: center;
-    margin: calc(var(--badge-size) / 2) 0;
+    margin: calc(var(--badge-size) / 6) 0;
     font-size: 1.75em;
     text-shadow: 0 0 10px black;
     display: flex;

@@ -31,7 +31,7 @@
 
 <section bind:clientWidth={width} style="--badge-size: {$badgeSize}px">
   <h2 transition:slide style="color: var(--color-faction-{publicUser?.faction || 'unaligned'})">
-    <AgentName id={publicUser.id} linkable={false} factionLogo={false} />
+    <AgentName id={publicUser.id} linkable={false} factionLogo={true} />
   </h2>
 
   <div class="badges">

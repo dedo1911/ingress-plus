@@ -73,8 +73,15 @@
     <span class:open={menuOpen} on:click={toggleMenu} />
     {#if menuOpen}
       <ul transition:slide>
-          <a href="/">
-            <li class="{pathname === '/' ? 'active' : ''}">
+      {#if $authData.isValid }
+          <a href="/agent">
+            <li class="{pathname === '/agent' ? 'active' : '{$authData.model.username}'}">
+              <img src="{$authData?.baseModel?.avatar}" alt="" /> {$authData.baseModel.username}
+            </li>
+          </a>
+          {/if}
+          <a href="/badges">
+            <li class="{pathname === '/badges' ? 'active' : ''}">
               <img src="/images/medal.svg" alt="Badges" /> Badges
             </li>
           </a>
@@ -100,11 +107,6 @@
         </a>
         <li on:click={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
         {#if $authData.isValid }
-        <a href="/agent">
-          <li class="{pathname === '/agent' ? 'active' : ''}">
-            <img src="/images/user.svg" alt="{$authData.model.username}" /> {$authData.baseModel.username}
-          </li>
-        </a>
         <li on:click={logout}><img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout</li>
         {:else}
           <li on:click={login}><img src="/images/user.svg" alt="Login" /> Login</li>
@@ -114,8 +116,15 @@
   </nav>
   <nav data-nav="large">
     <ul>
-        <a href="/">
-          <li class="{pathname === '/' ? 'active' : ''}">
+    {#if $authData.isValid }
+    <a href="/agent" transition:fly={{ y: 50, duration: 500 }}>
+      <li class="{pathname === '/agent' ? 'active' : ''}">
+        <img src="{$authData?.baseModel?.avatar}" alt="" /> {$authData.baseModel.username}
+      </li>
+    </a>
+        {/if}
+        <a href="/badges">
+          <li class="{pathname === '/badges' ? 'active' : ''}">
             <img src="/images/medal.svg" alt="Badges" /> Badges
           </li>
         </a>
@@ -141,12 +150,7 @@
       </a>
       <li on:click={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
       {#if $authData.isValid }
-        <a href="/agent" transition:fly={{ y: 50, duration: 500 }}>
-          <li class="{pathname === '/agent' ? 'active' : ''}">
-            <img src="/images/user.svg" alt="{$authData.model.username}" /> {$authData.baseModel.username}
-          </li>
-        </a>
-        <li on:click={logout} transition:fly={{ y: 50, duration: 500 }}>
+        <li on:click={logout}>
           <img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout
         </li>
       {:else}
