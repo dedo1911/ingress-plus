@@ -18,16 +18,26 @@
   $: rows = hasTiers
     ? Math.ceil(category.badges.length * tiers.length / badgesPerRow)
     : Math.ceil(category.badges.length / badgesPerRow)
+
+  const generateId = (str) =>
+    str
+      .replace(/[^\w\s]+/g, '-')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase()
+
+  const id = generateId(category.title)
 </script>
 
 <div style="--badge-size: {$badgeSize}px">
-  <h2>{category.title}</h2>
-  <section>
+  <section {id}>
+    <h2>{category.title}</h2>
     {#each { length: rows } as _, r}
       <div>
-      {#each { length: badgesPerRow } as _, c}
-        <Badge category={category} index={r * badgesPerRow + c} />
-      {/each}
+        {#each { length: badgesPerRow } as _, c}
+          <Badge {category} index={r * badgesPerRow + c} />
+        {/each}
       </div>
     {/each}
   </section>
