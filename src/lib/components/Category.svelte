@@ -35,7 +35,7 @@
 
   const copyCategoryLink = async (categoryId) => {
     try {
-      await navigator.clipboard.writeText(`${window?.location?.origin}/#${categoryId}`);
+      await navigator.clipboard.writeText(`${window?.location?.origin}${window?.location?.pathname}#${categoryId}`);
       toast.push('Copied to clipboard!', { classes: ['successToast'] });
     } catch (err) {
       console.error(err);
