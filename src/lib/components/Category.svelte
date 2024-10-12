@@ -1,17 +1,18 @@
 <script>
-  import { badgeSize } from "$lib/stores";
-  import Badge from "$lib/components/Badge.svelte";
+  import { toast } from '@zerodevx/svelte-toast'
+  import { badgeSize } from '$lib/stores'
+  import Badge from '$lib/components/Badge.svelte'
 
-  export let category;
-  export let width;
+  export let category
+  export let width
 
-  let badgesPerRow = 1;
-  let rows = 1;
-  let hasTiers = false;
-  let tiers = [];
+  let badgesPerRow = 1
+  let rows = 1
+  let hasTiers = false
+  let tiers = []
 
-  $: tiers = category.tiers.split(",").filter((t) => t);
-  $: hasTiers = tiers.length > 0;
+  $: tiers = category.tiers.split(',').filter(t => t)
+  $: hasTiers = tiers.length > 0
   $: badgesPerRow = hasTiers
     ? Math.max(
         1,
@@ -31,11 +32,21 @@
       .toLowerCase();
 
   const id = generateId(category.title);
+
+  const copyCategoryLink = async (categoryId) => {
+    try {
+      await navigator.clipboard.writeText(`${window?.location?.origin}/#${categoryId}`);
+      toast.push('Copied to clipboard!', { classes: ['successToast'] });
+    } catch (err) {
+      console.error(err);
+      toast.push('An error has occurred.', { classes: ['errorToast'] });
+    }
+  }
 </script>
 
 <div style="--badge-size: {$badgeSize}px">
   <section>
-    <h2 {id}><a href={`#${id}`}>{category.title}</a></h2>
+    <h2 {id}><a href={`#${id}`} on:click={() => copyCategoryLink(id)}>{category.title}</a></h2>
     <div>
       {#each { length: rows } as _, r}
         <div>
@@ -55,6 +66,13 @@
     margin: calc(var(--badge-size) / 3) 0 calc(var(--badge-size) / 2) 0;
     font-size: 2em;
     text-shadow: 0 0 10px black;
+  }
+  a {
+    padding: 0 1.25em;
+  }
+  a:hover {
+    background: url(/images/link.svg) no-repeat left center;
+    background-size: 1em;
   }
   section {
     padding-bottom: calc(var(--badge-size) / 4);
