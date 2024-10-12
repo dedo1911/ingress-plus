@@ -67,10 +67,8 @@
     font-size: 2em;
     text-shadow: 0 0 10px black;
   }
-  a {
-    padding: 0 1.25em;
-  }
   a:hover {
+    padding: 0 1.25em;
     background: url(/images/link.svg) no-repeat left center;
     background-size: 1em;
   }
