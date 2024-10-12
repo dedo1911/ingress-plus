@@ -73,7 +73,7 @@
   <header>
     {#if $authData.isValid}
 
-    {#if badge.unobtainable}
+    {#if badge.unobtainable || (badgeData?.locked_tier > 0 && [tier] >= badgeData?.locked_tier)}
     <span>
         <img
         src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
@@ -82,18 +82,6 @@
         width="32"
         />
     </span>
-
-    <!-- Locked tier black magic I dont understand /.ixm
-    {:else if [tier] >= badge.locked_tier}
-    <span>
-        <img
-        src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
-        alt="Checkbox"
-        height="32"
-        width="32"
-        />
-    </span>
-    --->
 
     {:else}
     <button on:click={toggleOwned} title={owned ? 'Mark not owned' : 'Mark owned'}>
