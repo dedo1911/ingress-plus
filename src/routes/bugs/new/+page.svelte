@@ -46,7 +46,7 @@
       return
     }
 
-        //TODO: Image validation
+    //TODO: Image validation
     //Image validation (Only allow upload if max. 5 images)
     //if (parseInt(attachments.get(0).files.length) > 5) {
     //toast.push('You can only upload up to 5 images.', { classes: ['errorToast'] })
@@ -76,15 +76,11 @@
   <hr />
 
 <h2>Description of the bug</h2>
-<!-- Disable on prod, enable MarkdownEditor -->
-  <input type="text" placeholder="Type here..." bind:value={description} />
-<!--  <MarkdownEditor {carta} theme='ingressplus' bind:value={description} placeholder="Type here..." /> -->
+  <MarkdownEditor {carta} theme="ingressplus" bind:value={description} placeholder="Type here..." />
   <hr />
 
 <h3>Reproduction steps (optional)</h3>
-<!-- Disable on prod, enable MarkdownEditor -->
-  <input type="text" placeholder="Open Ingress, then..." bind:value={ReproductionSteps} />
-<!--  <MarkdownEditor {carta} theme='ingressplus' bind:value={ReproductionSteps} placeholder="Open Ingress, then..." /> -->
+  <MarkdownEditor {carta} theme="ingressplus" bind:value={ReproductionSteps} placeholder="Open Ingress, then..." />
 <hr>
 
 <!-- TODO: Sending attachments broken, didn't understand documentation: https://pocketbase.io/docs/files-handling ^^' -->
@@ -93,7 +89,6 @@
     <p>You can add up to 5 screenshots to your Bug Report. Do not abuse this function or you will be banned.</p>
     <input type="file" accept="image/png, image/jpeg" multiple="multiple" onchange="loadFile(event)"><br>
     <div id="output"></div>
-    <img id="output" width="20%"/>
 {:else}
     <p>If your Verification level is at least "BASIC" you can also upload images.
     Verification is done manually and at the discrecion of the admins only at the moment.</p>
