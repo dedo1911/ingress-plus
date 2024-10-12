@@ -24,6 +24,8 @@
   }
 
   onMount(() => {
+    width = document.getElementsByTagName('section')[0].clientWidth
+    if (window.location.hash) document.querySelector(window.location.hash).scrollIntoView({ behavior: 'smooth' })
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
         e.preventDefault()
