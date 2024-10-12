@@ -34,6 +34,9 @@ a:link, a:visited, a:hover, a:active {
   color: #FFFFFF;
   text-decoration: none;
 }
+h2 a:link, h2 a:visited, h2 a:hover, h2 a:active {
+  color: #9593c3;
+}
 
 :root {
   --color-faction-unaligned: #ffce00;
@@ -86,7 +89,7 @@ input[type=text], select, button {
   font-size: 1.25em;
   background: rgba(14, 11, 28, 0.9);
   border: 3px double #5e5a75;
-  color: #FFFFFF;
+  color: #784f4f;
   border-radius: 8px;
   padding: 0.25em 0.5em;
   text-align: center;

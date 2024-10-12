@@ -1,45 +1,50 @@
 <script>
-  import { badgeSize } from '$lib/stores'
-  import Badge from '$lib/components/Badge.svelte'
+  import { badgeSize } from "$lib/stores";
+  import Badge from "$lib/components/Badge.svelte";
 
-  export let category
-  export let width
+  export let category;
+  export let width;
 
-  let badgesPerRow = 1
-  let rows = 1
-  let hasTiers = false
-  let tiers = []
+  let badgesPerRow = 1;
+  let rows = 1;
+  let hasTiers = false;
+  let tiers = [];
 
-  $: tiers = category.tiers.split(',').filter(t => t)
-  $: hasTiers = tiers.length > 0
+  $: tiers = category.tiers.split(",").filter((t) => t);
+  $: hasTiers = tiers.length > 0;
   $: badgesPerRow = hasTiers
-    ? Math.max(1, Math.min(tiers.length, Math.floor((width - $badgeSize) / $badgeSize)))
-    : 6 // Math.max(1, Math.floor((width-$badgeSize)/$badgeSize))
+    ? Math.max(
+        1,
+        Math.min(tiers.length, Math.floor((width - $badgeSize) / $badgeSize)),
+      )
+    : 6; // Math.max(1, Math.floor((width-$badgeSize)/$badgeSize))
   $: rows = hasTiers
-    ? Math.ceil(category.badges.length * tiers.length / badgesPerRow)
-    : Math.ceil(category.badges.length / badgesPerRow)
+    ? Math.ceil((category.badges.length * tiers.length) / badgesPerRow)
+    : Math.ceil(category.badges.length / badgesPerRow);
 
   const generateId = (str) =>
     str
-      .replace(/[^\w\s]+/g, '-')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-+|-+$/g, '')
-      .toLowerCase()
+      .replace(/[^\w\s]+/g, "-")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .toLowerCase();
 
-  const id = generateId(category.title)
+  const id = generateId(category.title);
 </script>
 
 <div style="--badge-size: {$badgeSize}px">
-  <section {id}>
-    <h2>{category.title}</h2>
-    {#each { length: rows } as _, r}
-      <div>
-        {#each { length: badgesPerRow } as _, c}
-          <Badge {category} index={r * badgesPerRow + c} />
-        {/each}
-      </div>
-    {/each}
+  <section>
+    <h2 {id}><a href={`#${id}`}>{category.title}</a></h2>
+    <div>
+      {#each { length: rows } as _, r}
+        <div>
+          {#each { length: badgesPerRow } as _, c}
+            <Badge {category} index={r * badgesPerRow + c} />
+          {/each}
+        </div>
+      {/each}
+    </div>
   </section>
 </div>
 <hr />
@@ -52,9 +57,11 @@
     text-shadow: 0 0 10px black;
   }
   section {
+    padding-bottom: calc(var(--badge-size) / 4);
+  }
+  section > div {
     width: fit-content;
     margin: auto;
-    padding-bottom: calc(var(--badge-size) / 4);
   }
   section div {
     white-space: nowrap;
