@@ -76,10 +76,6 @@
     goto(`/bugs/${entry.id}`);
   };
 
-  $: if (attachments) {
-    console.log(attachments);
-  }
-
   const removeAttachment = (index) => {
     const newAttachments = Array.from(attachments)
     newAttachments.splice(index, 1)

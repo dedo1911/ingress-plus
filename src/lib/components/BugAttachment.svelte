@@ -5,8 +5,6 @@
   export let attachment
   export let report
   let showModal = false
-
-  $: console.log(attachment)
 </script>
 
 <img

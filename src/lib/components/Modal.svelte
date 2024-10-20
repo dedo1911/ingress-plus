@@ -11,7 +11,6 @@
 	const preventDefault = (event) => {
     event.preventDefault()
     event.stopImmediatePropagation()
-    console.log('preventDefault', event)
   }
 </script>
 
