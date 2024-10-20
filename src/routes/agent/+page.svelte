@@ -84,7 +84,7 @@
 <section bind:clientWidth={width} style="--badge-size: {$badgeSize}px">
   {#if !editVisible}
   <div in:slide={{ delay: 200, duration: 200 }} out:slide={{ duration: 200 }} >
-    <h2 style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" on:click={() => (editVisible = true)}>
+    <h2 style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" onclick={() => (editVisible = true)}>
       {#if $authData?.baseModel?.faction === 'machina'}
       <img src="/images/{factionLogo}" height="40" alt={$authData?.baseModel?.faction || 'unaligned'}/>{zalgo(username)}
       {:else}
@@ -92,7 +92,7 @@
       {/if}
     </h2>
   {#if $authData?.baseModel?.verification != ''}
-      <p>Your Verification level is "<a href="/verify"><b>{verification.toUpperCase()}</b></a>"</p>
+      <p>Your Verification level is <a href="/verify"><code>{verification.toUpperCase()}</code></a></p>
       {:else}
       <p>You are currently not <a href="/verify">verified</a>.</p>
       {/if}
@@ -100,17 +100,17 @@
   {:else}
   <div in:slide={{ delay: 200, duration: 200 }} out:slide={{ duration: 200 }} >
     <div class="editbox">
-      <img src="/images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} on:click={toggleFaction} />
+      <img src="/images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} onclick={toggleFaction} />
       <input type="text" bind:value={newUsername} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" />
       <div class="actions">
-        <img src={$authData.baseModel.public ? '/images/public.svg' : '/images/private.svg'} alt={$authData.baseModel.public ? 'Public' : 'Private'} height="32" on:click={togglePublic} />
-        <img src="/images/accept.svg" height="32" alt="Save" on:click={saveUsername} />
+        <img src={$authData.baseModel.public ? '/images/public.svg' : '/images/private.svg'} alt={$authData.baseModel.public ? 'Public' : 'Private'} height="32" onclick={togglePublic} />
+        <img src="/images/accept.svg" height="32" alt="Save" onclick={saveUsername} />
       </div>
     </div>
     {#if $authData.baseModel.public}
       <p class="publicNotice">
         Your profile is public and will be visible at:<br />
-        <span on:click={copyProfileLink}>
+        <span onclick={copyProfileLink}>
           https://ingress.plus/agent/{newUsername}
         </span>
       </p>

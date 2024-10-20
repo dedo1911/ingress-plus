@@ -1,6 +1,5 @@
 <script>
   import { slide } from 'svelte/transition'
-  import { toast } from '@zerodevx/svelte-toast'
   import { pb, serverAddress } from '$lib/pocketbase'
   import { authData, ownedBadges, badgeSize } from '$lib/stores'
   import Modal from '$lib/components/Modal.svelte'
@@ -71,39 +70,26 @@
 
 <Modal bind:showModal>
   <header>
-    {#if $authData.isValid}
+    {#if $authData.isValid && !!badgeData}
 
-    {#if badge.unobtainable}
-    <span>
-        <img
-        src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
-        alt="Checkbox"
-        height="32"
-        width="32"
-        />
-    </span>
-
-    <!-- Locked tier black magic I dont understand /.ixm
-    {:else if [tier] >= badge.locked_tier}
-    <span>
-        <img
-        src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
-        alt="Checkbox"
-        height="32"
-        width="32"
-        />
-    </span>
-    --->
-
-    {:else}
-    <button on:click={toggleOwned} title={owned ? 'Mark not owned' : 'Mark owned'}>
-        <img
-          src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
+    {#if badge.unobtainable || (badgeData?.locked_tier > 0 && [tier] >= badgeData?.locked_tier)}
+      <span>
+          <img
+          src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
           alt="Checkbox"
           height="32"
           width="32"
-        />
-    </button>
+          />
+      </span>
+    {:else}
+      <span onclick={toggleOwned} class="toggleOwned" title={owned ? 'Mark not owned' : 'Mark owned'}>
+          <img
+            src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
+            alt="Checkbox"
+            height="32"
+            width="32"
+          />
+      </span>
     {/if}
 
     {:else}
@@ -124,7 +110,12 @@
     </a>
   </header>
   <section bind:this={content} style="--badge-size: {$badgeSize}px">
-    <h2>{title}</h2>
+    <h2>
+      {#if badgeData?.core_only }
+        <img src="/images/core.png" alt="C.O.R.E" class="core-flare" />
+      {/if}
+      {title}
+    </h2>
     {#if badgeData}
       <hr transition:slide />
       <p transition:slide>{badgeData.description}</p>
@@ -134,10 +125,12 @@
       {/if}
     {/if}
 
-    <button on:click={() => (showModal = false)}>Done</button>
-    {#if ownedCounter > 0 }
-      <small transition:slide>{ownedCounter} {ownedCounter === 1 ? 'agent has' : 'agents have'} this badge!</small>
-    {/if}
+    <button onclick={() => (showModal = false)}>Done</button>
+    <div class="footer">
+      {#if ownedCounter > 0 }
+        <small transition:slide>{ownedCounter} {ownedCounter === 1 ? 'agent has' : 'agents have'} this badge!</small>
+      {/if}
+    </div>
   </section>
 </Modal>
 
@@ -147,22 +140,19 @@
     align-items: center;
     justify-content: space-between;
     filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.75));
+    position: sticky;
+    z-index: 9999;
   }
-  header span, header a, header button {
+  header span, header a {
     height: 32px;
     width: 32px;
     margin: calc(32px + 15px) 20px 0;
   }
-  header button {
-    margin-left: 8px;
-    padding: 0;
-    border: 0;
-  }
-  header a img {
+  header a img, span.toggleOwned {
     cursor: pointer;
   }
   section h2 {
-    margin: 0.1em 0;
+    margin: 0.5em 0 0 0;
   }
   section {
     background: rgba(14, 11, 28, 0.9);
@@ -190,6 +180,11 @@
     border-color: #9593c3;
     border-radius: 6px;
   }
+  div.footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1em;
+  }
   small {
     color: #d1d1d1;
     text-align: right;
@@ -198,7 +193,5 @@
     right: 0;
     bottom: 0;
     font-size: small;
-    float: right;
-    padding: 1em 0 0 0;
   }
 </style>

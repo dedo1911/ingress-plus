@@ -2,6 +2,7 @@
   import { fly } from 'svelte/transition'
   import { categories, badgeSize, siteSettings, authData } from '$lib/stores'
   import Category from '$lib/components/Category.svelte'
+  import { onMount } from 'svelte'
 
   let width = 1024
   $: badgeSize.set(Math.min(128, width / 7))
@@ -21,6 +22,24 @@
       })
     }
   }
+
+  onMount(() => {
+    width = document.getElementsByTagName('section')[0].clientWidth
+    if (window.location.hash) {
+      setTimeout(() => {
+        document.querySelector(window.location.hash).scrollIntoView({ behavior: 'smooth' })
+      }, 1)
+    }
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault()
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+        window.history.pushState({}, '', this.getAttribute('href'));
+      });
+    });
+  })
 </script>
 
 <svelte:head>
@@ -29,12 +48,12 @@
 
 <section bind:clientWidth={width}>
     <div class="controls">
-      <button on:click={toggleSiteSettings('showUnobtainable')}>
+      <button onclick={toggleSiteSettings('showUnobtainable')}>
         <img src={`/images/${$siteSettings.showUnobtainable ? 'hide' : 'show'}.svg`} height="24" alt="Show unobtainable badges" />
         {$siteSettings.showUnobtainable ? 'Hide' : 'Show'} unobtainable badges
       </button>
       {#if $authData.isValid === true}
-        <button on:click={toggleSiteSettings('opaqueOwned')} transition:fly={{ x: 50, duration: 500 }}>
+        <button onclick={toggleSiteSettings('opaqueOwned')} transition:fly={{ x: 50, duration: 500 }}>
           <img src="/images/shuffle.svg" height="24" alt="Invert highlights" />
           Highlight {$siteSettings.opaqueOwned ? 'obtained' : 'unobtained'}
         </button>

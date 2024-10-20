@@ -35,7 +35,7 @@
 
   const copyCategoryLink = async (categoryId) => {
     try {
-      await navigator.clipboard.writeText(`${window?.location?.origin}/#${categoryId}`);
+      await navigator.clipboard.writeText(`${window?.location?.origin}${window?.location?.pathname}#${categoryId}`);
       toast.push('Copied to clipboard!', { classes: ['successToast'] });
     } catch (err) {
       console.error(err);
@@ -46,7 +46,7 @@
 
 <div style="--badge-size: {$badgeSize}px">
   <section>
-    <h2 {id}><a href={`#${id}`} on:click={() => copyCategoryLink(id)}>{category.title}</a></h2>
+    <h2 {id}><a href={`#${id}`} onclick={() => copyCategoryLink(id)}>{category.title}</a></h2>
     <div>
       {#each { length: rows } as _, r}
         <div>

@@ -4,8 +4,6 @@
 
   export let data
   $: media = data.media
-
-  $: console.log('RELEASE:', dayjs(media.released_at).isBefore(dayjs()))
 </script>
 
 <svelte:head>

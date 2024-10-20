@@ -86,10 +86,10 @@
 <div class="container">
     <div class="search">
         <div style="min-width: 270px">
-            <input type="text" bind:value={searchFilter} on:change={executeSearch} placeholder="Search..." />
+            <input type="text" bind:value={searchFilter} onkeydown={executeSearch} placeholder="Search..." />
         </div>
         <div style="min-width: 270px">
-            <select bind:value={sorting} on:change={executeSearch}>
+            <select bind:value={sorting} onchange={executeSearch}>
                 <option value="-released_at">Release (Newest first)</option>
                 <option value="released_at">Release (Oldest first)</option>
                 <option value="-created">Upload (Newest first)</option>
@@ -119,13 +119,13 @@
         <p class="empty">Nothing to show!</p>
     {/if}
     <div class="paginator">
-        <img class:disabled={page <= 1} src="/images/left.svg" on:click={prevPage} alt="Previous Page" />
+        <img class:disabled={page <= 1} src="/images/left.svg" onclick={prevPage} alt="Previous Page" />
         Page {page} of {totalPages} (Total Media: {totalItems})
-        <img class:disabled={page >= totalPages} src="/images/right.svg" on:click={nextPage} alt="Next Page" />
+        <img class:disabled={page >= totalPages} src="/images/right.svg" onclick={nextPage} alt="Next Page" />
     </div>
     <div class="page-options">
         Media per page:&nbsp;
-        <select bind:value={itemsPerPage} on:change={fetchMedias}>
+        <select bind:value={itemsPerPage} onchange={fetchMedias}>
             <option value="10">10</option>
             <option value="20">20</option>
             <option value="50">50</option>

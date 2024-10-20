@@ -109,6 +109,11 @@
             <li>Lists all upcoming Mission Day events and their details</li>
         </ul>
     </li>
+    <li><a target="_blank" rel="noopener noreferrer" href="http://glyphtionary.com/">The Glyphtionary</a>
+            <ul>
+                <li>Searchable database of every known Glyph, be it in the game or story only</li>
+            </ul>
+        </li>
 </ul>
 <hr>
 <h2><a name="telegram"></a><img src="/images/telegram.svg" alt="Telegram icon" />Telegram</h2>

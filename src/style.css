@@ -84,16 +84,19 @@ h2 a:link, h2 a:visited, h2 a:hover, h2 a:active {
 .flex {
   display: flex;
 }
-
-input[type=text], select, button {
+input[type=file] {
+  display: none;
+}
+input[type=text], select, button, label.file-upload {
   font-size: 1.25em;
   background: rgba(14, 11, 28, 0.9);
   border: 3px double #5e5a75;
-  color: #784f4f;
+  color: #FFFFFF;
   border-radius: 8px;
   padding: 0.25em 0.5em;
   text-align: center;
   min-width: 20px;
+  cursor: pointer;
 }
 
 button {
@@ -223,4 +226,11 @@ pre code {
   -webkit-background-clip: text;
   animation: shimmer 2s ease-in-out infinite, glow-machina 2s ease-in-out infinite alternate;
   background-size: 50% 100%;
+}
+
+img.core-flare {
+  height: 32px;
+  filter: drop-shadow(0px 0px 5px var(--color-faction-unaligned));
+  vertical-align: middle;
+  margin: auto 0.25em;
 }
