@@ -71,14 +71,14 @@
     </a>
   </div>
   <nav data-nav="mobile">
-    <span class:open={menuOpen} on:click={toggleMenu} />
+    <span class:open={menuOpen} onclick={toggleMenu} />
     {#if menuOpen}
       <ul transition:slide>
       {#if $authData.isValid }
           <a href="/agent">
             <li class="{pathname === '/agent' ? 'active' : '{$authData.model.username}'}">
               <img src="{$authData?.baseModel?.avatar.slice(0, -6)}" alt={$authData.baseModel.username}
-                onerror="this.onerror=null; this.src='/images/user.svg';" />
+                onerror={() => this.src='/images/user.svg'} />
               {$authData.baseModel.username}
             </li>
           </a>
@@ -108,11 +108,11 @@
             <img src="/images/statistics.svg" alt="Statistics" /> Statistics
           </li>
         </a>
-        <li on:click={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
+        <li onclick={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
         {#if $authData.isValid }
-        <li on:click={logout}><img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout</li>
+        <li onclick={logout}><img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout</li>
         {:else}
-          <li on:click={login}><img src="/images/user.svg" alt="Login" /> Login</li>
+          <li onclick={login}><img src="/images/user.svg" alt="Login" /> Login</li>
         {/if}
       </ul>
     {/if}
@@ -123,7 +123,7 @@
     <a href="/agent" transition:fly={{ y: 50, duration: 500 }}>
       <li class="{pathname === '/agent' ? 'active' : ''}">
         <img src="{$authData?.baseModel?.avatar.slice(0, -6)}" alt={$authData.baseModel.username}
-          onerror="this.onerror=null; this.src='/images/user.svg';" />
+          onerror={() => this.src='/images/user.svg'} />
         {$authData.baseModel.username}
       </li>
     </a>
@@ -153,13 +153,13 @@
           <img src="/images/statistics.svg" alt="Statistics" /> Statistics
         </li>
       </a>
-      <li on:click={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
+      <li onclick={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
       {#if $authData.isValid }
-        <li on:click={logout}>
+        <li onclick={logout}>
           <img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout
         </li>
       {:else}
-        <li on:click={login}>
+        <li onclick={login}>
           <img src="/images/user.svg" alt="Login" /> Login
         </li>
       {/if}

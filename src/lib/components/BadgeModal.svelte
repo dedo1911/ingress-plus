@@ -82,7 +82,7 @@
           />
       </span>
     {:else}
-      <span on:click={toggleOwned} class="toggleOwned" title={owned ? 'Mark not owned' : 'Mark owned'}>
+      <span onclick={toggleOwned} class="toggleOwned" title={owned ? 'Mark not owned' : 'Mark owned'}>
           <img
             src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
             alt="Checkbox"
@@ -125,7 +125,7 @@
       {/if}
     {/if}
 
-    <button on:click={() => (showModal = false)}>Done</button>
+    <button onclick={() => (showModal = false)}>Done</button>
     <div class="footer">
       {#if ownedCounter > 0 }
         <small transition:slide>{ownedCounter} {ownedCounter === 1 ? 'agent has' : 'agents have'} this badge!</small>

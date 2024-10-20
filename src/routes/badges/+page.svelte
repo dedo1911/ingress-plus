@@ -48,12 +48,12 @@
 
 <section bind:clientWidth={width}>
     <div class="controls">
-      <button on:click={toggleSiteSettings('showUnobtainable')}>
+      <button onclick={toggleSiteSettings('showUnobtainable')}>
         <img src={`/images/${$siteSettings.showUnobtainable ? 'hide' : 'show'}.svg`} height="24" alt="Show unobtainable badges" />
         {$siteSettings.showUnobtainable ? 'Hide' : 'Show'} unobtainable badges
       </button>
       {#if $authData.isValid === true}
-        <button on:click={toggleSiteSettings('opaqueOwned')} transition:fly={{ x: 50, duration: 500 }}>
+        <button onclick={toggleSiteSettings('opaqueOwned')} transition:fly={{ x: 50, duration: 500 }}>
           <img src="/images/shuffle.svg" height="24" alt="Invert highlights" />
           Highlight {$siteSettings.opaqueOwned ? 'obtained' : 'unobtained'}
         </button>

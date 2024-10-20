@@ -13,13 +13,13 @@
   class="thumbnail"
   src="{serverAddress}/api/files/{report.collectionId}/{report.id}/{attachment}?thumb=150x0"
   alt={attachment}
-  on:click={() => (showModal = true)}
+  onclick={() => (showModal = true)}
 />
 
 <Modal bind:showModal>
   <div>
     <img class="attachment" src="{serverAddress}/api/files/{report.collectionId}/{report.id}/{attachment}" alt="{attachment.name}" />
-    <button class="close" on:click={() => (showModal = false)} alt="Close">
+    <button class="close" onclick={() => (showModal = false)} alt="Close">
       <img src="/images/close.png" />
     </button>
   </div>

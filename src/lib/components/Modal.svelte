@@ -7,14 +7,20 @@
     if (showModal) dialog.showModal()
     else dialog.close()
   }
+
+	const preventDefault = (event) => {
+    event.preventDefault()
+    event.stopImmediatePropagation()
+    console.log('preventDefault', event)
+  }
 </script>
 
 {#if showModal}
   <dialog
     bind:this={dialog}
-    on:close={() => (showModal = false)}
-    on:click|self={() => dialog.close()} >
-    <div on:click|stopPropagation on:keydown|stopPropagation>
+    onclose={() => (showModal = false)}
+    onclick={() => dialog.close()}>
+    <div onclick={preventDefault} onkeydown={preventDefault}>
       <slot />
     </div>
   </dialog>

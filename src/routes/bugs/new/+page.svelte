@@ -150,7 +150,7 @@
               style={`background-image: url(${URL.createObjectURL(file)})`}
             ></div>
             <span class="fileName">{file.name}</span>
-            <span class="remove" on:click={() => removeAttachment(index)} />
+            <span class="remove" onclick={() => removeAttachment(index)} />
           </div>
         {/each}
       {/if}
@@ -163,7 +163,7 @@
     </p>
   {/if}
   <div class="actions">
-    <button on:click={publishReport}>Submit</button>
+    <button onclick={publishReport}>Submit</button>
   </div>
 </div>
 

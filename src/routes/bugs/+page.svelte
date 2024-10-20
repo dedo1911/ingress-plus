@@ -116,7 +116,7 @@
             <span class="comments">{formatNumber(report.comments)}</span>
             <span class="upvotes" class:voted={myUpvotes.includes(report.id)}
               title={myUpvotes.includes(report.id) ? 'Remove upvote' : 'Upvote'}
-              on:click={e => toggleUpvote(e, report.id)}>
+              onclick={e => toggleUpvote(e, report.id)}>
                 {formatNumber(report.upvotes)}
             </span>
         </a>
@@ -124,9 +124,9 @@
     {/key}
 
     <div class="paginator">
-        <img class:disabled={page <= 1} src="/images/left.svg" on:click={prevPage} alt="Previous Page" />
+        <img class:disabled={page <= 1} src="/images/left.svg" onclick={prevPage} alt="Previous Page" />
         Page {page} of {totalPages} (Total Bug Reports: {totalItems})
-        <img class:disabled={page >= totalPages} src="/images/right.svg" on:click={nextPage} alt="Next Page" />
+        <img class:disabled={page >= totalPages} src="/images/right.svg" onclick={nextPage} alt="Next Page" />
     </div>
 </div>
 

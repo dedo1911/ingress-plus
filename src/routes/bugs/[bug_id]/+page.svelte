@@ -161,7 +161,7 @@
         placeholder="Comment..."
       />
       <div class="new-comment-button">
-        <button on:click={postComment}>Comment</button>
+        <button onclick={postComment}>Comment</button>
       </div>
     </div>
   {/if}

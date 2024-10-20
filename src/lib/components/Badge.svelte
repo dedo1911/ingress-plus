@@ -43,7 +43,7 @@
 </script>
 
 {#if badge }
-  <span on:click={onBadgeClick} on:keydown={onBadgeKeydown} role='button' tabindex='0'>
+  <span onclick={onBadgeClick} onkeydown={onBadgeKeydown} role='button' tabindex='0'>
     <img loading="lazy" height="{$badgeSize}" width="{$badgeSize}" alt="{title}" class:opaque={opaque}
     src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={thumbSize($badgeSize)}" />
   </span>
