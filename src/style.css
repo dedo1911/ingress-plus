@@ -84,16 +84,19 @@ h2 a:link, h2 a:visited, h2 a:hover, h2 a:active {
 .flex {
   display: flex;
 }
-
-input[type=text], select, button {
+input[type=file] {
+  display: none;
+}
+input[type=text], select, button, label.file-upload {
   font-size: 1.25em;
   background: rgba(14, 11, 28, 0.9);
   border: 3px double #5e5a75;
-  color: #784f4f;
+  color: #FFFFFF;
   border-radius: 8px;
   padding: 0.25em 0.5em;
   text-align: center;
   min-width: 20px;
+  cursor: pointer;
 }
 
 button {
