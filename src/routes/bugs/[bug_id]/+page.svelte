@@ -5,10 +5,11 @@
   import { Carta, CartaViewer, MarkdownEditor } from "carta-md";
   import { toast } from "@zerodevx/svelte-toast";
   import { page } from "$app/stores";
-  import { pb, serverAddress } from "$lib/pocketbase";
+  import { pb } from "$lib/pocketbase";
   import { authData } from "$lib/stores";
   import AgentName from "$lib/components/AgentName.svelte";
   import Comment from "$lib/components/Comment.svelte";
+  import BugAttachment from "../../../lib/components/BugAttachment.svelte";
 
   export let data;
   let report = data.report;
@@ -132,16 +133,7 @@
     <h2>Attachments</h2>
     <div class="attachments">
       {#each report.attachments as attachment}
-        <a
-          href="{serverAddress}/api/files/{report.collectionId}/{report.id}/{attachment}"
-          alt={attachment}
-          target="_blank"
-        >
-          <img
-            src="{serverAddress}/api/files/{report.collectionId}/{report.id}/{attachment}?thumb=150x0"
-            alt={attachment}
-          />
-        </a>
+          <BugAttachment {attachment} {report} />
       {/each}
     </div>
 

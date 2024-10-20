@@ -1,6 +1,5 @@
 <script>
   import { slide } from 'svelte/transition'
-  import { toast } from '@zerodevx/svelte-toast'
   import { pb, serverAddress } from '$lib/pocketbase'
   import { authData, ownedBadges, badgeSize } from '$lib/stores'
   import Modal from '$lib/components/Modal.svelte'
