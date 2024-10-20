@@ -4,6 +4,7 @@
   import DOMPurify from "isomorphic-dompurify";
   import { pb } from "$lib/pocketbase";
   import { goto } from "$app/navigation";
+  import { browser } from '$app/environment'
   import { authData } from "$lib/stores";
 
   let title = "";
@@ -16,7 +17,7 @@
     sanitizer: DOMPurify.sanitize,
   });
 
-  $: if ($authData.isValid !== true) goto("/bugs");
+  $: if (browser && $authData.isValid !== true) goto("/bugs");
 
   const publishReport = async () => {
     //Title lengh validation
