@@ -71,27 +71,26 @@
 
 <Modal bind:showModal>
   <header>
-    {#if $authData.isValid}
+    {#if $authData.isValid && !!badgeData}
 
     {#if badge.unobtainable || (badgeData?.locked_tier > 0 && [tier] >= badgeData?.locked_tier)}
-    <span>
-        <img
-        src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
-        alt="Checkbox"
-        height="32"
-        width="32"
-        />
-    </span>
-
-    {:else}
-    <button on:click={toggleOwned} title={owned ? 'Mark not owned' : 'Mark owned'}>
-        <img
-          src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
+      <span>
+          <img
+          src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
           alt="Checkbox"
           height="32"
           width="32"
-        />
-    </button>
+          />
+      </span>
+    {:else}
+      <span on:click={toggleOwned} class="toggleOwned" title={owned ? 'Mark not owned' : 'Mark owned'}>
+          <img
+            src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
+            alt="Checkbox"
+            height="32"
+            width="32"
+          />
+      </span>
     {/if}
 
     {:else}
@@ -136,17 +135,12 @@
     justify-content: space-between;
     filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.75));
   }
-  header span, header a, header button {
+  header span, header a {
     height: 32px;
     width: 32px;
     margin: calc(32px + 15px) 20px 0;
   }
-  header button {
-    margin-left: 8px;
-    padding: 0;
-    border: 0;
-  }
-  header a img {
+  header a img, span.toggleOwned {
     cursor: pointer;
   }
   section h2 {
