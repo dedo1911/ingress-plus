@@ -227,3 +227,10 @@ pre code {
   animation: shimmer 2s ease-in-out infinite, glow-machina 2s ease-in-out infinite alternate;
   background-size: 50% 100%;
 }
+
+img.core-flare {
+  height: 32px;
+  filter: drop-shadow(0px 0px 5px var(--color-faction-unaligned));
+  vertical-align: middle;
+  margin: auto 0.25em;
+}
