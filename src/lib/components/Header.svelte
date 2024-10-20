@@ -76,7 +76,9 @@
       {#if $authData.isValid }
           <a href="/agent">
             <li class="{pathname === '/agent' ? 'active' : '{$authData.model.username}'}">
-              <img src="{$authData?.baseModel?.avatar}" alt="" /> {$authData.baseModel.username}
+              <img src="{$authData?.baseModel?.avatar.slice(0, -6)}" alt={$authData.baseModel.username}
+                onerror="this.onerror=null; this.src='/images/user.svg';" />
+              {$authData.baseModel.username}
             </li>
           </a>
           {/if}
@@ -119,7 +121,9 @@
     {#if $authData.isValid }
     <a href="/agent" transition:fly={{ y: 50, duration: 500 }}>
       <li class="{pathname === '/agent' ? 'active' : ''}">
-        <img src="{$authData?.baseModel?.avatar}" alt="" /> {$authData.baseModel.username}
+        <img src="{$authData?.baseModel?.avatar.slice(0, -6)}" alt={$authData.baseModel.username}
+          onerror="this.onerror=null; this.src='/images/user.svg';" />
+        {$authData.baseModel.username}
       </li>
     </a>
         {/if}
@@ -212,6 +216,7 @@
   nav ul li img {
     height: 1.5em;
     width: 1.5em;
+    margin: 0;
     margin-right: 0.5em;
     border-radius: 6px;
   }
