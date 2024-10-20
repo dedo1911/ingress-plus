@@ -13,10 +13,11 @@
 
   const login = async () => {
     menuOpen = false
+    const loginWindow = window.open('', '_blank')
     const user = await pb.collection('users').authWithOAuth2({
       provider: 'google',
       urlCallback: (url) => {
-        window.open().location.href = url
+        loginWindow.location.href = url
       }
     })
 
