@@ -2,7 +2,7 @@
     <title>Ingress Plus</title>
 </svelte:head>
 
-<div>
+<div class="container">
     <h1>Welcome to Ingress Plus!</h1>
 
     <p>
@@ -16,56 +16,76 @@
         <i>We are not affiliated with Ingress or Niantic.</i>
     </p>
 
-    <a class="hero" href="/badges">
-        <div style={"background-image: url('/images/homepage/cat_badges.png');"} />
+    <a class="hero hero-left" href="/badges">
+        <div style={"background-image: url('/images/homepage/cat_badges.png');"}>
+            <p><img src="/images/medal.svg" alt="Badges" /> Badges</p>
+        </div>
     </a>
-    <a class="hero" href="/media">
-        <div style={"background-image: url('/images/homepage/cat_mediagress.png');"} />
+    <a class="hero hero-right" href="/media">
+        <div style={"background-image: url('/images/homepage/cat_mediagress.png');"}>
+            <p><img src="/images/mediagress.png" alt="Mediagress" /> Mediagress</p>
+        </div>
     </a>
-    <a class="hero" href="/bugs">
-        <div style={"background-image: url('/images/homepage/cat_bug_tracker.png');"} />
+    <a class="hero hero-left" href="/bugs">
+        <div style={"background-image: url('/images/homepage/cat_bug_tracker.png');"}>
+            <p><img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker</p>
+        </div>
     </a>
-    <a class="hero" href="/resources">
-        <div style={"background-image: url('/images/homepage/cat_resources.png');"} />
+    <a class="hero hero-right" href="/resources">
+        <div style={"background-image: url('/images/homepage/cat_resources.png');"}>
+            <p><img src="/images/resources.svg" alt="Resources" /> Resources</p>
+        </div>
     </a>
 </div>
 
 <style>
     h1 {
         text-shadow: 0 0 10px black;
+        text-align: center;
+        margin: 1em auto;
+        max-width: 800px;
     }
-    div {
+    div.container {
+        text-align: center;
         max-width: 1000px;
         margin: auto;
         padding: 0 1em;
         line-height: 1.2em;
         margin-top: 2em;
     }
-    h1 {
-        text-align: center;
-        margin: 1em auto;
-        max-width: 800px;
-    }
-    p {
-        text-align: center;
+    .hero div {
+        display: flex;
+        align-items: center;
         margin: 2em auto;
-        max-width: 800px;
-    }
-    a.hero div {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        margin: 2em auto;
-        width: 90%;
-        height: 280px;
         max-width: 700px;
-        background: no-repeat center;
-        background-size: 100%; 
+        height: 150px;
+        background-repeat: no-repeat;
+        background-size: 100%;
         border-radius: 16px;
         box-shadow: #9593c3 0px 0px 5px 1px;
-        transition: background-size 250ms ease-in-out;
+        transition: background-size 500ms ease-in-out;
     }
-    a.hero div:hover {
-        background-size: 105%; 
+    .hero div:hover {
+        background-size: 110%;
+    }
+    .hero-left div {
+        justify-content: flex-start;
+        background-position: right;
+    }
+    .hero-right div {
+        justify-content: flex-end;
+        background-position: left;
+    }
+    .hero p {
+        font-size: 2em;
+        color: white;
+        text-shadow: 0 0 10px black;
+        padding: 0.5em;
+        border-radius: 16px;
+        margin: 0;
+    }
+    img {
+        height: 64px;
+        vertical-align: middle;
     }
 </style>
