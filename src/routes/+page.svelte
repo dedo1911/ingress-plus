@@ -17,22 +17,22 @@
     </p>
 
     <a class="hero hero-left" href="/badges">
-        <div style={"background-image: url('/images/homepage/cat_badges.png');"}>
+        <div style={"background-image: url('/images/homepage/cat_badges.jpg');"}>
             <p><img src="/images/medal.svg" alt="Badges" /> Badges</p>
         </div>
     </a>
     <a class="hero hero-right" href="/media">
-        <div style={"background-image: url('/images/homepage/cat_mediagress.png');"}>
+        <div style={"background-image: url('/images/homepage/cat_mediagress.jpg');"}>
             <p><img src="/images/mediagress.png" alt="Mediagress" /> Mediagress</p>
         </div>
     </a>
     <a class="hero hero-left" href="/bugs">
-        <div style={"background-image: url('/images/homepage/cat_bug_tracker.png');"}>
+        <div style={"background-image: url('/images/homepage/cat_bug_tracker.jpg');"}>
             <p><img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker</p>
         </div>
     </a>
     <a class="hero hero-right" href="/resources">
-        <div style={"background-image: url('/images/homepage/cat_resources.png');"}>
+        <div style={"background-image: url('/images/homepage/cat_resources.jpg');"}>
             <p><img src="/images/resources.svg" alt="Resources" /> Resources</p>
         </div>
     </a>
