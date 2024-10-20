@@ -92,7 +92,7 @@
       {/if}
     </h2>
   {#if $authData?.baseModel?.verification != ''}
-      <p>Your Verification level is "<a href="/verify"><b>{verification.toUpperCase()}</b></a>"</p>
+      <p>Your Verification level is <a href="/verify"><code>{verification.toUpperCase()}</code></a></p>
       {:else}
       <p>You are currently not <a href="/verify">verified</a>.</p>
       {/if}

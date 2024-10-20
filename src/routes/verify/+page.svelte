@@ -12,48 +12,54 @@
 </svelte:head>
 
 <div>
-{#if $authData.isValid}
-    <img
-        class="profilepicture"
-        src={$authData?.baseModel?.avatar.slice(0, -6)}
-        alt={username}
-    /><br />
-    <p>Your username is "<b>{username}</b>".</p>
-    <p>Your faction is <b>{faction.toUpperCase()}</b>.</p>
+    {#if $authData.isValid}
+        <div class="profileData">
+            <p>
+                <img
+                    class="profilePicture"
+                    src={$authData?.baseModel?.avatar.slice(0, -6)}
+                    alt={username}
+                />
+            </p>
+            <p>Your username is <code>{username}</code></p>
+            <p>Your faction is <code>{faction.toUpperCase()}</code></p>
+            <p>
+                <img
+                    class="badge"
+                    src="/images/verification/verified.svg"
+                    alt={verification}
+                />
+                Your Verification level is
+                <code>{verification.toUpperCase()}</code>
+            </p>
+            <p>Your User ID is <code>ING+{userId}</code></p>
+        </div>
+    {:else}
+        <p style="margin-top:2em;">
+            You are currently not logged in. Please log in first.
+        </p>
+    {/if}
+    <hr />
     <p>
-        <img
-            class="badge"
-            src="/images/verification/verified.svg"
-            alt={verification}
-        />Your Verification level is "<b>{verification.toUpperCase()}</b>".
+        Verification is only done manually and at the discretion of the admins
+        at the moment and can not be requested.
     </p>
-    <p>Your User ID is "<b>ING+{userId}</b>".</p>
-{:else}
-    <p style="margin-top:2em;">
-        You are currently not logged in. Please log in first.
-    </p>
-{/if}
-<hr />
-<p>
-    Verification is only done manually and at the discretion of the admins at
-    the moment and can not be requested.
-</p>
-<br />
-<p>
-    If instructed, make sure that your username and faction above match your
-    Ingress account, keep your User ID ready and follow further instructions
-    provided by the admins.
+    <br />
+    <p>
+        If instructed, make sure that your username and faction above match your
+        Ingress account, keep your User ID ready and follow further instructions
+        provided by the admins.
     </p>
 </div>
 
 <style>
-div {
-    max-width: 1000px;
-    margin: auto;
-    padding: 0 1em;
-    line-height: 1.2em;
-    margin-top: 2em;
-  }
+    div {
+        max-width: 1000px;
+        margin: auto;
+        padding: 0 1em;
+        line-height: 1.2em;
+        margin-top: 2em;
+    }
     p {
         text-align: center;
         margin: auto;
@@ -65,9 +71,14 @@ div {
         vertical-align: sub;
         margin: 0 0.25em;
     }
-    img.profilepicture {
+    div.profileData {
+        display: flex;
+        flex-direction: column;
+        row-gap: 1em;
+    }
+    img.profilePicture {
         display: block;
-        margin: auto;
+        margin: 1em auto;
         max-width: 200px;
         border-radius: 20%;
         box-shadow: #9593c3 0px 0px 5px 1px;
