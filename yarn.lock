@@ -1689,22 +1689,22 @@ eslint-plugin-promise@7.1.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-promise/-/eslint-plugin-promise-7.1.0.tgz#06b3ad6d36b3c3ef3ec201c8a8d97049cf5dbb20"
   integrity sha512-8trNmPxdAy3W620WKDpaS65NlM5yAumod6XeC4LOb+jxlkG4IVcp68c6dXY2ev+uT4U1PtG57YDV6EGAXN0GbQ==
 
-eslint-plugin-svelte@2.45.1:
-  version "2.45.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-svelte/-/eslint-plugin-svelte-2.45.1.tgz#2a9c1c5088667d432c36b0933229248450a199a6"
-  integrity sha512-mYAKNDRji0YWl7o00KQi0enREcrtzcN7xwK/8lwk5uLRoKLjzPXc+WjngsYpPV35I3AF7UlXc1+JfyNMJS+njA==
+eslint-plugin-svelte@2.46.0:
+  version "2.46.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-svelte/-/eslint-plugin-svelte-2.46.0.tgz#87bcc2820233065f79114012203b082319ff03e9"
+  integrity sha512-1A7iEMkzmCZ9/Iz+EAfOGYL8IoIG6zeKEq1SmpxGeM5SXmoQq+ZNnCpXFVJpsxPWYx8jIVGMerQMzX20cqUl0g==
   dependencies:
     "@eslint-community/eslint-utils" "^4.4.0"
     "@jridgewell/sourcemap-codec" "^1.4.15"
     eslint-compat-utils "^0.5.1"
     esutils "^2.0.3"
-    known-css-properties "^0.34.0"
+    known-css-properties "^0.35.0"
     postcss "^8.4.38"
     postcss-load-config "^3.1.4"
     postcss-safe-parser "^6.0.0"
     postcss-selector-parser "^6.1.0"
     semver "^7.6.2"
-    svelte-eslint-parser "^0.42.0"
+    svelte-eslint-parser "^0.43.0"
 
 eslint-scope@^7.2.2:
   version "7.2.2"
@@ -2713,10 +2713,10 @@ kleur@^4.1.5:
   resolved "https://registry.yarnpkg.com/kleur/-/kleur-4.1.5.tgz#95106101795f7050c6c650f350c683febddb1780"
   integrity sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==
 
-known-css-properties@^0.34.0:
-  version "0.34.0"
-  resolved "https://registry.yarnpkg.com/known-css-properties/-/known-css-properties-0.34.0.tgz#ccd7e9f4388302231b3f174a8b1d5b1f7b576cea"
-  integrity sha512-tBECoUqNFbyAY4RrbqsBQqDFpGXAEbdD5QKr8kACx3+rnArmuuR22nKQWKazvp07N9yjTyDZaw/20UIH8tL9DQ==
+known-css-properties@^0.35.0:
+  version "0.35.0"
+  resolved "https://registry.yarnpkg.com/known-css-properties/-/known-css-properties-0.35.0.tgz#f6f8e40ab4e5700fa32f5b2ef5218a56bc853bd6"
+  integrity sha512-a/RAk2BfKk+WFGhhOCAYqSiFLc34k8Mt/6NWRI4joER0EYUzXIcFivjjnoD3+XU1DggLn/tZc3DOAgke7l8a4A==
 
 levn@^0.4.1:
   version "0.4.1"
@@ -4037,10 +4037,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-svelte-eslint-parser@^0.42.0:
-  version "0.42.0"
-  resolved "https://registry.yarnpkg.com/svelte-eslint-parser/-/svelte-eslint-parser-0.42.0.tgz#a4b28b14505194e7f0b1aec22b2724253941cf40"
-  integrity sha512-e7LyqFPTuF43ZYhKOf0Gq1lzP+G64iWVJXAIcwVxohGx5FFyqdUkw7DEXNjZ+Fm+TAA98zPmDqWvgD1OpyMi5A==
+svelte-eslint-parser@^0.43.0:
+  version "0.43.0"
+  resolved "https://registry.yarnpkg.com/svelte-eslint-parser/-/svelte-eslint-parser-0.43.0.tgz#649e80f65183c4c1d1536d03dcb903e0632f4da4"
+  integrity sha512-GpU52uPKKcVnh8tKN5P4UZpJ/fUDndmq7wfsvoVXsyP+aY0anol7Yqo01fyrlaWGMFfm4av5DyrjlaXdLRJvGA==
   dependencies:
     eslint-scope "^7.2.2"
     eslint-visitor-keys "^3.4.3"
@@ -4082,10 +4082,10 @@ svelte@4.2.12:
     magic-string "^0.30.4"
     periscopic "^3.1.0"
 
-svelte@5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.0.3.tgz#093663a1c71c887e592fb34b4886da9105b6a9b7"
-  integrity sha512-i8DopbAPRP9iaR3qqe++LPv4povQRshSseH3kSrzI4URZ9/7OTt3vCJPBp+5ACRQDik0S/tM1ZRA6EW/sGcKfw==
+svelte@5.0.4:
+  version "5.0.4"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-5.0.4.tgz#b944121f11c92025100b218dea0c11efbacd8806"
+  integrity sha512-W22OPqEIhHGqYjW2XnESTZoHvJdNCEr5oGDE8WoRKB37dQCywM5Bv7I2uN4A0FWhBnV7NxWK4MZwPKW2AVm19Q==
   dependencies:
     "@ampproject/remapping" "^2.3.0"
     "@jridgewell/sourcemap-codec" "^1.5.0"
