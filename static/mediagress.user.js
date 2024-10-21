@@ -1,18 +1,23 @@
 // ==UserScript==
 // @name IITC Plugin: Mediagress
 // @category Misc
-// @version 1.0.3
+// @version 1.0.4
 // @namespace https://ingress.plus
 // @downloadURL https://ingress.plus/mediagress.user.js
 // @updateURL https://ingress.plus/mediagress.user.js
 // @homepageURL https://ingress.plus
-// @description Upload your media to Mediagress
-// @author Mediagress
+// @description Upload and contribute your Media to Mediagress. Requires a C.O.R.E. subscription to access your Inventory.
+// @icon https://ingress.plus/icons/icon_mediagress_32.png
+// @icon64 https://ingress.plus/icons/icon_mediagress_64.png
+// @author IngressPlus
 // @include https://intel.ingress.com/*
 // @match https://intel.ingress.com/*
 // @grant none
 // ==/UserScript==
 
+//
+// Changelog 1.0.4
+//   Added icon and changed description and author
 //
 // Changelog 1.0.3
 //   Fix minor StandardJS annoyances
