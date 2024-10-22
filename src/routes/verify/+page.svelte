@@ -46,14 +46,13 @@
     {/if}
     <hr />
     <p>
-        Verification is only done manually and at the discretion of the admins
-        at the moment and can not be requested.
+        It is not possible to verify yourself at this time. Check the Ingress.Plus
+        Telegram group from time to time to see if any Admin is opening Verifications.
     </p>
     <br />
     <p>
-        If instructed, make sure that your username and faction above match your
-        Ingress account, keep your User ID ready and follow further instructions
-        provided by the admins.
+        Make sure that your username and faction above match your
+        Ingress account, otherwise you cannot be verified.
     </p>
 </div>
 
