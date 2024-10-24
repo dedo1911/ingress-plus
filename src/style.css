@@ -87,7 +87,7 @@ h2 a:link, h2 a:visited, h2 a:hover, h2 a:active {
 input[type=file] {
   display: none;
 }
-input[type=text], select, button, label.file-upload {
+input[type=text], select, label.file-upload {
   font-size: 1.25em;
   background: rgba(14, 11, 28, 0.9);
   border: 3px double #5e5a75;
@@ -101,6 +101,24 @@ input[type=text], select, button, label.file-upload {
 
 button {
   cursor: pointer;
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+button.cta {
+  cursor: pointer;
+  width: 100%;
+  max-width: 8em;
+  padding: 0.25em 0;
+  font-size: larger;
+  color: #FFF;
+  background: rgb(50,60,110);
+  background: linear-gradient(90deg, rgba(50,60,110,1) 0%, rgba(52,39,83,1) 50%, rgba(83,52,118,1) 100%);
+  border: 3px double #9593c3;
+  border-radius: 6px;
+  min-width: 20px;
 }
 
 .level span { color: #FFFFFF }
