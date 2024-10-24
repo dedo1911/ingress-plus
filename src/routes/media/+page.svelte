@@ -204,7 +204,8 @@
     .level {
         background: rgba(14, 11, 28, 0.9);
         position: relative;
-        top: 75px;
+        top: 76px;
+        border-radius: 0 0 2px 2px;
         left: 2px;
         transition: all 250ms ease-in-out;
     }
