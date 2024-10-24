@@ -15,11 +15,11 @@
   }
 
   let editVisible = $state(false)
-
   let width = $state(1)
+
   const badgesPerRow = 6
-  let rows = $derived(Math.ceil($ownedBadges.length / badgesPerRow))
-  let sortedBadges = $derived(sortBy($ownedBadges.filter(b => b.expand?.badge?.expand?.category?.profile_visible || false), [
+  const rows = $derived(Math.ceil($ownedBadges.length / badgesPerRow))
+  const sortedBadges = $derived(sortBy($ownedBadges.filter(b => b.expand?.badge?.expand?.category?.profile_visible || false), [
     'expand.badge.expand.category.sorting',
     'expand.badge.sorting'
   ]).reverse())
@@ -42,7 +42,7 @@
     await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
   }
 
-  let username = $derived($authData?.baseModel?.username || '')
+  const username = $derived($authData?.baseModel?.username || '')
   let newUsername = $state('')
   $effect(() => {
     newUsername = username
@@ -62,11 +62,11 @@
     editVisible = false
   }
 
-  let factionLogo = $derived($authData?.baseModel?.faction === 'machina'
+  const factionLogo = $derived($authData?.baseModel?.faction === 'machina'
     ? 'machina.png'
     : `${$authData?.baseModel?.faction || 'unaligned'}.svg`)
 
-  let verification = $derived($authData?.baseModel?.verification || '')
+  const verification = $derived($authData?.baseModel?.verification || '')
 
   const copyProfileLink = async () => {
     try {

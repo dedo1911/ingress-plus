@@ -5,12 +5,12 @@
   import { formatNumber } from '$lib/utils.js'
 
   let { data } = $props()
-  let s = $derived(data.statistics)
-  let statistics = $derived(s[0][0])
-  let topBadges = $derived(s[1].items)
-  let topUsers = $derived(s[2])
-  let topMediaUsers = $derived(s[3])
-  let topMediaUploads = $derived(s[4])
+  const s = $derived(data.statistics)
+  const statistics = $derived(s[0][0])
+  const topBadges = $derived(s[1].items)
+  const topUsers = $derived(s[2])
+  const topMediaUsers = $derived(s[3])
+  const topMediaUploads = $derived(s[4])
 </script>
 
 <svelte:head>

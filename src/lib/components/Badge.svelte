@@ -13,21 +13,20 @@
 
   let showModal = $state(false)
   
-  let tiers = $derived(category.tiers.split(',').filter(t => t))
-  let hasTiers = $derived(tiers.length > 0)
-  let badge = $derived(category.badges[hasTiers ? Math.floor(index / tiers.length) : index])
-  let tier = $derived(hasTiers ? index % tiers.length : 0)
-  let title = $derived(hasTiers ? `${badge?.title} - ${tiers[tier]}` : badge?.title)
-  let owned = $derived(badge
+  const tiers = $derived(category.tiers.split(',').filter(t => t))
+  const hasTiers = $derived(tiers.length > 0)
+  const badge = $derived(category.badges[hasTiers ? Math.floor(index / tiers.length) : index])
+  const tier = $derived(hasTiers ? index % tiers.length : 0)
+  const title = $derived(hasTiers ? `${badge?.title} - ${tiers[tier]}` : badge?.title)
+  const owned = $derived(badge
     ? $ownedBadges.some(b => b.badge === badge.id && b.tier >= tier)
     : false)
+  const opaque = $derived($authData.isValid ? ($siteSettings.opaqueOwned ? owned : !owned) : false)
 
   const onBadgeClick = () => (showModal = true)
   const onBadgeKeydown = (e) => {
     if (e.key === 'Escape') showModal = false
   }
-
-  let opaque = $derived($authData.isValid ? ($siteSettings.opaqueOwned ? owned : !owned) : false)
 </script>
 
 {#if badge }

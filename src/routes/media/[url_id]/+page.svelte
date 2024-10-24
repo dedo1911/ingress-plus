@@ -3,7 +3,7 @@
   import AgentName from '$lib/components/AgentName.svelte'
 
   let { data } = $props()
-  let media = $derived(data.media)
+  const media = $derived(data.media)
 </script>
 
 <svelte:head>

@@ -9,7 +9,7 @@
     badgeSize.set(Math.min(128, width / 7))
   })
 
-  let badgeCategories = $derived($categories.map(c => ({
+  const badgeCategories = $derived($categories.map(c => ({
     ...c,
     badges: c.badges.filter(b => $siteSettings.showUnobtainable ? true : !b.unobtainable)
   })))

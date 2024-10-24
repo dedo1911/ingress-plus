@@ -12,15 +12,15 @@
   }
 
   let { data } = $props()
-  let publicUser = $derived(data.publicUser)
-  let sortedBadges = $derived(sortBy((data?.ownedBadges || []).filter(b => b.expand?.badge?.expand?.category?.profile_visible || false), [
+  const publicUser = $derived(data.publicUser)
+  const sortedBadges = $derived(sortBy((data?.ownedBadges || []).filter(b => b.expand?.badge?.expand?.category?.profile_visible || false), [
     'expand.badge.expand.category.sorting',
     'expand.badge.sorting'
   ]).reverse())
 
   let width = $state(1)
   const badgesPerRow = 6
-  let rows = $derived(Math.ceil(sortedBadges.length / badgesPerRow))
+  const rows = $derived(Math.ceil(sortedBadges.length / badgesPerRow))
 
   $effect(() => {
     badgeSize.set(Math.min(128, width / 7))

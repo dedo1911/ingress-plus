@@ -5,21 +5,19 @@
 
   let { category, width } = $props()
 
-  
-  
-  let tiers = $derived(category.tiers.split(',').filter(t => t))
-  let hasTiers = $derived(tiers.length > 0)
-  let rows = $derived(hasTiers
-    ? Math.ceil((category.badges.length * tiers.length) / badgesPerRow)
-    : Math.ceil(category.badges.length / badgesPerRow))
-  let badgesPerRow = $derived(hasTiers
+  const tiers = $derived(category.tiers.split(',').filter(t => t))
+  const hasTiers = $derived(tiers.length > 0)
+  const badgesPerRow = $derived(hasTiers
     ? Math.max(
         1,
         Math.min(tiers.length, Math.floor((width - $badgeSize) / $badgeSize)),
       )
     : 6)
     // Math.max(1, Math.floor((width-$badgeSize)/$badgeSize))
-
+  const rows = $derived(hasTiers
+    ? Math.ceil((category.badges.length * tiers.length) / badgesPerRow)
+    : Math.ceil(category.badges.length / badgesPerRow))
+  
   const generateId = (str) =>
     str
       .replace(/[^\w\s]+/g, "-")
