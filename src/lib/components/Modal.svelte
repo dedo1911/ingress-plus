@@ -1,12 +1,14 @@
 <script>
-  export let showModal
+  let { showModal = $bindable(), children } = $props()
 
-  let dialog
+  let dialog = $state()
 
-  $: if (dialog) {
-    if (showModal) dialog.showModal()
-    else dialog.close()
-  }
+  $effect(() => {
+    if (dialog) {
+      if (showModal) dialog.showModal()
+      else dialog.close()
+    }
+  })
 
 	const preventDefault = (event) => {
     event.preventDefault()
@@ -15,12 +17,11 @@
 </script>
 
 {#if showModal}
-  <dialog
-    bind:this={dialog}
-    onclose={() => (showModal = false)}
-    onclick={() => dialog.close()}>
-    <div onclick={preventDefault} onkeydown={preventDefault}>
-      <slot />
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+  <dialog bind:this={dialog} onclick={() => dialog.close()}>
+    <div onclick={preventDefault} role="button" tabindex="0">
+      {@render children?.()}
     </div>
   </dialog>
 {/if}

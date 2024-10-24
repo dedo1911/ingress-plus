@@ -2,23 +2,25 @@
   import { serverAddress } from "$lib/pocketbase"
   import Modal from "./Modal.svelte"
 
-  export let attachment
-  export let report
-  let showModal = false
+  let { attachment, report } = $props()
+  let showModal = $state(false)
+  const show = () => showModal = true
+  const hide = () => showModal = false
 </script>
 
-<img
-  class="thumbnail"
-  src="{serverAddress}/api/files/{report.collectionId}/{report.id}/{attachment}?thumb=150x0"
-  alt={attachment}
-  onclick={() => (showModal = true)}
-/>
+<button onclick={show}>
+  <img
+    class="thumbnail"
+    src="{serverAddress}/api/files/{report.collectionId}/{report.id}/{attachment}?thumb=150x0"
+    alt={attachment}
+  />
+</button>
 
 <Modal bind:showModal>
   <div>
     <img class="attachment" src="{serverAddress}/api/files/{report.collectionId}/{report.id}/{attachment}" alt="{attachment.name}" />
-    <button class="close" onclick={() => (showModal = false)} alt="Close">
-      <img src="/images/close.png" />
+    <button class="close" onclick={hide}>
+      <img src="/images/close.png" alt="Close" />
     </button>
   </div>
 </Modal>
@@ -39,13 +41,7 @@
     box-shadow: #9593c3 0px 0px 5px 1px;
     margin: 1em;
   }
-  button {
-    margin: 0;
-    padding: 0;
-    background: none;
-    border: none;
-  }
-  .close img {
+  button.close img {
     height: 48px;
     width: 48px;
   }

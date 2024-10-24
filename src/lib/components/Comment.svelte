@@ -5,7 +5,7 @@
 
   import AgentName from '$lib/components/AgentName.svelte'
 
-  export let comment
+  let { comment } = $props()
   const carta = new Carta({})
 </script>
 

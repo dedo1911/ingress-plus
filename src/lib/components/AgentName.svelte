@@ -4,29 +4,29 @@
   import { pb } from '$lib/pocketbase'
   import zalgo from '$lib/zalgo'
 
-  export let id = null
-  export let user = null
-  export let factionLogo = true
-  export let linkable = true
+  let {
+    id = null,
+    user = $bindable(null),
+    factionLogo = true,
+    linkable = true
+  } = $props()
 
-  $: url = linkable && user?.public ? `/agent/${user.username}` : null
+  const url = $derived(linkable && user?.public
+    ? `/agent/${user.username}` : null)
+  const logo = $derived(user?.faction === 'machina'
+    ? 'machina.png' : `${user?.faction || 'unaligned'}.svg`)
 
   onMount(async () => {
     if (id || !user) user = await pb.collection('public_users').getFirstListItem(`id="${id}"`, { requestKey: null })
     if (!!user.username && user.supporter === undefined) {
       const lateUser = await pb.collection('public_users').getFirstListItem(`username="${user.username}"`, { requestKey: null })
-      user.public = lateUser.public
-      user.supporter = lateUser.supporter
+      user = lateUser
     }
   })
-
-  $: logo = user?.faction === 'machina'
-    ? 'machina.png'
-    : `${user?.faction || 'unaligned'}.svg`
 </script>
 
 <!-- Add additional icon depending on verification level? (none/basic/advanced/strong) /.ixm -->
-{#if user}
+{#if user && user.faction !== undefined }
   <a href={url} style="color: var(--color-faction-{user.faction || 'unaligned'})"
     class:supporter-unaligned={user?.supporter && !user?.faction}
     class:supporter-machina={user?.supporter && user?.faction === 'machina'}

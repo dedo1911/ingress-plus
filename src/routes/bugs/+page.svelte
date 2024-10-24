@@ -7,12 +7,12 @@
 
     const itemsPerPage = '20'
     const sorting = '-created'
-    let items = []
-    let myUpvotes = []
-    let page = 1
-    let totalPages = 1
-    let totalItems = 1
-    let refetch = 0
+    let items = $state([])
+    let myUpvotes = $state([])
+    let page = $state(1)
+    let totalPages = $state(1)
+    let totalItems = $state(1)
+    let refetch = $state(0)
 
     const fetchBugs = async () => {
       const options = {
@@ -68,9 +68,9 @@
 
     onMount(fetchBugs)
 
-    $: {
+    $effect(() => {
       if ($authData.isValid) fetchUpvotes()
-    }
+    })
 </script>
 
 <svelte:head>

@@ -10,19 +10,21 @@
     if (badgeSize <= 128) return '128x128'
     return '256x256'
   }
-  export let data
-  $: publicUser = data.publicUser
-  $: sortedBadges = sortBy((data?.ownedBadges || []).filter(b => b.expand?.badge?.expand?.category?.profile_visible || false), [
+
+  let { data } = $props()
+  const publicUser = $derived(data.publicUser)
+  const sortedBadges = $derived(sortBy((data?.ownedBadges || []).filter(b => b.expand?.badge?.expand?.category?.profile_visible || false), [
     'expand.badge.expand.category.sorting',
     'expand.badge.sorting'
-  ]).reverse()
+  ]).reverse())
 
-  let width = 1
+  let width = $state(1)
   const badgesPerRow = 6
-  let rows = 1
+  const rows = $derived(Math.ceil(sortedBadges.length / badgesPerRow))
 
-  $: badgeSize.set(Math.min(128, width / 7))
-  $: rows = Math.ceil(sortedBadges.length / badgesPerRow)
+  $effect(() => {
+    badgeSize.set(Math.min(128, width / 7))
+  })
 </script>
 
 <svelte:head>

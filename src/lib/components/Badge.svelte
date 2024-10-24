@@ -3,8 +3,7 @@
   import { authData, ownedBadges, badgeSize, siteSettings } from '$lib/stores'
   import BadgeModal from '$lib/components/BadgeModal.svelte'
 
-  export let category
-  export let index
+  let { category, index } = $props()
 
   const thumbSize = (badgeSize) => {
     if (badgeSize <= 64) return '96x96'
@@ -12,34 +11,22 @@
     return '256x256'
   }
 
-  let badge = {}
-  let hasTiers = false
-  let tiers = []
-  let tier = 0
-  let title = ''
-  let showModal = false
-
-  $: tiers = category.tiers.split(',').filter(t => t)
-  $: hasTiers = tiers.length > 0
-  $: badge = hasTiers
-    ? category.badges[Math.floor(index / tiers.length)]
-    : category.badges[index]
-  $: tier = hasTiers
-    ? index % tiers.length
-    : 0
-  $: title = hasTiers
-    ? `${badge?.title} - ${tiers[tier]}`
-    : badge?.title
-  $: owned = badge
+  let showModal = $state(false)
+  
+  const tiers = $derived(category.tiers.split(',').filter(t => t))
+  const hasTiers = $derived(tiers.length > 0)
+  const badge = $derived(category.badges[hasTiers ? Math.floor(index / tiers.length) : index])
+  const tier = $derived(hasTiers ? index % tiers.length : 0)
+  const title = $derived(hasTiers ? `${badge?.title} - ${tiers[tier]}` : badge?.title)
+  const owned = $derived(badge
     ? $ownedBadges.some(b => b.badge === badge.id && b.tier >= tier)
-    : false
+    : false)
+  const opaque = $derived($authData.isValid ? ($siteSettings.opaqueOwned ? owned : !owned) : false)
 
   const onBadgeClick = () => (showModal = true)
   const onBadgeKeydown = (e) => {
     if (e.key === 'Escape') showModal = false
   }
-
-  $: opaque = $authData.isValid ? ($siteSettings.opaqueOwned ? owned : !owned) : false
 </script>
 
 {#if badge }

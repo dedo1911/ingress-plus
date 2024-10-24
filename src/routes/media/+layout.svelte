@@ -1,3 +1,7 @@
+<script>
+    let { children } = $props()
+</script>
+
 <section>
     <div class="header">
         <a href="/media">
@@ -12,7 +16,7 @@
         </div>
     </div>
 
-    <slot />
+    {@render children?.()}
 </section>
 
 <style>

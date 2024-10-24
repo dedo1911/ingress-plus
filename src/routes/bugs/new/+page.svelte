@@ -1,37 +1,39 @@
 <script>
-  import { toast } from "@zerodevx/svelte-toast";
-  import { Carta, MarkdownEditor } from "carta-md";
-  import DOMPurify from "isomorphic-dompurify";
-  import { pb } from "$lib/pocketbase";
-  import { goto } from "$app/navigation";
+  import { toast } from "@zerodevx/svelte-toast"
+  import { Carta, MarkdownEditor } from "carta-md"
+  import DOMPurify from "isomorphic-dompurify"
+  import { pb } from "$lib/pocketbase"
+  import { goto } from "$app/navigation"
   import { browser } from '$app/environment'
-  import { authData } from "$lib/stores";
+  import { authData } from "$lib/stores"
 
-  let title = "";
-  let ingressVersion = "";
-  let description = "";
-  let ReproductionSteps = "";
-  let attachments;
+  let title = $state("")
+  let ingressVersion = $state("")
+  let description = $state("")
+  let ReproductionSteps = $state("")
+  let attachments = $state()
 
   const carta = new Carta({
     sanitizer: DOMPurify.sanitize,
-  });
+  })
 
-  $: if (browser && $authData.isValid !== true) goto("/bugs");
+  $effect(() => {
+    if (browser && $authData.isValid !== true) goto("/bugs")
+  })
 
   const publishReport = async () => {
     //Title lengh validation
     if (title.length < 3) {
       toast.push("Title needs to be at least 3 characters long", {
         classes: ["errorToast"],
-      });
-      return;
+      })
+      return
     }
     if (title.length > 256) {
       toast.push("Title needs to be less than 256 characters long", {
         classes: ["errorToast"],
-      });
-      return;
+      })
+      return
     }
 
     //Ingress version validation
@@ -41,23 +43,23 @@
     ) {
       toast.push('Ingress version needs to follow the format "2.XXX.X"', {
         classes: ["errorToast"],
-      });
-      return;
+      })
+      return
     }
 
     //Description length validation
     if (description.length < 10) {
       toast.push("Description needs to be at least 10 characters long", {
         classes: ["errorToast"],
-      });
-      return;
+      })
+      return
     }
     if (description.length > 1024) {
       toast.push(
         "Description needs to be less than 1024 characters long. If more space is needed, continue in the comments.",
         { classes: ["errorToast"] },
-      );
-      return;
+      )
+      return
     }
 
     if (Array.from(attachments || []).length > 5) {
@@ -73,15 +75,15 @@
     formData.append('ingress_version', ingressVersion)
     formData.append('reproduction_steps', ReproductionSteps)
     for (const file of attachments || []) formData.append('attachments', file)
-    const entry = await pb.collection("bug_reports").create(formData);
-    goto(`/bugs/${entry.id}`);
-  };
+    const entry = await pb.collection("bug_reports").create(formData)
+    goto(`/bugs/${entry.id}`)
+  }
 
   const removeAttachment = (index) => {
     const newAttachments = Array.from(attachments)
     newAttachments.splice(index, 1)
     attachments = newAttachments
-  };
+  }
 </script>
 
 <h1>New Bug Report</h1>
@@ -147,7 +149,7 @@
               style={`background-image: url(${URL.createObjectURL(file)})`}
             ></div>
             <span class="fileName">{file.name}</span>
-            <span class="remove" onclick={() => removeAttachment(index)} />
+            <span class="remove" onclick={() => removeAttachment(index)}></span>
           </div>
         {/each}
       {/if}

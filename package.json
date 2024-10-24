@@ -16,17 +16,18 @@
 		"@zerodevx/svelte-toast": "0.9.6",
 		"carta-md": "4.6.1",
 		"cz-conventional-changelog": "^3.3.0",
-		"eslint": "9.13.0",
 		"eslint-config-standard": "^17.1.0",
 		"eslint-plugin-import": "2.31.0",
 		"eslint-plugin-n": "17.11.1",
 		"eslint-plugin-promise": "7.1.0",
 		"eslint-plugin-svelte": "2.46.0",
+		"eslint": "9.13.0",
 		"lodash.sortby": "^4.7.0",
 		"pocketbase": "0.21.5",
 		"sass": "1.80.3",
-		"svelte": "5.0.4",
+		"svelte-multiselect": "11.0.0-rc.1",
 		"svelte-time": "0.9.0",
+		"svelte": "5.0.4",
 		"vite": "5.4.9"
 	},
 	"type": "module",
@@ -37,7 +38,6 @@
 	},
 	"packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447",
 	"dependencies": {
-		"isomorphic-dompurify": "2.16.0",
-		"svelte-multiselect": "^10.3.0"
+		"isomorphic-dompurify": "2.16.0"
 	}
 }

@@ -4,18 +4,18 @@
     import { replaceState } from '$app/navigation'
     import { pb } from '$lib/pocketbase'
 
-    export let data
+    let { data } = $props()
     const { topics, destinations } = data
 
-    let itemsPerPage = '20'
-    let sorting = '-released_at'
-    let items = []
-    let page = 1
-    let totalPages = 1
-    let totalItems = 1
-    let searchFilter = ''
-    let topicsFilter = []
-    let destinationsFilter = []
+    let itemsPerPage = $state('20')
+    let sorting = $state('-released_at')
+    let items = $state([])
+    let page = $state(1)
+    let totalPages = $state(1)
+    let totalItems = $state(1)
+    let searchFilter = $state('')
+    let topicsFilter = $state([])
+    let destinationsFilter = $state([])
 
     const fetchMedias = async () => {
       const options = {
@@ -109,7 +109,7 @@
     <div class="media-container">
         {#each items as media}
             <a class="media" href={`/media/${media.url_id}`}>
-                <div class="image" style="background-image: url('{media.image_url.replace('http://', 'https://')}" />
+                <div class="image" style="background-image: url('{media.image_url.replace('http://', 'https://')}"></div>
                 <div class={`level level-${media.level}`}>L<span>{media.level}</span></div>
                 <p>{media.short_description}</p>
             </a>
@@ -204,7 +204,8 @@
     .level {
         background: rgba(14, 11, 28, 0.9);
         position: relative;
-        top: 75px;
+        top: 76px;
+        border-radius: 0 0 2px 2px;
         left: 2px;
         transition: all 250ms ease-in-out;
     }

@@ -2,8 +2,8 @@
   import Time, { dayjs } from 'svelte-time'
   import AgentName from '$lib/components/AgentName.svelte'
 
-  export let data
-  $: media = data.media
+  let { data } = $props()
+  const media = $derived(data.media)
 </script>
 
 <svelte:head>

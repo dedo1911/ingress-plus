@@ -39,11 +39,11 @@
     <p class="question">Why does the Media have to be in a Capsule for it to upload?</p>
     <p class="answer">For some reason, Media that is not in a Capsule doesn't return any data about itself, with the exception that it reports itself as a Media item. Once it is loaded into a Capsule it returns a lot more data about itself. In addition, this also serves as a way for you to control which Media is getting uploaded and gives you the chance to exclude certain Media you don't want to upload.</p>
     <p class="question">What about Media I don't want to upload?</p>
-    <p class="answer">There may be a time you don't want to upload a Media. An example might be OpSec reasons. In that case, make sure that Media that should not be uploaded isn't loaded into any Capsule. This way, the Intel Map doesn't return any data for it and it'll not be uploaded to Mediagress. <b>Make sure that you have clearance to upload potential OpSec media.</b> We are not responsible for any broken OpSec and will not check beforehand if any Media might break it.</p>
+    <p class="answer">There may be a time you don't want to upload a specific Media due to OpSec reasons, for example. In that case, make sure that Media that should not be uploaded isn't loaded into any Capsule. This way, the Intel Map doesn't return any data for it and it'll not be uploaded to Mediagress. <b>Make sure that you have clearance to upload potential OpSec media.</b> We are not responsible for any broken OpSec and will not check beforehand if any Media might break it.</p>
     <p class="question">What does the message "Try again in 5 minutes" mean?</p>
-    <p class="answer">Niantic rate-limits inventory requests if they happen to quickly and this is a safeguard to not hit that rate-limit. Try again after 5 minutes!</p>
+    <p class="answer">Niantic rate-limits inventory requests if they happen to quickly and, to ensure that you don't hit that limit, we restrict upload attempts to only once per 5 minutes. Try again after a little bit!</p>
     <p class="question">What does the message "No new media has been found in your inventory." mean?</p>
-    <p class="answer">Since your last upload, no new media has been found in your capsules compared to the last upload. If you have new media, make sure that it has been loaded into a capsule and try again in 5 minutes.</p>
+    <p class="answer">The Mediagress plugin stores a list of Media you sent to us locally and shows this message if there isn't a new Media to add to that list, meaning there is no new Media to upload. If you do have new media, make sure that it has been loaded into a capsule and try again in 5 minutes.</p>
     <p class="question">I have another question!</p>
     <p class="answer">Join us in our @Mediagress Telegram group where we'll answer any questions that might come up <a href="https://t.me/Mediagress" target="_blank">with the link in this channel</a>.</p>
 </div>

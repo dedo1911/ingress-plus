@@ -1,5 +1,5 @@
 <script>
-import AgentName from '$lib/components/AgentName.svelte'
+    import AgentName from '$lib/components/AgentName.svelte'
 </script>
 
 <svelte:head>
@@ -15,18 +15,27 @@ import AgentName from '$lib/components/AgentName.svelte'
     can contribute and add features to the site.</p>
 <hr>
 <h3>Admins</h3>
-<p><AgentName id=z90z06hc0vo9oyx linkable={true} factionLogo={true} /> - <img src="/images/telegram.svg" alt="Telegram icon" />@dedo1911</p>
-<p><AgentName id=l5jm7d8rp4o9wp3 linkable={true} factionLogo={true} /> - <img src="/images/telegram.svg" alt="Telegram icon" />@InvestigateXM</p>
-
+<p>
+    <AgentName user={{ username: "dedo1911" }} linkable={true} factionLogo={true} /> - 
+    <a href="https://t.me/dedo1911" target="_blank">
+        <img src="/images/telegram.svg" alt="Telegram" />@dedo1911
+    </a>
+</p>
+<p>
+    <AgentName user={{ username: "InvestigateXM" }} linkable={true} factionLogo={true} /> - 
+    <a href="https://t.me/InvestigateXM" target="_blank">
+        <img src="/images/telegram.svg" alt="Telegram" />@InvestigateXM
+    </a>
+</p>
 
 <style>
-p {
-    text-align: center;
-    margin: auto;
-    max-width: 800px;
+    p {
+        text-align: center;
+        margin: auto;
+        max-width: 800px;
     }
 
-    img {
+    a img {
         height: 1em;
         vertical-align: sub;
         margin: 0 0.25em;

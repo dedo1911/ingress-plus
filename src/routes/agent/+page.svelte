@@ -14,21 +14,23 @@
     return '256x256'
   }
 
-  let editVisible = false
+  let editVisible = $state(false)
+  let width = $state(1)
 
-  let width = 1
   const badgesPerRow = 6
-  let rows = 1
-  let sortedBadges = []
-
-  $: badgeSize.set(Math.min(128, width / 7))
-  $: rows = Math.ceil($ownedBadges.length / badgesPerRow)
-  $: sortedBadges = sortBy($ownedBadges.filter(b => b.expand?.badge?.expand?.category?.profile_visible || false), [
+  const rows = $derived(Math.ceil($ownedBadges.length / badgesPerRow))
+  const sortedBadges = $derived(sortBy($ownedBadges.filter(b => b.expand?.badge?.expand?.category?.profile_visible || false), [
     'expand.badge.expand.category.sorting',
     'expand.badge.sorting'
-  ]).reverse()
+  ]).reverse())
 
-  $: if (browser && $authData.isValid === false) goto('/')
+  $effect(() => {
+    if (browser && $authData.isValid === false) goto('/')
+  })
+
+  $effect(() => {
+    badgeSize.set(Math.min(128, width / 7))
+  })
 
   const toggleFaction = async () => {
     $authData.baseModel.faction = $authData.baseModel.faction === 'enlightened' ? 'resistance' : 'enlightened'
@@ -40,9 +42,12 @@
     await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
   }
 
-  let newUsername = ''
-  $: username = $authData?.baseModel?.username || ''
-  $: newUsername = username
+  const username = $derived($authData?.baseModel?.username || '')
+  let newUsername = $state('')
+  $effect(() => {
+    newUsername = username
+  })
+
   const saveUsername = async () => {
     const oldUsername = $authData.baseModel.username
     try {
@@ -57,14 +62,11 @@
     editVisible = false
   }
 
-  $: factionLogo = $authData?.baseModel?.faction === 'machina'
+  const factionLogo = $derived($authData?.baseModel?.faction === 'machina'
     ? 'machina.png'
-    : `${$authData?.baseModel?.faction || 'unaligned'}.svg`
+    : `${$authData?.baseModel?.faction || 'unaligned'}.svg`)
 
-  let verification = '';
-       $: {
-         verification = $authData?.baseModel?.verification || '';
-       }
+  const verification = $derived($authData?.baseModel?.verification || '')
 
   const copyProfileLink = async () => {
     try {

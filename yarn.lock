@@ -4048,10 +4048,10 @@ svelte-eslint-parser@^0.43.0:
     postcss "^8.4.39"
     postcss-scss "^4.0.9"
 
-svelte-multiselect@^10.3.0:
-  version "10.3.0"
-  resolved "https://registry.yarnpkg.com/svelte-multiselect/-/svelte-multiselect-10.3.0.tgz#0644d63fe84f03680fbcc31215ecd9f09b1f63a8"
-  integrity sha512-Pyvlcn4TK3dB2WWo6hDEeNH+x2O/DP82UuUf61PQFX8KMB3cm1Cam+zTKrcrOoRRVI2SwH/8dPF8hSTfJFaMmA==
+svelte-multiselect@11.0.0-rc.1:
+  version "11.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/svelte-multiselect/-/svelte-multiselect-11.0.0-rc.1.tgz#1238a6b768902afbdde23165e6dc922555f27342"
+  integrity sha512-dyUzja9AJfDejfafDj6PKNk3F51HavArevkJxZ0upJKUlPnPx5pDKY24BQYQvUpitTqVtsEoHevKr93WebBtwA==
   dependencies:
     svelte "4.2.12"
 

@@ -1,16 +1,18 @@
-<script async>
+<script>
   import { fly } from 'svelte/transition'
   import { categories, badgeSize, siteSettings, authData } from '$lib/stores'
   import Category from '$lib/components/Category.svelte'
   import { onMount } from 'svelte'
 
-  let width = 1024
-  $: badgeSize.set(Math.min(128, width / 7))
+  let width = $state(1024)
+  $effect(() => {
+    badgeSize.set(Math.min(128, width / 7))
+  })
 
-  $: badgeCategories = $categories.map(c => ({
+  const badgeCategories = $derived($categories.map(c => ({
     ...c,
     badges: c.badges.filter(b => $siteSettings.showUnobtainable ? true : !b.unobtainable)
-  }))
+  })))
 
   const toggleSiteSettings = (name) => {
     return () => {
@@ -35,10 +37,10 @@
         e.preventDefault()
         document.querySelector(this.getAttribute('href')).scrollIntoView({
           behavior: 'smooth'
-        });
-        window.history.pushState({}, '', this.getAttribute('href'));
-      });
-    });
+        })
+        window.history.pushState({}, '', this.getAttribute('href'))
+      })
+    })
   })
 </script>
 

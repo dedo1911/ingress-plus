@@ -1,57 +1,57 @@
 <script>
-  import { onMount } from "svelte";
-  import { slide } from "svelte/transition";
-  import Time, { dayjs } from "svelte-time";
-  import { Carta, CartaViewer, MarkdownEditor } from "carta-md";
-  import { toast } from "@zerodevx/svelte-toast";
-  import { page } from "$app/stores";
-  import { pb } from "$lib/pocketbase";
-  import { authData } from "$lib/stores";
-  import AgentName from "$lib/components/AgentName.svelte";
-  import Comment from "$lib/components/Comment.svelte";
-  import BugAttachment from "../../../lib/components/BugAttachment.svelte";
+  import { onMount } from "svelte"
+  import { slide } from "svelte/transition"
+  import Time, { dayjs } from "svelte-time"
+  import { Carta, CartaViewer, MarkdownEditor } from "carta-md"
+  import { toast } from "@zerodevx/svelte-toast"
+  import { page } from "$app/stores"
+  import { pb } from "$lib/pocketbase"
+  import { authData } from "$lib/stores"
+  import AgentName from "$lib/components/AgentName.svelte"
+  import Comment from "$lib/components/Comment.svelte"
+  import BugAttachment from "../../../lib/components/BugAttachment.svelte"
 
-  export let data;
-  let report = data.report;
-  let comments;
-  let newComment = "";
+  let { data } = $props()
+  let report = $state(data.report)
+  let comments = $state()
+  let newComment = $state('')
 
-  const carta = new Carta({});
+  const carta = new Carta({})
 
   const reloadData = async (pageData) => {
     report = await pb
       .collection("bug_reports_public")
       .getFirstListItem(`id="${pageData.params.bug_id}"`, {
         expand: "status",
-      });
-    await loadComments();
-  };
+      })
+    await loadComments()
+  }
 
   const loadComments = async () => {
     comments = await pb.collection("bug_comments").getFullList({
       sort: "created",
       filter: `bug="${report.id}"`,
       fields: "id,created,comment,user",
-    });
-  };
+    })
+  }
 
   const postComment = async () => {
     if (newComment.length < 3) {
-      toast.push("Comment too short", { classes: ["errorToast"] });
-      return;
+      toast.push("Comment too short", { classes: ["errorToast"] })
+      return
     }
     await pb.collection("bug_comments").create({
       bug: report.id,
       user: pb.authStore.model.id,
       comment: newComment,
-    });
-    newComment = "";
-    await loadComments();
-  };
+    })
+    newComment = ""
+    await loadComments()
+  }
 
-  onMount(loadComments);
+  onMount(loadComments)
 
-  $: reloadData($page);
+  $effect(() => reloadData($page))
 </script>
 
 <svelte:head>

@@ -6,8 +6,8 @@
   import { pb } from '$lib/pocketbase'
   import { authData, ownedBadges } from '$lib/stores'
 
-  let menuOpen = false
-  let pathname = '/'
+  let menuOpen = $state(false)
+  let pathname = $state('/')
 
   const toggleMenu = () => (menuOpen = !menuOpen)
 
@@ -63,6 +63,61 @@
   })
 </script>
 
+{#snippet menu()}
+  <ul transition:slide>
+    {#if $authData.isValid }
+      <a href="/agent">
+        <li class="{pathname === '/agent' ? 'active' : '{$authData.model.username}'}">
+          <img src="{$authData?.baseModel?.avatar.slice(0, -6)}" alt={$authData.baseModel.username}
+            onerror={() => this.src='/images/user.svg'} />
+          {$authData.baseModel.username}
+        </li>
+      </a>
+    {/if}
+    <a href="/badges">
+      <li class="{pathname === '/badges' ? 'active' : ''}">
+        <img src="/images/medal.svg" alt="Badges" /> Badges
+      </li>
+    </a>
+    <a href="/media">
+      <li class="{pathname === '/media' ? 'active' : ''}">
+        <img src="/images/mediagress.png" alt="Mediagress" /> Mediagress
+      </li>
+    </a>
+    <a href="/bugs">
+      <li class="{pathname === '/bugs' ? 'active' : ''}">
+        <img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker
+      </li>
+    </a>
+    <a href="/resources">
+      <li class="{pathname === '/resources' ? 'active' : ''}">
+        <img src="/images/resources.svg" alt="Resources" /> Resources
+      </li>
+    </a>
+    <a href="/stats">
+      <li class="{pathname === '/stats' ? 'active' : ''}">
+        <img src="/images/statistics.svg" alt="Statistics" /> Statistics
+      </li>
+    </a>
+    <li>
+      <button onclick={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</button>
+    </li>
+    {#if $authData.isValid }
+      <li>
+        <button onclick={logout}>
+          <img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout
+        </button>
+      </li>
+    {:else}
+      <li>
+        <button onclick={login}>
+          <img src="/images/user.svg" alt="Login" /> Login
+        </button>
+      </li>
+    {/if}
+  </ul>
+{/snippet}
+
 <header>
   <div>
     <a href="/">
@@ -71,99 +126,13 @@
     </a>
   </div>
   <nav data-nav="mobile">
-    <span class:open={menuOpen} onclick={toggleMenu} />
+    <button class="hamburger" class:open={menuOpen} onclick={toggleMenu} aria-label="Menu"></button>
     {#if menuOpen}
-      <ul transition:slide>
-      {#if $authData.isValid }
-          <a href="/agent">
-            <li class="{pathname === '/agent' ? 'active' : '{$authData.model.username}'}">
-              <img src="{$authData?.baseModel?.avatar.slice(0, -6)}" alt={$authData.baseModel.username}
-                onerror={() => this.src='/images/user.svg'} />
-              {$authData.baseModel.username}
-            </li>
-          </a>
-          {/if}
-          <a href="/badges">
-            <li class="{pathname === '/badges' ? 'active' : ''}">
-              <img src="/images/medal.svg" alt="Badges" /> Badges
-            </li>
-          </a>
-        <a href="/media">
-          <li class="{pathname === '/media' ? 'active' : ''}">
-            <img src="/images/mediagress.png" alt="Mediagress" /> Mediagress
-          </li>
-        </a>
-        <a href="/bugs">
-          <li class="{pathname === '/bugs' ? 'active' : ''}">
-            <img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker
-          </li>
-        </a>
-        <a href="/resources">
-          <li class="{pathname === '/resources' ? 'active' : ''}">
-            <img src="/images/resources.svg" alt="Resources" /> Resources
-          </li>
-        </a>
-        <a href="/stats">
-          <li class="{pathname === '/stats' ? 'active' : ''}">
-            <img src="/images/statistics.svg" alt="Statistics" /> Statistics
-          </li>
-        </a>
-        <li onclick={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
-        {#if $authData.isValid }
-        <li onclick={logout}><img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout</li>
-        {:else}
-          <li onclick={login}><img src="/images/user.svg" alt="Login" /> Login</li>
-        {/if}
-      </ul>
+      {@render menu()}
     {/if}
   </nav>
   <nav data-nav="large">
-    <ul>
-    {#if $authData.isValid }
-    <a href="/agent" transition:fly={{ y: 50, duration: 500 }}>
-      <li class="{pathname === '/agent' ? 'active' : ''}">
-        <img src="{$authData?.baseModel?.avatar.slice(0, -6)}" alt={$authData.baseModel.username}
-          onerror={() => this.src='/images/user.svg'} />
-        {$authData.baseModel.username}
-      </li>
-    </a>
-        {/if}
-        <a href="/badges">
-          <li class="{pathname === '/badges' ? 'active' : ''}">
-            <img src="/images/medal.svg" alt="Badges" /> Badges
-          </li>
-        </a>
-      <a href="/media">
-        <li class="{pathname === '/media' ? 'active' : ''}">
-          <img src="/images/mediagress.png" alt="Mediagress" /> Mediagress
-        </li>
-      </a>
-      <a href="/bugs">
-        <li class="{pathname === '/bugs' ? 'active' : ''}">
-          <img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker
-        </li>
-      </a>
-      <a href="/resources">
-        <li class="{pathname === '/resources' ? 'active' : ''}">
-          <img src="/images/resources.svg" alt="Resources" /> Resources
-        </li>
-      </a>
-      <a href="/stats">
-        <li class="{pathname === '/stats' ? 'active' : ''}">
-          <img src="/images/statistics.svg" alt="Statistics" /> Statistics
-        </li>
-      </a>
-      <li onclick={openTelegram}><img src="/images/telegram.svg" alt="Telegram" /> Telegram</li>
-      {#if $authData.isValid }
-        <li onclick={logout}>
-          <img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout
-        </li>
-      {:else}
-        <li onclick={login}>
-          <img src="/images/user.svg" alt="Login" /> Login
-        </li>
-      {/if}
-    </ul>
+    {@render menu()}
   </nav>
 </header>
 
@@ -175,6 +144,10 @@
     justify-content: space-between;
     height: 100px;
     color: #FFF;
+  }
+  header button {
+    color: #FFF;
+    font-size: 1em;
   }
   div, nav {
     display: flex;
@@ -229,7 +202,7 @@
     display: none;
   }
 
-  nav[data-nav="mobile"] span {
+  nav[data-nav="mobile"] button.hamburger {
     height: 32px;
     width: 32px;
     background-image: url('/images/menu.png');
@@ -237,7 +210,7 @@
     transition: all 0.3s ease-in-out;
     cursor: pointer;
   }
-  nav[data-nav="mobile"] span.open {
+  nav[data-nav="mobile"] button.hamburger.open {
     background-image: url('/images/close.png');
   }
   nav[data-nav="mobile"] ul {
@@ -258,7 +231,7 @@
     padding: 1em 0.5em;
   }
 
-  @media (max-width: 1185px) {
+  @media (max-width: 1400px) {
     nav[data-nav="large"] {
       display: none;
     }

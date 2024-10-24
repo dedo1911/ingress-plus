@@ -4,13 +4,15 @@
   import { authData, ownedBadges, badgeSize } from '$lib/stores'
   import Modal from '$lib/components/Modal.svelte'
 
-  export let showModal
-  export let badge
-  export let tier
-  export let owned
-  export let title
-  let content
-  let badgeData
+  let {
+    showModal = $bindable(),
+    badge,
+    tier,
+    owned,
+    title
+  } = $props()
+  let content = $state()
+  let badgeData = $state()
 
   const toggleOwned = async () => {
     if (!$authData.isValid) return
@@ -43,7 +45,7 @@
     badgeData = await pb.collection('badges').getFirstListItem(`id="${badge.id}"`)
   }
 
-  let ownedCounter = 0
+  let ownedCounter = $state(0)
 
   const updateCounter = async () => {
     try {
@@ -58,43 +60,39 @@
     }
   }
 
-  $: {
-    if (showModal) updateCounter()
-  }
-
-  $: if (showModal) {
-    content?.scrollTo(0, 0)
-    fetchBadge()
-  }
+  $effect(() => {
+    if (showModal) {
+      updateCounter()
+      content?.scrollTo(0, 0)
+      fetchBadge()
+    }
+  })
 </script>
 
 <Modal bind:showModal>
   <header>
     {#if $authData.isValid && !!badgeData}
-
-    {#if badge.unobtainable || (badgeData?.locked_tier > 0 && [tier] >= badgeData?.locked_tier)}
-      <span>
-          <img
-          src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
-          alt="Checkbox"
-          height="32"
-          width="32"
-          />
-      </span>
-    {:else}
-      <span onclick={toggleOwned} class="toggleOwned" title={owned ? 'Mark not owned' : 'Mark owned'}>
-          <img
-            src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
+      {#if badge.unobtainable || (badgeData?.locked_tier > 0 && [tier] >= badgeData?.locked_tier)}
+        <button disabled>
+            <img
+            src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
             alt="Checkbox"
             height="32"
             width="32"
-          />
-      </span>
-    {/if}
-
+            />
+        </button>
+      {:else}
+        <button onclick={toggleOwned} title={owned ? 'Mark not owned' : 'Mark owned'}>
+            <img
+              src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
+              alt="Checkbox"
+              height="32"
+              width="32"
+            />
+        </button>
+      {/if}
     {:else}
-    <span>&nbsp;</span>
-
+      <span>&nbsp;</span>
     {/if}
     <img
       height={$badgeSize * 2}
@@ -102,10 +100,7 @@
       alt={title}
       src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize * 2}x{$badgeSize * 2}"
     />
-    <a
-      title="Download"
-      href="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?download=true"
-    >
+    <a title="Download" href="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?download=true">
       <img src="/images/download.svg" alt="Download" height="32" width="32" />
     </a>
   </header>
@@ -125,7 +120,7 @@
       {/if}
     {/if}
 
-    <button onclick={() => (showModal = false)}>Done</button>
+    <button class="cta" onclick={() => (showModal = false)}>Done</button>
     <div class="footer">
       {#if ownedCounter > 0 }
         <small transition:slide>{ownedCounter} {ownedCounter === 1 ? 'agent has' : 'agents have'} this badge!</small>
@@ -143,13 +138,11 @@
     position: sticky;
     z-index: 9999;
   }
-  header span, header a {
-    height: 32px;
-    width: 32px;
-    margin: calc(32px + 15px) 20px 0;
+  header button {
+    margin: 4.5em 0 0 1em;
   }
-  header a img, span.toggleOwned {
-    cursor: pointer;
+  header a {
+    margin: 3.75em 0.75em 0 0;
   }
   section h2 {
     margin: 0.5em 0 0 0;
@@ -167,18 +160,6 @@
     word-break: break-word;
     overflow: auto;
     max-height: 50vh;
-  }
-  button {
-    cursor: pointer;
-    width: 100%;
-    max-width: 8em;
-    padding: 0.25em 0;
-    font-size: larger;
-    color: #FFF;
-    background: rgb(50,60,110);
-    background: linear-gradient(90deg, rgba(50,60,110,1) 0%, rgba(52,39,83,1) 50%, rgba(83,52,118,1) 100%);
-    border-color: #9593c3;
-    border-radius: 6px;
   }
   div.footer {
     display: flex;

@@ -1,15 +1,10 @@
 <script>
-    import { authData } from "$lib/stores";
+    import { authData } from "$lib/stores"
 
-    let username
-    let faction
-    let verification
-    let userId
-
-    $: username = $authData?.baseModel?.username || "NONE";
-    $: faction = $authData?.baseModel?.faction || "NOT SET";
-    $: verification = $authData?.baseModel?.verification || "NONE";
-    $: userId = $authData?.baseModel?.id || "NONE";
+    const username = $derived($authData?.baseModel?.username || "NONE")
+    const faction = $derived($authData?.baseModel?.faction || "NOT SET")
+    const verification = $derived($authData?.baseModel?.verification || "NONE")
+    const userId = $derived($authData?.baseModel?.id || "NONE")
 </script>
 
 <svelte:head>
@@ -46,14 +41,13 @@
     {/if}
     <hr />
     <p>
-        Verification is only done manually and at the discretion of the admins
-        at the moment and can not be requested.
+        It is not possible to verify yourself at this time. Check the Ingress.Plus
+        Telegram group from time to time to see if any Admin is opening Verifications.
     </p>
     <br />
     <p>
-        If instructed, make sure that your username and faction above match your
-        Ingress account, keep your User ID ready and follow further instructions
-        provided by the admins.
+        Make sure that your username and faction above match your
+        Ingress account, otherwise you cannot be verified.
     </p>
 </div>
 
