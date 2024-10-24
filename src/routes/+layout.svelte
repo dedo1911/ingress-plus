@@ -8,6 +8,8 @@
   import '../style.css'
   import '$lib/styles/editor.scss'
 
+  let { children } = $props()
+
   const options = {
     duration: 2000,
     reversed: true
@@ -30,7 +32,7 @@
 <main>
 <Header />
   <div>
-    <slot />
+    {@render children?.()}
   </div>
 <Footer />
 </main>

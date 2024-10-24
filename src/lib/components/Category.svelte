@@ -3,25 +3,22 @@
   import { badgeSize } from '$lib/stores'
   import Badge from '$lib/components/Badge.svelte'
 
-  export let category
-  export let width
+  let { category, width } = $props()
 
-  let badgesPerRow = 1
-  let rows = 1
-  let hasTiers = false
-  let tiers = []
-
-  $: tiers = category.tiers.split(',').filter(t => t)
-  $: hasTiers = tiers.length > 0
-  $: badgesPerRow = hasTiers
+  
+  
+  let tiers = $derived(category.tiers.split(',').filter(t => t))
+  let hasTiers = $derived(tiers.length > 0)
+  let rows = $derived(hasTiers
+    ? Math.ceil((category.badges.length * tiers.length) / badgesPerRow)
+    : Math.ceil(category.badges.length / badgesPerRow))
+  let badgesPerRow = $derived(hasTiers
     ? Math.max(
         1,
         Math.min(tiers.length, Math.floor((width - $badgeSize) / $badgeSize)),
       )
-    : 6; // Math.max(1, Math.floor((width-$badgeSize)/$badgeSize))
-  $: rows = hasTiers
-    ? Math.ceil((category.badges.length * tiers.length) / badgesPerRow)
-    : Math.ceil(category.badges.length / badgesPerRow);
+    : 6)
+    // Math.max(1, Math.floor((width-$badgeSize)/$badgeSize))
 
   const generateId = (str) =>
     str
@@ -29,17 +26,17 @@
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
       .replace(/^-+|-+$/g, "")
-      .toLowerCase();
+      .toLowerCase()
 
-  const id = generateId(category.title);
+  const id = generateId(category.title)
 
   const copyCategoryLink = async (categoryId) => {
     try {
-      await navigator.clipboard.writeText(`${window?.location?.origin}${window?.location?.pathname}#${categoryId}`);
-      toast.push('Copied to clipboard!', { classes: ['successToast'] });
+      await navigator.clipboard.writeText(`${window?.location?.origin}${window?.location?.pathname}#${categoryId}`)
+      toast.push('Copied to clipboard!', { classes: ['successToast'] })
     } catch (err) {
-      console.error(err);
-      toast.push('An error has occurred.', { classes: ['errorToast'] });
+      console.error(err)
+      toast.push('An error has occurred.', { classes: ['errorToast'] })
     }
   }
 </script>

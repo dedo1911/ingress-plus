@@ -4,13 +4,13 @@
   import AgentName from '$lib/components/AgentName.svelte'
   import { formatNumber } from '$lib/utils.js'
 
-  export let data
-  $: s = data.statistics
-  $: statistics = s[0][0]
-  $: topBadges = s[1].items
-  $: topUsers = s[2]
-  $: topMediaUsers = s[3]
-  $: topMediaUploads = s[4]
+  let { data } = $props()
+  let s = $derived(data.statistics)
+  let statistics = $derived(s[0][0])
+  let topBadges = $derived(s[1].items)
+  let topUsers = $derived(s[2])
+  let topMediaUsers = $derived(s[3])
+  let topMediaUploads = $derived(s[4])
 </script>
 
 <svelte:head>

@@ -4,13 +4,15 @@
   import { authData, ownedBadges, badgeSize } from '$lib/stores'
   import Modal from '$lib/components/Modal.svelte'
 
-  export let showModal
-  export let badge
-  export let tier
-  export let owned
-  export let title
-  let content
-  let badgeData
+  let {
+    showModal = $bindable(),
+    badge,
+    tier,
+    owned,
+    title
+  } = $props()
+  let content = $state()
+  let badgeData = $state()
 
   const toggleOwned = async () => {
     if (!$authData.isValid) return
@@ -43,7 +45,7 @@
     badgeData = await pb.collection('badges').getFirstListItem(`id="${badge.id}"`)
   }
 
-  let ownedCounter = 0
+  let ownedCounter = $state(0)
 
   const updateCounter = async () => {
     try {
@@ -58,14 +60,13 @@
     }
   }
 
-  $: {
-    if (showModal) updateCounter()
-  }
-
-  $: if (showModal) {
-    content?.scrollTo(0, 0)
-    fetchBadge()
-  }
+  $effect(() => {
+    if (showModal) {
+      updateCounter()
+      content?.scrollTo(0, 0)
+      fetchBadge()
+    }
+  })
 </script>
 
 <Modal bind:showModal>

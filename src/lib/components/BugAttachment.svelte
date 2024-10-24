@@ -2,9 +2,8 @@
   import { serverAddress } from "$lib/pocketbase"
   import Modal from "./Modal.svelte"
 
-  export let attachment
-  export let report
-  let showModal = false
+  let { attachment, report } = $props()
+  let showModal = $state(false)
 </script>
 
 <img

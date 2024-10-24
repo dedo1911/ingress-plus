@@ -1,15 +1,10 @@
 <script>
-    import { authData } from "$lib/stores";
+    import { authData } from "$lib/stores"
 
-    let username
-    let faction
-    let verification
-    let userId
-
-    $: username = $authData?.baseModel?.username || "NONE";
-    $: faction = $authData?.baseModel?.faction || "NOT SET";
-    $: verification = $authData?.baseModel?.verification || "NONE";
-    $: userId = $authData?.baseModel?.id || "NONE";
+    let username = $derived($authData?.baseModel?.username || "NONE")
+    let faction = $derived($authData?.baseModel?.faction || "NOT SET")
+    let verification = $derived($authData?.baseModel?.verification || "NONE")
+    let userId = $derived($authData?.baseModel?.id || "NONE")
 </script>
 
 <svelte:head>

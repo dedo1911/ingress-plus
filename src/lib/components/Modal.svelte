@@ -1,12 +1,14 @@
 <script>
-  export let showModal
+  let { showModal = $bindable(), children } = $props()
 
-  let dialog
+  let dialog = $state()
 
-  $: if (dialog) {
-    if (showModal) dialog.showModal()
-    else dialog.close()
-  }
+  $effect(() => {
+    if (dialog) {
+      if (showModal) dialog.showModal()
+      else dialog.close()
+    }
+  })
 
 	const preventDefault = (event) => {
     event.preventDefault()
@@ -20,7 +22,7 @@
     onclose={() => (showModal = false)}
     onclick={() => dialog.close()}>
     <div onclick={preventDefault} onkeydown={preventDefault}>
-      <slot />
+      {@render children?.()}
     </div>
   </dialog>
 {/if}

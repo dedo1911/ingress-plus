@@ -6,8 +6,8 @@
   import { pb } from '$lib/pocketbase'
   import { authData, ownedBadges } from '$lib/stores'
 
-  let menuOpen = false
-  let pathname = '/'
+  let menuOpen = $state(false)
+  let pathname = $state('/')
 
   const toggleMenu = () => (menuOpen = !menuOpen)
 
@@ -71,7 +71,7 @@
     </a>
   </div>
   <nav data-nav="mobile">
-    <span class:open={menuOpen} onclick={toggleMenu} />
+    <span class:open={menuOpen} onclick={toggleMenu}></span>
     {#if menuOpen}
       <ul transition:slide>
       {#if $authData.isValid }
@@ -258,7 +258,7 @@
     padding: 1em 0.5em;
   }
 
-  @media (max-width: 1185px) {
+  @media (max-width: 1400px) {
     nav[data-nav="large"] {
       display: none;
     }
