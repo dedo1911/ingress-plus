@@ -2,6 +2,8 @@
 
 Fan site not officially affiliated with Ingress or Niantic Labs!
 
+If you would like to contribute, take a look at the open Bugs and Feature Requests in the Issues tab and join our Dev Telegram Chat: https://t.me/+1hrYWn8qWVk0NTgy
+
 ## Developing
 
 Once you've cloned the project and installed dependencies with `yarn`, start a development server:
