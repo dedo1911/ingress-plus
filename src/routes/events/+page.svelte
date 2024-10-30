@@ -68,12 +68,16 @@
     activeEvents = events.filter(e => e.start_time.isBefore(dayjs()) && e.end_time.isAfter(dayjs()))
     futureEvents = sortBy(events.filter(e => e.start_time.isAfter(dayjs())), 'start_time')
     pastEvents = sortBy(events.filter(e => e.end_time.isBefore(dayjs())), 'start_time')
-    
+
     if (activeEvents.length === 0) activeSection = 'future'
   }
 
   onMount(loadData)
 </script>
+
+<svelte:head>
+    <title>Ingress Plus &middot; Events</title>
+</svelte:head>
 
 {#snippet eventRow(e)}
   <div class="event-row">

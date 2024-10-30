@@ -26,6 +26,11 @@
             <li>The very website you are already on :)</li>
         </ul>
     </li>
+    <li><a target="_blank" rel="noopener noreferrer" href="https://community-archive.ingress.plus">Community Forums Archive</a>
+            <ul>
+                <li>Our Archive of the now defunct Ingress Community Forums</li>
+            </ul>
+        </li>
     <li><a target="_blank" rel="noopener noreferrer" href="https://ingress.com">Ingress</a>
         <ul>
             <li>The official Websites of Ingress, includes<ul>
