@@ -28,12 +28,12 @@
 
 <style>
   dialog {
-  background: none;
-      border: none;
-      padding: 0;
-      min-width: min(32em, 100vw);
-  max-width: 1000px;
-      animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background: none;
+    border: none;
+    padding: 0;
+    min-width: min(32em, 100vw);
+    max-width: 1000px;
+    animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   dialog::backdrop {
       background: rgba(0, 0, 0, 0.5);

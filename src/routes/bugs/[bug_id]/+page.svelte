@@ -69,7 +69,7 @@
   />
   <meta
     property="og:description"
-    content={`Report created on ${dayjs(report.created).format("DD/MM/YYYY HH:mm:ss")} by ${report.agent}`}
+    content={`Report created on ${dayjs(report.created).format("MMMM D, YYYY [at] h:mm A")} by ${report.agent}`}
   />
 
   <meta name="twitter:card" content="summary_large_image" />
@@ -84,7 +84,7 @@
   />
   <meta
     name="twitter:description"
-    content={`Report created on ${dayjs(report.created).format("DD/MM/YYYY HH:mm:ss")} by ${report.agent}`}
+    content={`Report created on ${dayjs(report.created).format("MMMM D, YYYY [at] h:mm A")} by ${report.agent}`}
   />
 </svelte:head>
 
