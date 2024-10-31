@@ -36,6 +36,20 @@
 
 <svelte:head>
   <title>Ingress Plus &middot; {event?.title || "Bug Report"}</title>
+
+  <meta property="og:site_name" content="Ingress Plus">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content={`Event: ${event?.title || 'Event'}`}>
+  <meta property="og:url" content={events ? `https://ingress.plus/events/${events.id}` : ''}>
+  <meta property="og:description" content={(events?.description || '').replace(/(<([^>]+)>)/gi, '')}>
+  <meta property="og:image" content={events?.image?.replace('http://', 'https://') || ''}>
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:domain" content="ingress.plus">
+  <meta property="twitter:url" content={events ? `https://ingress.plus/events/${events.id}` : ''}>
+  <meta name="twitter:title" content={`Events: ${events?.title || 'Event'}`}>
+  <meta name="twitter:description" content={(events?.description || '').replace(/(<([^>]+)>)/gi, '')}>
+  <meta name="twitter:image" content={events?.image?.replace('http://', 'https://') || ''}>
 </svelte:head>
 
 <div class="container">
