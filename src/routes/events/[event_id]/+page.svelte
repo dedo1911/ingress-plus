@@ -34,6 +34,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Ingress Plus &middot; {event?.title || "Bug Report"}</title>
+</svelte:head>
+
 <div class="container">
   <h1>{event.title}</h1>
   <p class="center">
