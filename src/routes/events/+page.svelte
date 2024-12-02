@@ -82,11 +82,13 @@
 {#snippet eventRow(e)}
   <div class="event-row">
     <div class="event-icon">
-      <img src="images/events/{e.category}.png" alt={e.category} />
+      <img src="https://ingress.plus/api/files/ncmy64l5pb3p039/{e.id}/{e.image}" alt={e.category} />
+	  <!-- todo: fix image url to be relative -->
     </div>
     <div class="event-description">
       <a href="/events/{e.id}"><h2>{e.title}</h2></a>
-      <p>
+      <p><img style="height:1em;" src="images/events/{e.category}.png" alt={e.category} /> {e.category}<br>
+	  <!-- todo: move event images so they dont overlap with text, convert event category to "real" text -->
         <strong><Time timestamp={e.start_time} relative live /></strong>
         <small>(
           from <Time timestamp={e.start_time} format="MMMM D, YYYY [at] h:mm A" live />
