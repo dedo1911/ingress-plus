@@ -12,5 +12,5 @@ export async function load ({ fetch, params }) {
   } catch (err) {
     console.error(err)
   }
-  throw error(404, 'Report not found')
+  throw error(404, 'Event not found')
 }
