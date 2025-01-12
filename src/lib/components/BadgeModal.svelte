@@ -13,6 +13,7 @@
   } = $props()
   let content = $state()
   let badgeData = $state()
+  let Requirement = $state()
 
   const toggleOwned = async () => {
     if (!$authData.isValid) return
@@ -42,7 +43,14 @@
   }
 
   const fetchBadge = async () => {
-    badgeData = await pb.collection('badges').getFirstListItem(`id="${badge.id}"`)
+    badgeData = await pb.collection('badges').getFirstListItem(`id="${badge.id}"`);
+     console.log(badgeData.requirement)
+    let requirementsArray = badgeData.tier_values.split(",").map(Number);
+    console.log(requirementsArray)
+    let tierIndex = Number(tier);
+    console.log(tierIndex)
+    Requirement = requirementsArray[tierIndex];
+    console.log("Requirement for badge:", Requirement)
   }
 
   let ownedCounter = $state(0)
@@ -114,6 +122,11 @@
     {#if badgeData}
       <hr transition:slide />
       <p transition:slide>{badgeData.description}</p>
+      {#if badgeData.requirement}
+          <hr />
+          <p transition:slide ><b>Requirements:</b></p>
+          <p transition:slide >{badgeData.requirement.replace('{0}', Requirement)}</p>
+          {/if}
       {#if badgeData.description_extra}
         <hr />
         <p transition:slide>{@html badgeData.description_extra}</p>
