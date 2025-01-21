@@ -84,11 +84,18 @@
         <img src="/images/mediagress.png" alt="Mediagress" /> Mediagress
       </li>
     </a>
+    <a href="/events">
+      <li class="{pathname === '/events' ? 'active' : ''}">
+        <img src="/images/event.svg" alt="Events" /> Events
+      </li>
+    </a>
+    <!--
     <a href="/bugs">
       <li class="{pathname === '/bugs' ? 'active' : ''}">
         <img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker
       </li>
     </a>
+    -->
     <a href="/resources">
       <li class="{pathname === '/resources' ? 'active' : ''}">
         <img src="/images/resources.svg" alt="Resources" /> Resources

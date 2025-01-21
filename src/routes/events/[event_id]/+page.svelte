@@ -36,7 +36,7 @@
 
 <svelte:head>
   <title>Ingress Plus &middot; {event?.title || "Bug Report"}</title>
-
+<!--
   <meta property="og:site_name" content="Ingress Plus">
   <meta property="og:type" content="website">
   <meta property="og:title" content={`Event: ${event?.title || 'Event'}`}>
@@ -50,6 +50,7 @@
   <meta name="twitter:title" content={`Events: ${events?.title || 'Event'}`}>
   <meta name="twitter:description" content={(events?.description || '').replace(/(<([^>]+)>)/gi, '')}>
   <meta name="twitter:image" content={events?.image?.replace('http://', 'https://') || ''}>
+  -->
 </svelte:head>
 
 <div class="container">
@@ -58,11 +59,25 @@
     <img src="{serverAddress}/api/files/{event.collectionId}/{event.id}/{event.image}" alt={event.title} />
   </p>
   <p class="center">
-    <strong><Time timestamp={event.start_time} relative live /></strong>
-    <small>(
-      from <Time timestamp={event.start_time} format="MMMM D, YYYY [at] h:mm A" live />
-      to <Time timestamp={event.end_time} format="MMMM D, YYYY [at] h:mm A" live />
-    )</small>
+      {#if event.start_time.isAfter(dayjs())}
+             <strong>Starts <Time timestamp={event.start_time} relative live /></strong>
+             <small>(
+                 from <Time timestamp={event.start_time} format="MMMM D, YYYY [at] h:mm A" live />
+                 to <Time timestamp={event.end_time} format="MMMM D, YYYY [at] h:mm A" live />
+             )</small>
+         {:else if event.start_time.isBefore(dayjs()) && event.end_time.isAfter(dayjs())}
+             <strong>Ends <Time timestamp={event.end_time} relative live /></strong>
+             <small>(
+                 from <Time timestamp={event.start_time} format="MMMM D, YYYY [at] h:mm A" live />
+                 to <Time timestamp={event.end_time} format="MMMM D, YYYY [at] h:mm A" live />
+             )</small>
+         {:else if event.end_time.isBefore(dayjs())}
+             <strong>Ended <Time timestamp={event.start_time} relative live /></strong>
+             <small>(
+                 from <Time timestamp={event.start_time} format="MMMM D, YYYY [at] h:mm A" live />
+                 to <Time timestamp={event.end_time} format="MMMM D, YYYY [at] h:mm A" live />
+             )</small>
+         {/if}
   <p class="center">
     {@html event.description}
   </p>

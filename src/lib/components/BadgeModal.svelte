@@ -44,13 +44,9 @@
 
   const fetchBadge = async () => {
     badgeData = await pb.collection('badges').getFirstListItem(`id="${badge.id}"`);
-     console.log(badgeData.requirement)
-    let requirementsArray = badgeData.tier_values.split(",").map(Number);
-    console.log(requirementsArray)
-    let tierIndex = Number(tier);
-    console.log(tierIndex)
+    const requirementsArray = badgeData.tier_values.split(",").map(Number);
+    const tierIndex = Number(tier);
     Requirement = requirementsArray[tierIndex];
-    console.log("Requirement for badge:", Requirement)
   }
 
   let ownedCounter = $state(0)

@@ -67,7 +67,7 @@
 
     activeEvents = events.filter(e => e.start_time.isBefore(dayjs()) && e.end_time.isAfter(dayjs()))
     futureEvents = sortBy(events.filter(e => e.start_time.isAfter(dayjs())), 'start_time')
-    pastEvents = sortBy(events.filter(e => e.end_time.isBefore(dayjs())), 'start_time')
+    pastEvents = sortBy(events.filter(e => e.end_time.isBefore(dayjs())), 'start_time').reverse()
 
     if (activeEvents.length === 0) activeSection = 'future'
   }
@@ -82,18 +82,37 @@
 {#snippet eventRow(e)}
   <div class="event-row">
     <div class="event-icon">
-      <img src="https://ingress.plus/api/files/ncmy64l5pb3p039/{e.id}/{e.image}" alt={e.category} />
+        {#if e.image != ''}
+        <img src="https://ingress.plus/api/files/ncmy64l5pb3p039/{e.id}/{e.image}" alt={e.category} />
+        {:else}
+        <img src="images/events/global_event.png" alt={e.category} />
+        {/if}
 	  <!-- todo: fix image url to be relative -->
     </div>
     <div class="event-description">
       <a href="/events/{e.id}"><h2>{e.title}</h2></a>
       <p><img style="height:1em;" src="images/events/{e.category}.png" alt={e.category} /> {e.category}<br>
-	  <!-- todo: move event images so they dont overlap with text, convert event category to "real" text -->
-        <strong><Time timestamp={e.start_time} relative live /></strong>
+	  <!-- todo: convert event category to "real" text -->
+	{#if e.start_time.isAfter(dayjs())}
+        <strong>Starts <Time timestamp={e.start_time} relative live /></strong>
         <small>(
-          from <Time timestamp={e.start_time} format="MMMM D, YYYY [at] h:mm A" live />
-          to <Time timestamp={e.end_time} format="MMMM D, YYYY [at] h:mm A" live />
+            from <Time timestamp={e.start_time} format="MMMM D, YYYY [at] h:mm A" live />
+            to <Time timestamp={e.end_time} format="MMMM D, YYYY [at] h:mm A" live />
         )</small>
+    {:else if e.start_time.isBefore(dayjs()) && e.end_time.isAfter(dayjs())}
+        <strong>Ends <Time timestamp={e.end_time} relative live /></strong>
+        <small>(
+            from <Time timestamp={e.start_time} format="MMMM D, YYYY [at] h:mm A" live />
+            to <Time timestamp={e.end_time} format="MMMM D, YYYY [at] h:mm A" live />
+        )</small>
+    {:else if e.end_time.isBefore(dayjs())}
+        <strong>Ended <Time timestamp={e.start_time} relative live /></strong>
+        <small>(
+            from <Time timestamp={e.start_time} format="MMMM D, YYYY [at] h:mm A" live />
+            to <Time timestamp={e.end_time} format="MMMM D, YYYY [at] h:mm A" live />
+        )</small>
+    {/if}
+
       </p>
     </div>
   </div>
@@ -129,13 +148,14 @@
     {#each pastEventsPage as event}
       {@render eventRow(event)}
     {/each}
-    <Pagination rows={pastEvents} perPage={5} bind:trimmedRows={pastEventsPage} />
+    <Pagination rows={pastEvents} perPage={10} bind:trimmedRows={pastEventsPage} />
   </div>
   {/if}
 
   <div class="options">
     <button onclick={toggleShowAll} title={showAll ? 'Show less' : 'Show more'}>
       <img src="/images/{showAll ? 'checkbox_on' : 'checkbox_off'}.png" alt="Checkbox"/> Show All Events</button>
+        <p><small>(including Events that might not be relevant to you like Mission Days)</small></p>
   </div>
 </div>
 
@@ -160,7 +180,7 @@
     text-align: center;
   }
   div.event-icon img {
-    max-height: 64px;
+    max-width: 6em;
   }
   div.event-description {
     flex-grow: 1;
