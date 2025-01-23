@@ -65,52 +65,52 @@
 		
 		switch (e.category) {
 		case 'anomaly':
-			categoryTitle = 'Anomaly';
+			e.categoryTitle = 'Anomaly';
 			break;
 		case 'second_sunday':
-			categoryTitle = 'Second Sunday';
+			e.categoryTitle = 'Second Sunday';
 			break;
 		case 'first_saturday':
-			categoryTitle = 'First Saturday';
+			e.categoryTitle = 'First Saturday';
 			break;
 		case 'mission_day':
-			categoryTitle = 'Mission Day';
+			e.categoryTitle = 'Mission Day';
 			break;
 		case 'global_event':
-			categoryTitle = 'Global Event';
+			e.categoryTitle = 'Global Event';
 			break;
 		case 'global_challenge':
-			categoryTitle = 'Global Challenge';
+			e.categoryTitle = 'Global Challenge';
 			break;
 		case '2sday':
-			categoryTitle = '2x AP Tuesday';
+			e.categoryTitle = '2x AP Tuesday';
 			break;
 		case 'agent_enl':
-			categoryTitle = 'Agent organized Event (Enlightened)';
+			e.categoryTitle = 'Agent organized Event (Enlightened)';
 			break;
 		case 'agent_res':
-			categoryTitle = 'Agent organized Event (Resistance)';
+			e.categoryTitle = 'Agent organized Event (Resistance)';
 			break;
 		case 'agent_xfac':
-			categoryTitle = 'Agent organized Event (Crossfaction)';
+			e.categoryTitle = 'Agent organized Event (Crossfaction)';
 			break;
 		case 'nl1331':
-			categoryTitle = 'NL-1331 Meetup';
+			e.categoryTitle = 'NL-1331 Meetup';
 			break;
 		case 'special':
-			categoryTitle = 'Special Event';
+			e.categoryTitle = 'Special Event';
 			break;
 		case 'TKO':
-			categoryTitle = 'Tactical Kinetic Operations/GORUCK';
+			e.categoryTitle = 'Tactical Kinetic Operations/GORUCK';
 			break;
 		case 'wayfarer':
-			categoryTitle = 'Wayfarer Challenge';
+			e.categoryTitle = 'Wayfarer Challenge';
 			break;
 		case 'canceled':
-			categoryTitle = 'Canceled Event';
+			e.categoryTitle = 'Canceled Event';
 			break;
 		default:
-			categoryTitle = 'Unknown Event type'
+			e.categoryTitle = 'Unknown Event type'
 			break;
 		}
 		
@@ -122,7 +122,8 @@
     pastEvents = sortBy(events.filter(e => e.end_time.isBefore(dayjs())), 'start_time').reverse()
 
     if (activeEvents.length === 0) activeSection = 'future'
-
+	}
+	
   onMount(loadData)
 </script>
 
@@ -142,7 +143,7 @@
     </div>
     <div class="event-description">
       <a href="/events/{e.id}"><h2>{e.title}</h2></a>
-      <p><img style="height:1em;" src="images/events/{e.category}.png" alt={e.category} /> {categoryTitle}<br>
+      <p><img style="height:1em;" src="images/events/{e.category}.png" alt={e.category} /> {e.categoryTitle}<br>
 	  <!-- todo: convert event category to "real" text -->
 	{#if e.start_time.isAfter(dayjs())}
         <strong>Starts <Time timestamp={e.start_time} relative live /></strong>
