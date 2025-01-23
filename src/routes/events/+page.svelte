@@ -100,7 +100,7 @@
 		case 'special':
 			e.categoryTitle = 'Special Event';
 			break;
-		case 'TKO':
+		case 'tko':
 			e.categoryTitle = 'Tactical Kinetic Operations/GORUCK';
 			break;
 		case 'wayfarer':
@@ -110,7 +110,8 @@
 			e.categoryTitle = 'Canceled Event';
 			break;
 		default:
-			e.categoryTitle = 'Unknown Event type'
+			console.log("Unknown Event type: " + e.category)
+			e.categoryTitle = 'Unknown Event type';
 			break;
 		}
 		
