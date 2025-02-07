@@ -62,7 +62,7 @@
           e.start_time = e.start_time.year(e.repeat_cron.year()).month(e.repeat_cron.month()).date(e.repeat_cron.date())
           e.end_time = e.end_time.year(e.repeat_cron.year()).month(e.repeat_cron.month()).date(e.repeat_cron.date())
         }
-		
+
 		switch (e.category) {
 		case 'anomaly':
 			e.categoryTitle = 'Anomaly';
@@ -114,7 +114,7 @@
 			e.categoryTitle = 'Unknown Event type';
 			break;
 		}
-		
+
         return e
       })
 
@@ -124,7 +124,7 @@
 
     if (activeEvents.length === 0) activeSection = 'future'
 	}
-	
+
   onMount(loadData)
 </script>
 
@@ -145,7 +145,6 @@
     <div class="event-description">
       <a href="/events/{e.id}"><h2>{e.title}</h2></a>
       <p><img style="height:1em;" src="images/events/{e.category}.png" alt={e.category} /> {e.categoryTitle}<br>
-	  <!-- todo: convert event category to "real" text -->
 	{#if e.start_time.isAfter(dayjs())}
         <strong>Starts <Time timestamp={e.start_time} relative live /></strong>
         <small>(
