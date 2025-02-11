@@ -11,11 +11,16 @@
             rel="noopener noreferrer"
             href="https://www.ingress.com">Ingress Prime</a
         >. Users of this site can create a profile with badges they own in the game
-        to share, submit Ingress media and raise bug reports for community awareness
-        (ensure you raise in app firstly).
+        to share, submit Ingress media and check what Events are currently ongoing
+		or planned.
         <i>We are not affiliated with Ingress or Niantic.</i>
     </p>
 
+    <a class="hero hero-right" href="/events">
+        <div style={"background-image: url('/images/homepage/cat_events_temp.png');"}>
+            <p><img src="/images/event.svg" alt="Events" /> Events</p>
+        </div>
+    </a>
     <a class="hero hero-left" href="/badges">
         <div style={"background-image: url('/images/homepage/cat_badges.jpg');"}>
             <p><img src="/images/medal.svg" alt="Badges" /> Badges</p>
