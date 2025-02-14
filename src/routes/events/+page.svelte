@@ -144,7 +144,10 @@
     </div>
     <div class="event-description">
       <a href="/events/{e.id}"><h2>{e.title}</h2></a>
-      <p><img style="height:1em;" src="images/events/{e.category}.png" alt={e.category} /> {e.categoryTitle}<br>
+      <p><img style="height:1em;" src="images/events/{e.category}.png" alt={e.category} /> {e.categoryTitle} |
+                <!-- TODO: switch formatting of the description in the link below so that it doesn't format special characters with an & (breaks link otherwise) -->
+          <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&dates={dayjs(e.start_time).format('YYYYMMDDTHHmmss')}/{dayjs(e.end_time).format('YYYYMMDDTHHmmss')}&details={e.description}&location={e.location}&text={e.title}&ctz={dayjs.tz.guess()}">
+          <img style="height:1em;" src="images/add_to_calendar.svg" alt="Add to Calendar" /> Add to Google Calendar</a><br>
 	{#if e.start_time.isAfter(dayjs())}
         <strong>Starts <Time timestamp={e.start_time} relative live /></strong>
         <small>(
