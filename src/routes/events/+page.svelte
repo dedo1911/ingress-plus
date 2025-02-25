@@ -147,7 +147,7 @@
         {#if e.image != ''}
         <a href="/events/{e.id}"><img src="https://ingress.plus/api/files/ncmy64l5pb3p039/{e.id}/{e.image}" alt={e.category} /></a>
         {:else}
-        <a href="/events/{e.id}"><img src="images/events/global_event.png" alt={e.category} /></a>
+        <a href="/events/{e.id}"><img src="images/events/{e.category}.png" alt={e.category} /></a>
         {/if}
 	  <!-- todo: fix image url to be relative -->
     </div>
