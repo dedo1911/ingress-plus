@@ -65,7 +65,13 @@
 
 		switch (e.category) {
 		case 'anomaly':
-			e.categoryTitle = 'Anomaly';
+			e.categoryTitle = 'Anomaly event';
+			break;
+		case 'shard_skirmish':
+			e.categoryTitle = 'Shard Skirmish';
+			break;
+		case 'beacon_skirmish':
+			e.categoryTitle = 'Beacon Skirmish';
 			break;
 		case 'second_sunday':
 			e.categoryTitle = 'Second Sunday';
@@ -81,6 +87,9 @@
 			break;
 		case 'global_challenge':
 			e.categoryTitle = 'Global Challenge';
+			break;
+		case 'campaign':
+			e.categoryTitle = 'Dispatch Campaign';
 			break;
 		case '2sday':
 			e.categoryTitle = '2x AP Tuesday';
@@ -136,9 +145,9 @@
   <div class="event-row">
     <div class="event-icon">
         {#if e.image != ''}
-        <img src="https://ingress.plus/api/files/ncmy64l5pb3p039/{e.id}/{e.image}" alt={e.category} />
+        <a href="/events/{e.id}"><img src="https://ingress.plus/api/files/ncmy64l5pb3p039/{e.id}/{e.image}" alt={e.category} /></a>
         {:else}
-        <img src="images/events/global_event.png" alt={e.category} />
+        <a href="/events/{e.id}"><img src="images/events/global_event.png" alt={e.category} /></a>
         {/if}
 	  <!-- todo: fix image url to be relative -->
     </div>
@@ -146,7 +155,7 @@
       <a href="/events/{e.id}"><h2>{e.title}</h2></a>
       <p><img style="height:1em;" src="images/events/{e.category}.png" alt={e.category} /> {e.categoryTitle} |
                 <!-- TODO: switch formatting of the description in the link below so that it doesn't format special characters with an & (breaks link otherwise) -->
-          <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&dates={dayjs(e.start_time).format('YYYYMMDDTHHmmss')}/{dayjs(e.end_time).format('YYYYMMDDTHHmmss')}&details={e.description}&location={e.location}&text={e.title}&ctz={dayjs.tz.guess()}">
+          <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&dates={dayjs(e.start_time).format('YYYYMMDDTHHmmss')}/{dayjs(e.end_time).format('YYYYMMDDTHHmmss')}&details={e.description}&location={e.location}&text={e.title}&ctz={dayjs.tz.guess()}" target="_blank" rel="noopener noreferrer">
           <img style="height:1em;" src="images/add_to_calendar.svg" alt="Add to Calendar" /> Add to Google Calendar</a><br>
 	{#if e.start_time.isAfter(dayjs())}
         <strong>Starts <Time timestamp={e.start_time} relative live /></strong>
