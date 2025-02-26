@@ -3,7 +3,7 @@
 </svelte:head>
 <div>
 
-    <h2><img src="/images/user-search.svg" alt="User search icon" />Attibutions</h2>
+    <h2><img src="/images/user-search.svg" alt="User search icon" />Attributions</h2>
 
     <ul>
        <li>
