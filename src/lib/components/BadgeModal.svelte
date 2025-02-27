@@ -153,10 +153,13 @@
     position: sticky;
     z-index: 9999;
   }
-  header button {
+  header button, header span, header a {
+    flex: 1;
     margin: 4.5em 0 0 1em;
-  }
+    text-align: left;
+}
   header a {
+    text-align: right;
     margin: 3.75em 0.75em 0 0;
   }
   section h2 {
