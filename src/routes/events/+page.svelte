@@ -2,12 +2,13 @@
   import { onMount } from 'svelte'
   import { slide } from 'svelte/transition'
   import { pb } from '$lib/pocketbase'
+  import { addToCalendar } from '$lib/utils.js'
   import sortBy from 'lodash.sortby'
   import Time, { dayjs } from 'svelte-time'
   import utc from 'dayjs/plugin/utc'
   import timezone from 'dayjs/plugin/timezone'
   import * as cronjsMatcher from '@datasert/cronjs-matcher'
-  import Pagination from '../../lib/components/Pagination.svelte';
+  import Pagination from '../../lib/components/Pagination.svelte'
 
   dayjs.extend(utc)
   dayjs.extend(timezone)
@@ -152,11 +153,17 @@
 	  <!-- todo: fix image url to be relative -->
     </div>
     <div class="event-description">
-      <a href="/events/{e.id}"><h2>{e.title}</h2></a>
+      <a href="/events/{e.id}"><h2 id={`event${e.id}`}>{e.title}</h2></a>
       <p><img style="height:1em;" src="images/events/{e.category}.png" alt={e.category} /> {e.categoryTitle} |
-                <!-- TODO: switch formatting of the description in the link below so that it doesn't format special characters with an & (breaks link otherwise) -->
-          <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&dates={dayjs(e.start_time).format('YYYYMMDDTHHmmss')}/{dayjs(e.end_time).format('YYYYMMDDTHHmmss')}&details={encodeURIComponent(e.description)}&location={encodeURIComponent(e.location)}&text={encodeURIComponent(e.title)}&ctz={dayjs.tz.guess()}" target="_blank" rel="noopener noreferrer">
-          <img style="height:1em;" src="images/add_to_calendar.svg" alt="Add to Calendar" /> Add to Google Calendar</a><br>
+        <a href={`#event${e.id}`} onclick={addToCalendar({
+          title: e.title,
+          description: e.description,
+          startTime: e.start_time,
+          endTime: e.end_time,
+          location: e.location
+        })}>
+          <img style="height:1em;" src="images/add_to_calendar.svg" alt="Add to Calendar" /> Add to Calendar
+        </a><br>
 	{#if e.start_time.isAfter(dayjs())}
         <strong>Starts <Time timestamp={e.start_time} relative live /></strong>
         <small>(
