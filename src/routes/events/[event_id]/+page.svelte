@@ -14,6 +14,7 @@
   const isLocal = data.event.time_type === 'local'
   const event = {
     ...data.event,
+    image: `${serverAddress}/api/files/${data.event.collectionId}/${data.event.id}/${data.event.image}`,
     start_time: isLocal
       ? dayjs(data.event.start_time.substring(0, 19)).tz(userTZ)
       : dayjs(data.event.start_time),
@@ -36,27 +37,26 @@
 
 <svelte:head>
   <title>Ingress Plus &middot; {event?.title || "Bug Report"}</title>
-<!--
+
   <meta property="og:site_name" content="Ingress Plus">
   <meta property="og:type" content="website">
   <meta property="og:title" content={`Event: ${event?.title || 'Event'}`}>
-  <meta property="og:url" content={events ? `https://ingress.plus/events/${events.id}` : ''}>
-  <meta property="og:description" content={(events?.description || '').replace(/(<([^>]+)>)/gi, '')}>
-  <meta property="og:image" content={events?.image?.replace('http://', 'https://') || ''}>
+  <meta property="og:url" content={event ? `https://ingress.plus/events/${event.id}` : ''}>
+  <meta property="og:description" content={(event?.description || '').replace(/(<([^>]+)>)/gi, '')}>
+  <meta property="og:image" content={event?.image?.replace('http://', 'https://') || ''}>
 
   <meta name="twitter:card" content="summary_large_image">
   <meta property="twitter:domain" content="ingress.plus">
-  <meta property="twitter:url" content={events ? `https://ingress.plus/events/${events.id}` : ''}>
-  <meta name="twitter:title" content={`Events: ${events?.title || 'Event'}`}>
-  <meta name="twitter:description" content={(events?.description || '').replace(/(<([^>]+)>)/gi, '')}>
-  <meta name="twitter:image" content={events?.image?.replace('http://', 'https://') || ''}>
-  -->
+  <meta property="twitter:url" content={event ? `https://ingress.plus/events/${event.id}` : ''}>
+  <meta name="twitter:title" content={`Events: ${event?.title || 'Event'}`}>
+  <meta name="twitter:description" content={(event?.description || '').replace(/(<([^>]+)>)/gi, '')}>
+  <meta name="twitter:image" content={event?.image?.replace('http://', 'https://') || ''}>
 </svelte:head>
 
 <div class="container">
   <h1>{event.title}</h1>
   <p class="center">
-    <img src="{serverAddress}/api/files/{event.collectionId}/{event.id}/{event.image}" alt={event.title} />
+    <img src="{event.image}" alt={event.title} />
   </p>
   <p class="center">
       {#if event.start_time.isAfter(dayjs())}
