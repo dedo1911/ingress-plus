@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte'
-  import { slide, fly } from 'svelte/transition'
+  import { slide } from 'svelte/transition'
 
   import { afterNavigate } from '$app/navigation'
   import { pb } from '$lib/pocketbase'
