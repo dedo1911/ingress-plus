@@ -154,16 +154,19 @@
     </div>
     <div class="event-description">
       <a href="/events/{e.id}"><h2 id={`event${e.id}`}>{e.title}</h2></a>
-      <p><img style="height:1em;" src="images/events/{e.category}.png" alt={e.category} /> {e.categoryTitle} |
-        <a href={`#event${e.id}`} onclick={addToCalendar({
-          title: e.title,
-          description: e.description,
-          startTime: e.start_time,
-          endTime: e.end_time,
-          location: e.location
-        })}>
-          <img style="height:1em;" src="images/add_to_calendar.svg" alt="Add to Calendar" /> Add to Calendar
-        </a><br>
+      <p><img style="height:1em;" src="images/events/{e.category}.png" alt={e.category} /> {e.categoryTitle}
+        {#if e.end_time.isAfter(dayjs())}
+          | <a href={`#event${e.id}`} onclick={addToCalendar({
+            title: e.title,
+            description: e.description,
+            startTime: e.start_time,
+            endTime: e.end_time,
+            location: e.location
+          })}>
+            <img style="height:1em;" src="images/add_to_calendar.svg" alt="Add to Calendar" /> Add to Calendar
+          </a>
+        {/if}
+        <br>
 	{#if e.start_time.isAfter(dayjs())}
         <strong>Starts <Time timestamp={e.start_time} relative live /></strong>
         <small>(
