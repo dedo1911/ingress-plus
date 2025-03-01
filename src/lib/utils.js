@@ -2,18 +2,16 @@ export const formatNumber = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '
 
 export const isIOSSafari = () => {
   const ua = window.navigator.userAgent
-  const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i)
-  const webkit = !!ua.match(/WebKit/i)
-  return iOS && webkit && !ua.match(/CriOS/i)
+  const iOS = Boolean(ua.test(/iPad/i)) || Boolean(ua.test(/iPhone/i))
+  const webkit = Boolean(ua.test(/WebKit/i))
+  return iOS && webkit && !ua.test(/CriOS/i)
 }
 
-export const isCrappyIE = () => {
-  return !!(
-    typeof window !== "undefined" &&
-    window.navigator.msSaveOrOpenBlob &&
-    window.Blob
-  )
-}
+export const isCrappyIE = () => Boolean(
+  typeof window !== "undefined" &&
+  window.navigator.msSaveOrOpenBlob &&
+  window.Blob
+)
 
 function padCalNum(num) {
   if (num < 10) return `0${num}`
@@ -28,7 +26,7 @@ export const formatDate = (dateString) => {
     padCalNum(dateTime.getUTCDate()),
     "T",
     padCalNum(dateTime.getUTCHours()),
-    padCalNum(dateTime.getUTCMinutes()) + "00Z"
+    `${padCalNum(dateTime.getUTCMinutes())}00Z`
   ].join("")
 }
 
@@ -40,30 +38,29 @@ export const buildUrl = (event, useDataURL, rawContent) => {
   body.push(`DTSTART:${formatDate(event.startTime)}`)
   body.push(`SUMMARY:${event.title}`)
 
-  event.url && body.push(`URL:${event.url}`)
-  event.attendees &&
-    event.attendees.forEach(attendee => {
-      const regExp = /^([^<]+)\s*<(.+)>/
-      const matches = attendee.match(regExp)
-      if (matches) {
-        const name = matches[1]
-        const email = matches[2]
-        body.push(
-          [
-            "ATTENDEE",
-            `CN=${name}`,
-            "CUTYPE=INDIVIDUAL",
-            "PARTSTAT=NEEDS-ACTION",
-            "ROLE=REQ-PARTICIPANT",
-            `RSVP=TRUE:mailto:${email}`
-          ].join("")
-        )
-      }
-    })
-  event.endTime && body.push(`DTEND:${formatDate(event.endTime)}`)
-  event.description && body.push(`DESCRIPTION:${event.description}`)
-  event.location && body.push(`LOCATION:${event.location}`)
-  rawContent && body.push(rawContent)
+  if (event.url) body.push(`URL:${event.url}`)
+  event.attendees?.forEach(attendee => {
+    const regExp = /^([^<]+)\s*<(.+)>/
+    const matches = attendee.match(regExp)
+    if (matches) {
+      const name = matches[1]
+      const email = matches[2]
+      body.push(
+        [
+          "ATTENDEE",
+          `CN=${name}`,
+          "CUTYPE=INDIVIDUAL",
+          "PARTSTAT=NEEDS-ACTION",
+          "ROLE=REQ-PARTICIPANT",
+          `RSVP=TRUE:mailto:${email}`
+        ].join("")
+      )
+    }
+  })
+  if (event.endTime) body.push(`DTEND:${formatDate(event.endTime)}`)
+  if (event.description) body.push(`DESCRIPTION:${event.description}`)
+  if (event.location) body.push(`LOCATION:${event.location}`)
+  if (rawContent) body.push(rawContent)
 
   const url = [
     "BEGIN:VCALENDAR",
