@@ -76,7 +76,7 @@
 <Modal bind:showModal>
   <header>
     {#if $authData.isValid && !!badgeData}
-      {#if badge.unobtainable || (badgeData?.locked_tier > 0 && [tier] >= badgeData?.locked_tier) || (badgeData?.unlocks_at || null)?.dayjs().isAfter(dayjs())}
+      {#if badge.unobtainable || (badgeData?.locked_tier > 0 && [tier] >= badgeData?.locked_tier) || (badgeData?.unlocks_at && dayjs(badgeData?.unlocks_at).isAfter(dayjs()))}
         <button disabled>
             <img
             src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
@@ -136,8 +136,8 @@
       {#if ownedCounter > 0 }
         <small transition:slide>{ownedCounter} {ownedCounter === 1 ? 'agent has' : 'agents have'} this badge!</small>
       {/if}
-      {#if (badgeData?.unlocks_at || null)?.dayjs().isAfter(dayjs())}
-      <small transition:slide>Unlocks <Time timestamp={badgeData?.unlocks_at} relative live /></small>
+      {#if (badgeData?.unlocks_at && dayjs(badgeData?.unlocks_at).isAfter(dayjs()))}
+        <small transition:slide>Unlocks <Time timestamp={badgeData?.unlocks_at} relative live /></small>
       {/if}
     </div>
   </section>
