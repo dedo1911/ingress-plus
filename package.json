@@ -23,7 +23,7 @@
 		"eslint-plugin-promise": "7.2.1",
 		"eslint-plugin-svelte": "3.0.2",
 		"lodash.sortby": "^4.7.0",
-		"pocketbase": "0.21.5",
+		"pocketbase": "0.25.1",
 		"sass": "1.85.1",
 		"svelte": "5.20.5",
 		"svelte-multiselect": "11.0.0-rc.1",
