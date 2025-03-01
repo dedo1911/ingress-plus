@@ -4,22 +4,25 @@
   let dialog = $state()
 
   $effect(() => {
-    if (dialog) {
-      if (showModal) dialog.showModal()
-      else dialog.close()
-    }
+    if (!dialog) return
+    if (showModal) dialog.showModal()
+    else dialog.close()
   })
 
 	const preventDefault = (event) => {
     event.preventDefault()
     event.stopImmediatePropagation()
   }
+
+  const closeModal = () => {
+    showModal = false
+  }
 </script>
 
 {#if showModal}
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-  <dialog bind:this={dialog} onclick={() => dialog.close()}>
+  <dialog bind:this={dialog} onclick={closeModal}>
     <div onclick={preventDefault} role="button" tabindex="0">
       {@render children?.()}
     </div>
