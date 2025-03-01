@@ -66,63 +66,63 @@
 
 		switch (e.category) {
 		case 'anomaly':
-			e.categoryTitle = 'Anomaly event';
-			break;
+			e.categoryTitle = 'Anomaly event'
+			break
 		case 'shard_skirmish':
-			e.categoryTitle = 'Shard Skirmish';
-			break;
+			e.categoryTitle = 'Shard Skirmish'
+			break
 		case 'beacon_skirmish':
-			e.categoryTitle = 'Beacon Skirmish';
-			break;
+			e.categoryTitle = 'Beacon Skirmish'
+			break
 		case 'second_sunday':
-			e.categoryTitle = 'Second Sunday';
-			break;
+			e.categoryTitle = 'Second Sunday'
+			break
 		case 'first_saturday':
-			e.categoryTitle = 'First Saturday';
-			break;
+			e.categoryTitle = 'First Saturday'
+			break
 		case 'mission_day':
-			e.categoryTitle = 'Mission Day';
-			break;
+			e.categoryTitle = 'Mission Day'
+			break
 		case 'global_event':
-			e.categoryTitle = 'Global Event';
-			break;
+			e.categoryTitle = 'Global Event'
+			break
 		case 'global_challenge':
-			e.categoryTitle = 'Global Challenge';
-			break;
+			e.categoryTitle = 'Global Challenge'
+			break
 		case 'campaign':
-			e.categoryTitle = 'Dispatch Campaign';
-			break;
+			e.categoryTitle = 'Dispatch Campaign'
+			break
 		case '2sday':
-			e.categoryTitle = '2x AP Tuesday';
-			break;
+			e.categoryTitle = '2x AP Tuesday'
+			break
 		case 'agent_enl':
-			e.categoryTitle = 'Agent organized Event (Enlightened)';
-			break;
+			e.categoryTitle = 'Agent organized Event (Enlightened)'
+			break
 		case 'agent_res':
-			e.categoryTitle = 'Agent organized Event (Resistance)';
-			break;
+			e.categoryTitle = 'Agent organized Event (Resistance)'
+			break
 		case 'agent_xfac':
-			e.categoryTitle = 'Agent organized Event (Crossfaction)';
-			break;
+			e.categoryTitle = 'Agent organized Event (Crossfaction)'
+			break
 		case 'nl1331':
-			e.categoryTitle = 'NL-1331 Meetup';
-			break;
+			e.categoryTitle = 'NL-1331 Meetup'
+			break
 		case 'special':
-			e.categoryTitle = 'Special Event';
-			break;
+			e.categoryTitle = 'Special Event'
+			break
 		case 'tko':
-			e.categoryTitle = 'Tactical Kinetic Operations/GORUCK';
-			break;
+			e.categoryTitle = 'Tactical Kinetic Operations/GORUCK'
+			break
 		case 'wayfarer':
-			e.categoryTitle = 'Wayfarer Challenge';
-			break;
+			e.categoryTitle = 'Wayfarer Challenge'
+			break
 		case 'canceled':
-			e.categoryTitle = 'Canceled Event';
-			break;
+			e.categoryTitle = 'Canceled Event'
+			break
 		default:
 			console.log("Unknown Event type: " + e.category)
-			e.categoryTitle = 'Unknown Event type';
-			break;
+			e.categoryTitle = 'Unknown Event type'
+			break
 		}
 
         return e

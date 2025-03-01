@@ -44,10 +44,9 @@
   }
 
   const fetchBadge = async () => {
-    badgeData = await pb.collection('badges').getFirstListItem(`id="${badge.id}"`);
-    const requirementsArray = badgeData.tier_values.split(",").map(Number);
-    const tierIndex = Number(tier);
-    Requirement = requirementsArray[tierIndex];
+    badgeData = await pb.collection('badges').getFirstListItem(`id="${badge.id}"`)
+    const requirementsArray = badgeData.tier_values.split(",").map(Number)
+    Requirement = Number(requirementsArray[tier]).toLocaleString()
   }
 
   let ownedCounter = $state(0)
@@ -121,8 +120,10 @@
       <p transition:slide>{badgeData.description}</p>
       {#if badgeData.requirement}
           <hr />
-          <p transition:slide ><b>Requirements:</b></p>
-          <p transition:slide >{badgeData.requirement.replace('{0}', Requirement)}</p>
+          <p transition:slide >
+            <b>Requirements:</b><br />
+            {badgeData.requirement.replace('{0}', Requirement)}
+          </p>
           {/if}
       {#if badgeData.description_extra}
         <hr />
