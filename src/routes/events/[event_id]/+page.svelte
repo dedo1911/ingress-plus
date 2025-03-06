@@ -78,6 +78,8 @@
                  to <Time timestamp={event.end_time} format="MMMM D, YYYY [at] h:mm A" live />
              )</small>
          {/if}
+		 <br>
+		 <p class="center"><b><img style="height:1em;" src="../images/location.svg" alt="Location" /> {event.location}</b></p>
   <p class="center">
     {@html event.description}
   </p>
