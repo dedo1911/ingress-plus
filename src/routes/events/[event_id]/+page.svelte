@@ -33,6 +33,9 @@
     event.start_time = event.start_time.year(event.repeat_cron.year()).month(event.repeat_cron.month()).date(event.repeat_cron.date())
     event.end_time = event.end_time.year(event.repeat_cron.year()).month(event.repeat_cron.month()).date(event.repeat_cron.date())
   }
+  
+  if (data.event.image == '') {
+	event.image = `../images/events/${event.category}.png`}
 </script>
 
 <svelte:head>
