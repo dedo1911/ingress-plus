@@ -155,6 +155,7 @@
     <div class="event-description">
       <a href="/events/{e.id}"><h2 id={`event${e.id}`}>{e.title}</h2></a>
       <p><img style="height:1em;" src="images/events/{e.category}.png" alt={e.category} /> {e.categoryTitle}
+		 | <img style="height:1em;" src="images/location.svg" alt="Location" /> {e.location}
         {#if e.end_time.isAfter(dayjs())}
           | <a href={`#event${e.id}`} onclick={addToCalendar({
             title: e.title,
