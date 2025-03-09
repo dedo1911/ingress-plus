@@ -17,12 +17,12 @@
     </p>
 
     <a class="hero hero-right" href="/events">
-        <div style={"background-image: url('/images/homepage/cat_events_temp.png');"}>
+        <div style={"background-image: url('/images/homepage/cat_events.png');"}>
             <p><img src="/images/event.svg" alt="Events" /> Events</p>
         </div>
     </a>
     <a class="hero hero-left" href="/badges">
-        <div style={"background-image: url('/images/homepage/cat_badges.jpg');"}>
+        <div style={"background-image: url('/images/homepage/cat_badges.png');"}>
             <p><img src="/images/medal.svg" alt="Badges" /> Badges</p>
         </div>
     </a>
