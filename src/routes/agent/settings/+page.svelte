@@ -2,6 +2,7 @@
   import { authData } from "$lib/stores"
   import { pb, serverAddress } from '$lib/pocketbase'
   import { toast } from '@zerodevx/svelte-toast'
+  import AgentName from '$lib/components/AgentName.svelte'
 
   const username = $derived($authData?.baseModel?.username || "NONE")
   const faction = $derived($authData?.baseModel?.faction || "NOT SET")
@@ -16,6 +17,43 @@
     toast.push('Updated glowing username to ' + $authData.baseModel.showSupport, { classes: ['successToast'] })
   }
 
+  const togglePublic = async () => {
+    $authData.baseModel.public = !$authData.baseModel.public
+    await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+    toast.push('Profile is public: ' + $authData.baseModel.public, { classes: ['successToast'] })
+  }
+
+  $effect(() => {
+    if (browser && $authData.isValid === false) goto('/')
+  })
+
+  const toggleFaction = async () => {
+    $authData.baseModel.faction = $authData.baseModel.faction === 'enlightened' ? 'resistance' : 'enlightened'
+    await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+  }
+
+  let newUsername = $state('')
+  $effect(() => {
+    newUsername = username
+  })
+
+  const saveUsername = async () => {
+    const oldUsername = $authData.baseModel.username
+    try {
+      $authData.baseModel.username = newUsername
+      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+    } catch (err) {
+      $authData.baseModel.username = oldUsername
+      console.error(username, err)
+      toast.push('An error has occurred.', { classes: ['errorToast'] })
+      return
+    }
+    editVisible = false
+  }
+
+  const factionLogo = $derived($authData?.baseModel?.faction === 'machina'
+    ? '/machina.png'
+    : `/${$authData?.baseModel?.faction || 'unaligned'}.svg`)
 </script>
 
 <svelte:head>
@@ -32,24 +70,39 @@
                   alt={username}
               />
           </p>
-          <p>Username: <code>{username}</code></p>
-          <p>Faction: <code>{faction.toUpperCase()}</code></p>
-          <p>
-              <img
-                  class="badge"
-                  src="/images/verification/verified.svg"
-                  alt={verification}
-              />
-              Verification level:
-              <code>{verification.toUpperCase()}</code>
+          <p>Username: 
+            <input type="text" bind:value={newUsername} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" />
+            <img src="../images/accept.svg" height="32" alt="Save" onclick={saveUsername} />
           </p>
+          <p>Faction: <code>{faction.toUpperCase()}</code> - 
+            <img class="checkbox" src="../images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} onclick={toggleFaction} /> - Click me!</p>
+          <p>Profile visiblity:
+            <button onclick={togglePublic} title={$authData.baseModel.public ? 'Make Profile private' : 'Make Profile public'}>
+              <img
+                class="checkbox"
+                src="../images/{$authData.baseModel.public ? 'checkbox_on' : 'checkbox_off'}.png"
+                alt="Checkbox"
+              />
+            </button>
+            - {$authData.baseModel.public ? 'Public' : 'Private'}</p>
+            <br>
           <p>User ID: <code>ING+{userId}</code></p>
           <p>E-mail: <code>{email}</code></p>
           <!-- TODO: Support for (un-)linking multiple Auth providers (Google, FB, Apple)-->
-          <p>Authenticated with: </p>
+          <p>Authenticated with: Google</p>
           {#if supporter === true}
+            <br>
+            <p><b>For Supporters:</b></p>
             <p>Enable glowing username: 
-              <img src={$authData.baseModel.public ? '../images/public.svg' : '../images/private.svg'} alt="Glow" height="32" onclick={toggleUsernameGlow} />
+              <button onclick={toggleUsernameGlow} title={$authData.baseModel.showSupport ? 'Disable glowing username' : 'Enable glowing username'}>
+                <img
+                  class="checkbox"
+                  src="../images/{$authData.baseModel.showSupport ? 'checkbox_on' : 'checkbox_off'}.png"
+                  alt="Checkbox"
+                />
+              </button>
+              <AgentName user={{ username: username }} linkable={false} factionLogo={true} />
+               - {$authData.baseModel.showSupport ? 'Enabled' : 'Disabled'}!
             </p>
           {/if}
       </div>
@@ -76,6 +129,11 @@
 
   img.badge {
       height: 1em;
+      vertical-align: sub;
+      margin: 0 0.25em;
+  }
+  img.checkbox {
+      height: 1.25em;
       vertical-align: sub;
       margin: 0 0.25em;
   }
