@@ -77,6 +77,7 @@
     // Special handling for Via Lux Explorer event
     if (title == "Via Lux Explorer - Bronze") {
       title = "Via Lux Adventure"
+      description = "Adventured to over 300 unique Portals in September 2016."
     }
 
     if (title == "Via Lux Explorer - Silver") {
