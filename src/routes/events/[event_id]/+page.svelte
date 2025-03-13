@@ -3,7 +3,6 @@
   import Time, { dayjs } from 'svelte-time'
   import utc from 'dayjs/plugin/utc'
   import timezone from 'dayjs/plugin/timezone'
-  import * as cronjsMatcher from '@datasert/cronjs-matcher'
 
   dayjs.extend(utc)
   dayjs.extend(timezone)
@@ -20,18 +19,7 @@
       : dayjs(data.event.start_time),
     end_time: isLocal
       ? dayjs(data.event.end_time.substring(0, 19)).tz(userTZ)
-      : dayjs(data.event.end_time),
-    repeat_cron: data.event.repeat_cron
-      ? dayjs(cronjsMatcher.getFutureMatches(data.event.repeat_cron, {
-        timezone: isLocal ? userTZ : 'UTC',
-        formatInTimezone: true,
-        matchCount: 1,
-      })[0])
-      : null
-  }
-  if (event.repeat_cron) {
-    event.start_time = event.start_time.year(event.repeat_cron.year()).month(event.repeat_cron.month()).date(event.repeat_cron.date())
-    event.end_time = event.end_time.year(event.repeat_cron.year()).month(event.repeat_cron.month()).date(event.repeat_cron.date())
+      : dayjs(data.event.end_time)
   }
   
   if (data.event.image == '') {
