@@ -13,15 +13,25 @@
   const supporter = $derived($authData?.baseModel?.supporter)
 
   const toggleUsernameGlow = async () => {
-    $authData.baseModel.showSupport = !$authData.baseModel.showSupport
+    $authData.baseModel.hasUsernameGlow = !$authData.baseModel.hasUsernameGlow
     await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-    toast.push('Updated glowing username to ' + $authData.baseModel.showSupport, { classes: ['successToast'] })
+    toast.push('Updated glowing username to ' + $authData.baseModel.hasUsernameGlow, { classes: ['successToast'] })
   }
 
   const togglePublic = async () => {
     $authData.baseModel.public = !$authData.baseModel.public
     await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
     toast.push('Profile is public: ' + $authData.baseModel.public, { classes: ['successToast'] })
+  }
+
+  const copyProfileLink = async () => {
+    try {
+      await navigator.clipboard.writeText(`https://ingress.plus/agent/${newUsername}`)
+      toast.push('Copied to clipboard!', { classes: ['successToast'] })
+    } catch (err) {
+      console.error(err)
+      toast.push('An error has occurred.', { classes: ['errorToast'] })
+    }
   }
 
   $effect(() => {
@@ -53,6 +63,11 @@
         toast.push('The username is already taken. Please choose a different username.', { classes: ['errorToast'] });
       } 
       
+      // Check if error because username is blank
+      if (err.response?.data?.username?.code === 'validation_required') {
+        toast.push('Username cannot be blank.', { classes: ['errorToast'] });
+      } 
+
       // Check for minimum username lenght
       else if (err.response?.data?.username?.code === 'validation_min_text_constraint') {
         toast.push('The username is too short. It needs to be at least 3 characters long.', { classes: ['errorToast'] });
@@ -99,7 +114,7 @@
             <img src="../images/accept.svg" height="32" alt="Save" onclick={saveUsername} />
           </p>
           <p>Faction: <code>{faction.toUpperCase()}</code> - 
-            <img class="checkbox" src="../images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} onclick={toggleFaction} /> - Click me!</p>
+            <img class="checkbox" src="../images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} onclick={toggleFaction} /> - Click the icon to change!</p>
           <p>Profile visiblity:
             <button onclick={togglePublic} title={$authData.baseModel.public ? 'Make Profile private' : 'Make Profile public'}>
               <img
@@ -109,24 +124,30 @@
               />
             </button>
             - {$authData.baseModel.public ? 'Public' : 'Private'}</p>
+            {#if $authData.baseModel.public}
+            <p class="publicNotice">
+              Your profile is public and will be visible at:<br />
+              <span onclick={copyProfileLink}>
+              https://ingress.plus/agent/{newUsername}
+              </span>
+            </p>
+            {/if}
             <br>
           <p>User ID: <code>ING+{userId}</code></p>
           <p>E-mail: <code>{email}</code></p>
-          <!-- TODO: Support for (un-)linking multiple Auth providers (Google, FB, Apple)-->
-          <p>Authenticated with: Google</p>
           {#if supporter === true}
             <br>
             <p><b>For Supporters:</b></p>
             <p>Enable glowing username: 
-              <button onclick={toggleUsernameGlow} title={$authData.baseModel.showSupport ? 'Disable glowing username' : 'Enable glowing username'}>
+              <button onclick={toggleUsernameGlow} title={$authData.baseModel.hasUsernameGlow ? 'Disable glowing username' : 'Enable glowing username'}>
                 <img
                   class="checkbox"
-                  src="../images/{$authData.baseModel.showSupport ? 'checkbox_on' : 'checkbox_off'}.png"
+                  src="../images/{$authData.baseModel.hasUsernameGlow ? 'checkbox_on' : 'checkbox_off'}.png"
                   alt="Checkbox"
                 />
               </button>
               <AgentName user={{ username: username }} linkable={false} factionLogo={true} />
-               - {$authData.baseModel.showSupport ? 'Enabled' : 'Disabled'}!
+               - {$authData.baseModel.hasUsernameGlow ? 'Enabled' : 'Disabled'}!
             </p>
           {/if}
       </div>
@@ -173,5 +194,13 @@
       border-radius: 20%;
       box-shadow: #9593c3 0px 0px 5px 1px;
       border-radius: 6px;
+  }
+  p.publicNotice span {
+    border: 3px double #5e5a75;
+    border-radius: 8px;
+    display: inline-block;
+    padding: 1rem;
+    margin-top: 1rem;
+    cursor: pointer;
   }
 </style>
