@@ -154,12 +154,6 @@
             <li>Official Ingress Telegram channel</li>
         </ul>
     </li>
-    <li><a target="_blank" rel="noopener noreferrer" href="https://t.me/thiaNtoasty">NianticThia Adventures</a>
-        <ul>
-            <li>Personal channel of Community Operations NianticThia</li>
-            <li>Posts about some things the official Ingress channel might not</li>
-        </ul>
-    </li>
     <li><a target="_blank" rel="noopener noreferrer" href="https://t.me/IUENG">Ingress Updates [ENG] - @IUENG</a>
         <ul>
             <li>Crossfaction</li>
