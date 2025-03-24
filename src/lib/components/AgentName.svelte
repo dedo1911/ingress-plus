@@ -25,13 +25,12 @@
   })
 </script>
 
-<!-- Add additional icon depending on verification level? (none/basic/advanced/strong) /.ixm -->
 {#if user && user.faction !== undefined }
   <a href={url} style="color: var(--color-faction-{user.faction || 'unaligned'})"
-    class:supporter-unaligned={user?.supporter && !user?.faction}
-    class:supporter-machina={user?.supporter && user?.faction === 'machina'}
-    class:supporter-enlightened={user?.supporter && user?.faction === 'enlightened'}
-    class:supporter-resistance={user?.supporter && user?.faction === 'resistance'} >
+    class:supporter-unaligned={user?.hasUsernameGlow && !user?.faction}
+    class:supporter-machina={user?.hasUsernameGlow && user?.faction === 'machina'}
+    class:supporter-enlightened={user?.hasUsernameGlow && user?.faction === 'enlightened'}
+    class:supporter-resistance={user?.hasUsernameGlow && user?.faction === 'resistance'} >
     {#if factionLogo}
       <img src="/images/{logo}" height="32" class={user?.faction || 'unaligned'} alt={user?.faction || 'Unaligned'} />
     {/if}

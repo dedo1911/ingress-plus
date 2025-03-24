@@ -15,13 +15,23 @@
   const toggleUsernameGlow = async () => {
     $authData.baseModel.hasUsernameGlow = !$authData.baseModel.hasUsernameGlow
     await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-    toast.push('Updated glowing username to ' + $authData.baseModel.hasUsernameGlow, { classes: ['successToast'] })
+    if ($authData.baseModel.hasUsernameGlow) {
+      toast.push('Glowing Username has been enabled!', { classes: ['successToast'] })
+    }
+    else {
+      toast.push('Glowing Username has been disabled!', { classes: ['successToast'] })
+    }
   }
 
   const togglePublic = async () => {
     $authData.baseModel.public = !$authData.baseModel.public
     await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-    toast.push('Profile is public: ' + $authData.baseModel.public, { classes: ['successToast'] })
+    if ($authData.baseModel.public) {
+      toast.push('Profile has been set to public!', { classes: ['successToast'] })
+    }
+    else {
+      toast.push('Profile has been set to private!', { classes: ['successToast'] })
+    }
   }
 
   const copyProfileLink = async () => {
@@ -41,6 +51,15 @@
   const toggleFaction = async () => {
     $authData.baseModel.faction = $authData.baseModel.faction === 'enlightened' ? 'resistance' : 'enlightened'
     await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+    if ($authData.baseModel.faction === 'enlightened') {
+      toast.push('Faction has been changed to Enlightened!', { classes: ['successToast'] })
+    }
+    else if ($authData.baseModel.faction === 'resistance'){
+      toast.push('Faction has been changed to Resistance!', { classes: ['successToast'] })
+    }
+    else {
+      toast.push('Faction has been changed!', { classes: ['successToast'] })
+    }
   }
 
   let newUsername = $state('')
@@ -53,6 +72,7 @@
     try {
       $authData.baseModel.username = newUsername
       await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+      toast.push('Username has been changed to ' + $authData.baseModel.username, { classes: ['successToast'] })
     } catch (err) {
       $authData.baseModel.username = oldUsername
       console.log('Error: ' + err.response?.data?.username?.code)
@@ -114,7 +134,7 @@
             <img src="../images/accept.svg" height="32" alt="Save" onclick={saveUsername} />
           </p>
           <p>Faction: <code>{faction.toUpperCase()}</code> - 
-            <img class="checkbox" src="../images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} onclick={toggleFaction} /> - Click the icon to change!</p>
+            <img class="checkbox" src="../images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} onclick={toggleFaction} /> - Click the Faction icon to change!</p>
           <p>Profile visiblity:
             <button onclick={togglePublic} title={$authData.baseModel.public ? 'Make Profile private' : 'Make Profile public'}>
               <img
