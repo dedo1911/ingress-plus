@@ -83,6 +83,12 @@
         case "campaign":
         e.categoryTitle = "Dispatch Campaign"
           break
+        case "paid_campaign":
+          e.categoryTitle = "Premium Dispatch Campaign"
+          break
+        case "battle_pass":
+          e.categoryTitle = "Reward Campaign"
+          break
         case "2sday":
           e.categoryTitle = "2x AP Tuesday"
           break
@@ -113,6 +119,7 @@
         default:
           console.log("Unknown Event type: " + e.category)
           e.categoryTitle = "Unknown Event type"
+          e.category = "special"
           break
       }
 
