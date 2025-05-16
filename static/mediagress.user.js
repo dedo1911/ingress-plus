@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name IITC Plugin: Mediagress
 // @category Misc
-// @version 1.0.4
+// @version 1.0.5
 // @namespace https://ingress.plus
 // @downloadURL https://ingress.plus/mediagress.user.js
 // @updateURL https://ingress.plus/mediagress.user.js
@@ -16,17 +16,22 @@
 // ==/UserScript==
 
 //
-// Changelog 1.0.4
-//   Added icon and changed description and author
+//  Changelog 1.0.5
+//    Added time remaining before you can upload again if you try within 5 minutes of a prior upload
+//    Added console command to skip 5 minute waiting time
+//    Cleaned up code
 //
-// Changelog 1.0.3
-//   Fix minor StandardJS annoyances
+//  Changelog 1.0.4
+//    Added icon and changed description and author
 //
-// Changelog 1.0.2
-//   Display errors to the user, so it can be easily screenshot for bug reports
+//  Changelog 1.0.3
+//    Fix minor StandardJS annoyances
 //
-// Changelog 1.0.1
-//   Edited strings to make process of uploading clearer as well as giving a better understanding of errors when they happen
+//  Changelog 1.0.2
+//    Display errors to the user, so it can be easily screenshot for bug reports
+//
+//  Changelog 1.0.1
+//    Edited strings to make process of uploading clearer as well as giving a better understanding of errors when they happen
 //
 
 // shout out to https://github.com/EisFrei/ and his Live Inventory plugin
@@ -122,27 +127,53 @@ function wrapper (pluginInfo) {
 
   let uploadInProgress = false
   async function uploadMedia () {
+
     if (uploadInProgress) {
       return
     }
+
     uploadInProgress = true
+
     try {
       const { uploadedIds, lastUploadTimestamp } = getSettings()
-      if (lastUploadTimestamp > Date.now() - 1000 * 60 * 5) {
-        return window.alert('You recently tried to upload media from your inventory. Niantic rate-limits inventory requests if they happen too quickly, so to ensure that you don\'t hit that limit, please try again in 5 minutes!')
+      const waitTime = 1000 * 60 * 5; // 5 minutes in milliseconds, set to 0 for instant retry
+      const now = Date.now();
+      const timeSinceLastUpload = now - lastUploadTimestamp ;
+
+      if (!window.IMPATIENT && timeSinceLastUpload < waitTime) {
+
+        const timeRemaining = waitTime - timeSinceLastUpload;
+        const minutes = Math.floor(timeRemaining / 60000);
+        const seconds = Math.floor((timeRemaining % 60000) / 1000);
+        
+        console.log('%c[INFO] You can bypass the 5-minute wait to upload media by running \"window.IMPATIENT = true\" in the console.', 'color: green');
+        console.log('%c[INFO] We don\'t think that Niantic will mind, but do it at your own risk!', 'color: green');
+
+        return window.alert(
+          `You recently tried to upload media from your inventory. Niantic rate-limits inventory requests if they happen too quickly, so to ensure that you don't hit that limit, please try again in ${minutes} minute(s) and ${seconds} second(s)!`
+        )
       }
+
+        if (window.IMPATIENT) {
+          console.warn('⚠️ Mediagress wait-time bypassed via IMPATIENT');
+      }
+
       if (!(await getHasActiveSubscription()).result) {
         return window.alert('Your inventory is only available on Intel if you have an active C.O.R.E. subscription. Without it, you cannot upload media :c Please subscribe to C.O.R.E. in the Ingress app and then return here!')
       }
+
       const rawInventory = await getInventory()
       const mediaOutsideCapsulesCount = getCountOfMediaOutsideCapsules(rawInventory)
       // todo use dialog?
+
       if (mediaOutsideCapsulesCount > 0 &&
         !window.confirm(`You currently have ${mediaOutsideCapsulesCount} Media that are not loaded into a capsule; these won't be uploaded. Do you wish to proceed?`)) {
         return
       }
+
       const medias = getMediaFromRawInventory(rawInventory)
       const filteredMedia = medias.filter((item) => !uploadedIds.flat().includes(item.storyItem.mediaId))
+
       if (!filteredMedia.length) {
         console.log('No new media to upload, skipping')
         window.alert('No new media has been found in your inventory since your last upload attempt. Make sure that you have loaded new Media into a Capsule and try again in 5 minutes!')
@@ -151,6 +182,7 @@ function wrapper (pluginInfo) {
         })
         return
       }
+
       const response = await fetch(`${host}/api/mediagress/v1/upload-media`, {
         method: 'POST',
         headers: {
@@ -158,6 +190,7 @@ function wrapper (pluginInfo) {
         },
         body: JSON.stringify({ medias: filteredMedia, player: PLAYER })
       })
+
       if (response.ok) {
         const responseBody = await response.json()
         if (responseBody.previouslyUnknownMediaCount) {
@@ -171,6 +204,7 @@ function wrapper (pluginInfo) {
         })
         return
       }
+      
       const err = `${response.status} ${response.statusText}: ${await response.text()}`
       console.error(`Error making request to Mediagress: ${err}`)
       window.alert(`Error :C please contact the developers at https://t.me/Mediagress\n\nError: ${err}`)
