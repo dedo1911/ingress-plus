@@ -19,6 +19,8 @@
 //  Changelog 1.0.5
 //    Added time remaining before you can upload again if you try within 5 minutes of a prior upload
 //    Added console command to skip 5 minute waiting time
+//    Added pop up that shows while uploading
+//    Added "[Mediagress]" in front of console logs to show from which plugin the log comes from
 //    Cleaned up code
 //
 //  Changelog 1.0.4
@@ -98,6 +100,65 @@ function wrapper (pluginInfo) {
     return deduplicatedByLowestAcquisition
   }
 
+function showUploadingOverlay(message = "Uploading...") {
+  const existing = document.getElementById('mediagress-uploading-overlay');
+  if (existing) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'mediagress-uploading-overlay';
+  overlay.style.position = 'fixed';
+  overlay.style.top = '50%';
+  overlay.style.left = '50%';
+  overlay.style.transform = 'translate(-50%, -50%)';
+  overlay.style.padding = '30px 40px';
+  overlay.style.backgroundColor = '#222';
+  overlay.style.color = '#fff';
+  overlay.style.fontSize = '18px';
+  overlay.style.borderRadius = '10px';
+  overlay.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+  overlay.style.zIndex = 10000;
+  overlay.style.textAlign = 'center';
+  overlay.style.display = 'flex';
+  overlay.style.flexDirection = 'column';
+  overlay.style.alignItems = 'center';
+
+  // PNG spinner
+  const spinnerImg = document.createElement('img');
+  spinnerImg.src = 'https://ingress.plus/icons/icon_mediagress_64.png';
+  spinnerImg.alt = 'Loading...';
+  spinnerImg.style.width = '48px';
+  spinnerImg.style.height = '48px';
+  spinnerImg.style.marginBottom = '15px';
+  spinnerImg.style.animation = 'spin 1s linear infinite';
+
+  const text = document.createElement('div');
+  text.textContent = message;
+
+  // Add keyframes for spin animation (if not already present)
+  if (!document.getElementById('mediagress-spinner-style')) {
+    const style = document.createElement('style');
+    style.id = 'mediagress-spinner-style';
+    style.textContent = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  overlay.appendChild(spinnerImg);
+  overlay.appendChild(text);
+  document.body.appendChild(overlay);
+}
+
+function removeUploadingOverlay() {
+  const overlay = document.getElementById('mediagress-uploading-overlay');
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
   const settingsKey = 'mediagress'
   const defaultSettings = {
     lastUploadTimestamp: 0,
@@ -134,6 +195,8 @@ function wrapper (pluginInfo) {
 
     uploadInProgress = true
 
+    showUploadingOverlay(); // Show the "Uploading..." alert
+
     try {
       const { uploadedIds, lastUploadTimestamp } = getSettings()
       const waitTime = 1000 * 60 * 5; // 5 minutes in milliseconds, set to 0 for instant retry
@@ -146,8 +209,8 @@ function wrapper (pluginInfo) {
         const minutes = Math.floor(timeRemaining / 60000);
         const seconds = Math.floor((timeRemaining % 60000) / 1000);
         
-        console.log('%c[INFO] You can bypass the 5-minute wait to upload media by running \"window.IMPATIENT = true\" in the console.', 'color: green');
-        console.log('%c[INFO] We don\'t think that Niantic will mind, but do it at your own risk!', 'color: green');
+        console.log('%c[Mediagress] You can bypass the 5-minute wait to upload media by running \"window.IMPATIENT = true\" in the console.', 'color: green');
+        console.log('%c[Mediagress] We don\'t think that Niantic will mind, but do it at your own risk! The bypass will reset once you refresh the page.', 'color: green');
 
         return window.alert(
           `You recently tried to upload media from your inventory. Niantic rate-limits inventory requests if they happen too quickly, so to ensure that you don't hit that limit, please try again in ${minutes} minute(s) and ${seconds} second(s)!`
@@ -175,7 +238,7 @@ function wrapper (pluginInfo) {
       const filteredMedia = medias.filter((item) => !uploadedIds.flat().includes(item.storyItem.mediaId))
 
       if (!filteredMedia.length) {
-        console.log('No new media to upload, skipping')
+        console.log('[Mediagress] No new media to upload, skipping')
         window.alert('No new media has been found in your inventory since your last upload attempt. Make sure that you have loaded new Media into a Capsule and try again in 5 minutes!')
         saveSettings({
           lastUploadTimestamp: Date.now()
@@ -204,7 +267,7 @@ function wrapper (pluginInfo) {
         })
         return
       }
-      
+
       const err = `${response.status} ${response.statusText}: ${await response.text()}`
       console.error(`Error making request to Mediagress: ${err}`)
       window.alert(`Error :C please contact the developers at https://t.me/Mediagress\n\nError: ${err}`)
@@ -213,6 +276,7 @@ function wrapper (pluginInfo) {
       console.error(e)
     } finally {
       uploadInProgress = false
+      removeUploadingOverlay(); // Remove the alert when done
     }
   }
 
