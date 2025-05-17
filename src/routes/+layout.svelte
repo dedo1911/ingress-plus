@@ -11,7 +11,7 @@
   let { children } = $props()
 
   const options = {
-    duration: 2000,
+    duration: 3000,
     reversed: true
   }
 
