@@ -27,25 +27,25 @@
     <img src="/images/mediagress_upload.jpg" alt="Successful upload popup" width="320" />
     <p>The media won't show up on the site immediately. Give our moderators some time to properly categorize it and to add a description :)<br />
     If you have Media that you do not want to upload, make sure it is not in a Capsule. As long as it outside a capsule it will not be uploaded to Mediagress.</p>
-    <p>Questions? Want to know about site updates? <a href="https://t.me/Mediagress" target="_blank">Join us in the Mediagress Telegram channel!</a></p>
+    <p>Questions? Want to know about site updates? <a href="https://t.me/Ingress_Plus" target="_blank">Join us in the Ingress.Plus Telegram channel!</a></p>
 
     <h2>FAQ</h2>
     <p class="question">Is my entire Inventory being submitted to Mediagress?</p>
     <p class="answer">No, only Media is being submitted. The plugin will filter out everything that isn't a Media item in a Capsule locally before it's sent off to us. We will never see your Items or Keys.</p>
     <p class="question">Why do I need a C.O.R.E. subscription?</p>
-    <p class="answer">Only Agents with an active C.O.R.E. subscription have the benefit of accesing their Inventory on the intel map. Without a C.O.R.E. Subscription, our plugin cannot read your Inventory and search for Media. For more information about C.O.R.E., please visit <a href="https://niantic.helpshift.com/a/ingress/?s=top-articles&f=what-is-c-o-r-e&p=all" target="_blank">the official Ingress support page for C.O.R.E. here</a>.</p>
+    <p class="answer">Only Agents with an active C.O.R.E. subscription have the benefit of accesing their Inventory on the intel map. Without a C.O.R.E. Subscription, our plugin cannot read your Inventory and search for Media. For more information about C.O.R.E., please visit <a href="https://nianticspatial.helpshift.com/hc/en/5-ingress/faq/13-what-is-c-o-r-e/" target="_blank">the official Ingress support page for C.O.R.E. here</a>.</p>
     <p class="question">Can I manually submit media by sending you the links they lead to?</p>
     <p class="answer">We really appreciate your help, however there is certain data that is being sent via the Intel map that we want to capture that is not available in the Scanner, such as the Release Date and the Media Level. As such, we cannot manually upload Media at this time.</p>
     <p class="question">Why does the Media have to be in a Capsule for it to upload?</p>
     <p class="answer">For some reason, Media that is not in a Capsule doesn't return any data about itself, with the exception that it reports itself as a Media item. Once it is loaded into a Capsule it returns a lot more data about itself. In addition, this also serves as a way for you to control which Media is getting uploaded and gives you the chance to exclude certain Media you don't want to upload.</p>
     <p class="question">What about Media I don't want to upload?</p>
-    <p class="answer">There may be a time you don't want to upload a specific Media due to OpSec reasons, for example. In that case, make sure that Media that should not be uploaded isn't loaded into any Capsule. This way, the Intel Map doesn't return any data for it and it'll not be uploaded to Mediagress. <b>Make sure that you have clearance to upload potential OpSec media.</b> We are not responsible for any broken OpSec and will not check beforehand if any Media might break it.</p>
-    <p class="question">What does the message "Try again in 5 minutes" mean?</p>
+    <p class="answer">There may be a time you don't want to upload a specific Media (due to OpSec reasons, for example). In that case, make sure that Media that should not be uploaded isn't loaded into any Capsule. This way, the Intel Map doesn't return any data for it and it'll not be uploaded to Mediagress. <b>Make sure that you have clearance to upload potential OpSec media.</b> We are not responsible for any broken OpSec and will not check beforehand if any Media might break it.</p>
+    <p class="question">What does the message "Try again in X minute(s) and X second(s)" mean?</p>
     <p class="answer">Niantic rate-limits inventory requests if they happen to quickly and, to ensure that you don't hit that limit, we restrict upload attempts to only once per 5 minutes. Try again after a little bit!</p>
     <p class="question">What does the message "No new media has been found in your inventory." mean?</p>
     <p class="answer">The Mediagress plugin stores a list of Media you sent to us locally and shows this message if there isn't a new Media to add to that list, meaning there is no new Media to upload. If you do have new media, make sure that it has been loaded into a capsule and try again in 5 minutes.</p>
     <p class="question">I have another question!</p>
-    <p class="answer">Join us in our @Mediagress Telegram group where we'll answer any questions that might come up <a href="https://t.me/Mediagress" target="_blank">with the link in this channel</a>.</p>
+    <p class="answer">Join us in our @Ingress_Plus Telegram group where we'll answer any questions that might come up <a href="https://t.me/Ingress_Plus" target="_blank">with the link in this channel</a>.</p>
 </div>
 
 <style>
