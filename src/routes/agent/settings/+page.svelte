@@ -1,27 +1,32 @@
 <script>
   import { authData } from "$lib/stores"
-  import { pb, serverAddress } from '$lib/pocketbase'
+  import { pb } from '$lib/pocketbase'
   import { toast } from '@zerodevx/svelte-toast'
   import AgentName from '$lib/components/AgentName.svelte'
   import { browser } from '$app/environment'
 
   const username = $derived($authData?.baseModel?.username || "NONE")
   const faction = $derived($authData?.baseModel?.faction || "NOT SET")
-  const verification = $derived($authData?.baseModel?.verification || "NONE")
   const userId = $derived($authData?.baseModel?.id || "NONE")
   const email = $derived($authData?.baseModel?.email || "UNKNOWN")
   const supporter = $derived($authData?.baseModel?.supporter)
 
-  const toggleUsernameGlow = async () => {
-    $authData.baseModel.hasUsernameGlow = !$authData.baseModel.hasUsernameGlow
-    await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-    if ($authData.baseModel.hasUsernameGlow) {
-      toast.push('Glowing Username has been enabled!', { classes: ['successToast'] })
-    }
-    else {
-      toast.push('Glowing Username has been disabled!', { classes: ['successToast'] })
-    }
-  }
+  let reloadKey = $state(0);
+
+  const handleToggleUsernameGlow = async () => {
+    await toggleUsernameGlow();
+    reloadKey += 1; // Force AgentName to reload
+  };
+
+  const handleSaveUsername = async () => {
+    await saveUsername();
+    reloadKey += 1; // Force AgentName to reload
+  };
+
+  const handleSaveFaction = async () => {
+    await saveFaction();
+    reloadKey += 1; // Force AgentName to reload
+  };
 
   const togglePublic = async () => {
     $authData.baseModel.public = !$authData.baseModel.public
@@ -48,19 +53,27 @@
     if (browser && $authData.isValid === false) goto('/')
   })
 
-  const toggleFaction = async () => {
-    $authData.baseModel.faction = $authData.baseModel.faction === 'enlightened' ? 'resistance' : 'enlightened'
+  const toggleUsernameGlow = async () => {
+    $authData.baseModel.hasUsernameGlow = !$authData.baseModel.hasUsernameGlow
     await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-    if ($authData.baseModel.faction === 'enlightened') {
-      toast.push('Faction has been changed to Enlightened!', { classes: ['successToast'] })
-    }
-    else if ($authData.baseModel.faction === 'resistance'){
-      toast.push('Faction has been changed to Resistance!', { classes: ['successToast'] })
+    if ($authData.baseModel.hasUsernameGlow) {
+      toast.push('Glowing Username has been enabled!', { classes: ['successToast'] })
     }
     else {
-      toast.push('Faction has been changed!', { classes: ['successToast'] })
+      toast.push('Glowing Username has been disabled!', { classes: ['successToast'] })
     }
   }
+
+  let selectedFaction = $state($authData?.baseModel?.faction || 'unaligned');
+
+  const saveFaction = async () => {
+  $authData.baseModel.faction = selectedFaction;
+  await pb.collection('users').update($authData.baseModel.id, $authData.baseModel);
+  toast.push('Faction has been changed to ' + selectedFaction.charAt(0).toUpperCase() + selectedFaction.slice(1) + '!', {
+    classes: ['successToast']
+  });
+  };
+
 
   let newUsername = $state('')
   $effect(() => {
@@ -129,13 +142,24 @@
                   alt={username}
               />
           </p>
-          <p>Username: 
+          <p><b>Username</b>: 
             <input type="text" bind:value={newUsername} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" />
-            <img src="../images/accept.svg" height="32" alt="Save" onclick={saveUsername} />
+            <img src="../images/accept.svg" height="32" alt="Save" onclick={handleSaveUsername} />
           </p>
-          <p>Faction: <code>{faction.toUpperCase()}</code> - 
-            <img class="checkbox" src="../images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} onclick={toggleFaction} /> - Click the Faction icon to change!</p>
-          <p>Profile visiblity:
+          <p>
+            <b>Faction</b>: 
+            <select bind:value={selectedFaction}>
+              <option value="enlightened" >Enlightened</option>
+              <option value="resistance">Resistance</option>
+              {#if supporter === true}
+              <option value="machina">Machina</option>
+              {/if}
+            </select>
+            <button onclick={handleSaveFaction}>
+              <img src="../images/accept.svg" height="24" alt="Save faction" />
+            </button>
+          </p>
+          <p><b>Profile visiblity</b>:
             <button onclick={togglePublic} title={$authData.baseModel.public ? 'Make Profile private' : 'Make Profile public'}>
               <img
                 class="checkbox"
@@ -153,20 +177,22 @@
             </p>
             {/if}
             <br>
-          <p>User ID: <code>ING+{userId}</code></p>
-          <p>E-mail: <code>{email}</code></p>
+          <p><b>User ID:</b> <code>ING+{userId}</code></p>
+          <p><b>E-mail:</b> <code>{email}</code></p>
           {#if supporter === true}
             <br>
             <p><b>For Supporters:</b></p>
             <p>Enable glowing username: 
-              <button onclick={toggleUsernameGlow} title={$authData.baseModel.hasUsernameGlow ? 'Disable glowing username' : 'Enable glowing username'}>
+              <button onclick={handleToggleUsernameGlow} title={$authData.baseModel.hasUsernameGlow ? 'Disable glowing username' : 'Enable glowing username'}>
                 <img
                   class="checkbox"
                   src="../images/{$authData.baseModel.hasUsernameGlow ? 'checkbox_on' : 'checkbox_off'}.png"
                   alt="Checkbox"
                 />
               </button>
+              {#key reloadKey}
               <AgentName user={{ username: username }} linkable={false} factionLogo={true} />
+              {/key}
                - {$authData.baseModel.hasUsernameGlow ? 'Enabled' : 'Disabled'}!
             </p>
           {/if}
