@@ -19,8 +19,10 @@
 //  Changelog 1.0.5
 //    Added time remaining before you can upload again if you try within 5 minutes of a prior upload
 //    Added console command to skip 5 minute waiting time
-//    Added pop up that shows while uploading
+//    Added "Uploading media..." pop up that shows while uploading
 //    Added "[Mediagress]" in front of console logs to show from which plugin the log comes from
+//    Added better error messages for the user
+//    Fixed missing uploadInProgress = false on early return
 //    Cleaned up code
 //
 //  Changelog 1.0.4
@@ -49,7 +51,7 @@ function wrapper (pluginInfo) {
   // Name of the IITC build for first-party plugins
   pluginInfo.buildName = 'Mediagress'
   // Datetime-derived version of the plugin
-  pluginInfo.dateTimeVersion = '202401110000'
+  pluginInfo.dateTimeVersion = '202505170000'
   // ID/name of the plugin
   pluginInfo.pluginId = 'mediagress'
 
@@ -100,7 +102,7 @@ function wrapper (pluginInfo) {
     return deduplicatedByLowestAcquisition
   }
 
-function showUploadingOverlay(message = "Uploading...") {
+function showUploadingOverlay(message = "Uploading media...") { // Message shown during upload
   const existing = document.getElementById('mediagress-uploading-overlay');
   if (existing) return;
 
@@ -124,12 +126,12 @@ function showUploadingOverlay(message = "Uploading...") {
 
   // PNG spinner
   const spinnerImg = document.createElement('img');
-  spinnerImg.src = 'https://ingress.plus/icons/icon_mediagress_64.png';
+  spinnerImg.src = 'https://ingress.plus/icons/icon_mediagress_64.png'; // Source for spinning icon
   spinnerImg.alt = 'Loading...';
   spinnerImg.style.width = '48px';
   spinnerImg.style.height = '48px';
   spinnerImg.style.marginBottom = '15px';
-  spinnerImg.style.animation = 'spin 1s linear infinite';
+  spinnerImg.style.animation = 'spin 2s linear infinite';
 
   const text = document.createElement('div');
   text.textContent = message;
@@ -195,7 +197,7 @@ function removeUploadingOverlay() {
 
     uploadInProgress = true
 
-    showUploadingOverlay(); // Show the "Uploading..." alert
+    showUploadingOverlay(); // Show the "Uploading media..." alert
 
     try {
       const { uploadedIds, lastUploadTimestamp } = getSettings()
@@ -208,41 +210,73 @@ function removeUploadingOverlay() {
         const timeRemaining = waitTime - timeSinceLastUpload;
         const minutes = Math.floor(timeRemaining / 60000);
         const seconds = Math.floor((timeRemaining % 60000) / 1000);
-        
-        console.log('%c[Mediagress] You can bypass the 5-minute wait to upload media by running \"window.IMPATIENT = true\" in the console.', 'color: green');
-        console.log('%c[Mediagress] We don\'t think that Niantic will mind, but do it at your own risk! The bypass will reset once you refresh the page.', 'color: green');
+
+        console.log('%c[Mediagress] You can bypass the 5-minute wait to upload media by running \"window.IMPATIENT = true\" in the console. Do so at your own risk!', 'color: green');
+        console.log('%c[Mediagress] We don\'t think that Niantic will warn or ban you for it, but you will likely get rate limited. The bypass will reset once you refresh the page.', 'color: green');
 
         return window.alert(
-          `You recently tried to upload media from your inventory. Niantic rate-limits inventory requests if they happen too quickly, so to ensure that you don't hit that limit, please try again in ${minutes} minute(s) and ${seconds} second(s)!`
+          `You recently tried to upload media from your inventory. 
+          Niantic rate-limits inventory requests if they happen too quickly, so to ensure that you don't hit that limit, please try again in ${minutes} minute(s) and ${seconds} second(s)!`
         )
       }
 
         if (window.IMPATIENT) {
-          console.warn('⚠️ Mediagress wait-time bypassed via IMPATIENT');
+          console.warn('[Mediagress] ⚠️ Wait-time bypassed via IMPATIENT console command');
+          console.warn('[Mediagress] Refresh your browser window to reset bypass');
       }
 
       if (!(await getHasActiveSubscription()).result) {
-        return window.alert('Your inventory is only available on Intel if you have an active C.O.R.E. subscription. Without it, you cannot upload media :c Please subscribe to C.O.R.E. in the Ingress app and then return here!')
+        uploadInProgress = false
+        return window.alert(`Your inventory is only available on Intel if you have an active C.O.R.E. subscription. Without it, you cannot upload media.\n
+          Please subscribe to C.O.R.E. in the Ingress app and then return here!`)
       }
 
-      const rawInventory = await getInventory()
+      let rawInventory;
+      try {
+        rawInventory = await getInventory();
+      } catch (inventoryError) {
+        console.error('[Mediagress] Failed to fetch inventory: ', inventoryError);
+        window.alert(`Failed to fetch your inventory from Intel. This might happen if:\n\n
+          - Your session expired\n
+          - Intel is temporarily down\n
+          - The server doesn\'t recognize your C.O.R.E. subscription\n
+          \nPlease refresh or restart IITC and try again in a moment.`);
+        uploadInProgress = false;
+        return;
+      }
+
+      // Intel returns '{"result":[]}' when rate limited
+      if (!rawInventory || !Array.isArray(rawInventory.result) || rawInventory.result.length === 0) {
+        console.warn('[Mediagress] Inventory response was empty:', rawInventory);
+        window.alert(`We have received an empty inventory from Intel. This sometimes happens if:\n\n
+          - You have been rate limited by trying to access your inventory too often \(via other plugins, for example\)\n
+          - Your C.O.R.E. subscription recently expired\n
+          - Intel is having sync issues\n
+          - Ingress is currently experiencing server issues\n
+          \nPlease refresh or restart IITC and try again in a few minutes.`);
+        uploadInProgress = false;
+        return;
+      }
+
       const mediaOutsideCapsulesCount = getCountOfMediaOutsideCapsules(rawInventory)
       // todo use dialog?
 
       if (mediaOutsideCapsulesCount > 0 &&
         !window.confirm(`You currently have ${mediaOutsideCapsulesCount} Media that are not loaded into a capsule; these won't be uploaded. Do you wish to proceed?`)) {
-        return
+          uploadInProgress = false
+          return
       }
 
-      const medias = getMediaFromRawInventory(rawInventory)
-      const filteredMedia = medias.filter((item) => !uploadedIds.flat().includes(item.storyItem.mediaId))
+      const media = getMediaFromRawInventory(rawInventory)
+      const filteredMedia = media.filter((item) => !uploadedIds.flat().includes(item.storyItem.mediaId))
 
       if (!filteredMedia.length) {
         console.log('[Mediagress] No new media to upload, skipping')
-        window.alert('No new media has been found in your inventory since your last upload attempt. Make sure that you have loaded new Media into a Capsule and try again in 5 minutes!')
+        window.alert(`No new media has been found in your inventory since your last upload attempt. Make sure that you have loaded new Media into a Capsule and try again in 5 minutes!`)
         saveSettings({
           lastUploadTimestamp: Date.now()
         })
+        uploadInProgress = false
         return
       }
 
@@ -251,7 +285,7 @@ function removeUploadingOverlay() {
         headers: {
           'content-type': 'application/json'
         },
-        body: JSON.stringify({ medias: filteredMedia, player: PLAYER })
+        body: JSON.stringify({ media: filteredMedia, player: PLAYER })
       })
 
       if (response.ok) {
@@ -269,11 +303,11 @@ function removeUploadingOverlay() {
       }
 
       const err = `${response.status} ${response.statusText}: ${await response.text()}`
-      console.error(`Error making request to Mediagress: ${err}`)
-      window.alert(`Error :C please contact the developers at https://t.me/Mediagress\n\nError: ${err}`)
+      console.error(`[Mediagress] Error making request to Mediagress: ${err}`)
+      window.alert(`There has been a problem contacting Mediagress. It is possible that the site is currently down.\nTry again in a few minutes or contact the developers at https://t.me/Mediagress\n\nError: ${err}`)
     } catch (e) {
-      window.alert('Failed to get inventory data from Intel. Try again in a moment')
-      console.error(e)
+      window.alert(`There has been an error while trying to upload your media. Try again in a few minutes or contact the developers at https://t.me/Mediagress\n\nError: ${e}`)
+      console.error(`[Mediagress] ${e}`)
     } finally {
       uploadInProgress = false
       removeUploadingOverlay(); // Remove the alert when done
