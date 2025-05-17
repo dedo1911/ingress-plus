@@ -304,9 +304,9 @@ function removeUploadingOverlay() {
 
       const err = `${response.status} ${response.statusText}: ${await response.text()}`
       console.error(`[Mediagress] Error making request to Mediagress: ${err}`)
-      window.alert(`There has been a problem contacting Mediagress. It is possible that the site is currently down.\nTry again in a few minutes or contact the developers at https://t.me/Mediagress\n\nError: ${err}`)
+      window.alert(`There has been a problem contacting Mediagress. It is possible that the site is currently down.\nTry again in a few minutes or contact the developers at https://t.me/Ingress_Plus\n\nError: ${err}`)
     } catch (e) {
-      window.alert(`There has been an error while trying to upload your media. Try again in a few minutes or contact the developers at https://t.me/Mediagress\n\nError: ${e}`)
+      window.alert(`There has been an error while trying to upload your media. Try again in a few minutes or contact the developers at https://t.me/Ingerss_Plus\n\nError: ${e}`)
       console.error(`[Mediagress] ${e}`)
     } finally {
       uploadInProgress = false
