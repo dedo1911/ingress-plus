@@ -84,9 +84,7 @@
 </svelte:head>
 
 <section bind:clientWidth={width} style="--badge-size: {$badgeSize}px">
-  {#if !editVisible}
-  <div in:slide={{ delay: 200, duration: 200 }} out:slide={{ duration: 200 }} >
-    <h2 style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" onclick={() => (editVisible = true)}>
+    <h2 style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" >
       {#if $authData?.baseModel?.faction === 'machina'}
       <img src="/images/{factionLogo}" height="40" alt={$authData?.baseModel?.faction || 'unaligned'}/>{zalgo(username)}
       {:else}
@@ -98,27 +96,6 @@
       {:else}
       <p>You are currently not <a href="/verify">verified</a>. | <a href="agent/settings">Open Profile Settings</a></p>
       {/if}
-  </div>
-  {:else}
-  <div in:slide={{ delay: 200, duration: 200 }} out:slide={{ duration: 200 }} >
-    <div class="editbox">
-      <img src="/images/{factionLogo}" height="64" alt={$authData?.baseModel?.faction || 'unaligned'} onclick={toggleFaction} />
-      <input type="text" bind:value={newUsername} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" />
-      <div class="actions">
-        <img src={$authData.baseModel.public ? '/images/public.svg' : '/images/private.svg'} alt={$authData.baseModel.public ? 'Public' : 'Private'} height="32" onclick={togglePublic} />
-        <img src="/images/accept.svg" height="32" alt="Save" onclick={saveUsername} />
-      </div>
-    </div>
-    {#if $authData.baseModel.public}
-      <p class="publicNotice">
-        Your profile is public and will be visible at:<br />
-        <span onclick={copyProfileLink}>
-          https://ingress.plus/agent/{newUsername}
-        </span>
-      </p>
-    {/if}
-  </div>
-  {/if}
 
   <div class="badges">
     {#each { length: rows } as _, r}
@@ -141,11 +118,6 @@
         margin-left: 5%;
         margin-right: 5%;
     }
-    .center {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-}
   h2 {
     text-align: center;
     margin: calc(var(--badge-size) / 6) 0;
@@ -155,16 +127,6 @@
     align-content: center;
     justify-content: center;
     cursor: pointer;
-  }
-  div.editbox {
-    display: flex;
-    margin: 2em 1em;
-    align-items: center;
-    justify-content: space-around;
-  }
-  div.editbox img {
-    cursor: pointer;
-    margin-left: 1em;
   }
   section {
     max-width: 1200px;
@@ -181,17 +143,5 @@
   }
   div.badges div:nth-child(even of div) {
     margin-left: calc(var(--badge-size) / 2);
-  }
-  p.publicNotice {
-    text-align: center;
-    color: var(--color-faction-unaligned)
-  }
-  p.publicNotice span {
-    border: 3px double #5e5a75;
-    border-radius: 8px;
-    display: inline-block;
-    padding: 1rem;
-    margin-top: 1rem;
-    cursor: pointer;
   }
 </style>
