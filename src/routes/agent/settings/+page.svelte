@@ -87,40 +87,22 @@
       await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
       toast.push('Username has been changed to ' + $authData.baseModel.username, { classes: ['successToast'] })
     } catch (err) {
-      $authData.baseModel.username = oldUsername
-      console.log('Error: ' + err.response?.data?.username?.code)
-      console.error(username, err)
+      $authData.baseModel.username = oldUsername;
+      const errorCode = err.response?.data?.username?.code;
+      console.error('Username Error:', errorCode, err);
 
-      // Check if error because username already exists
-      if (err.response?.data?.username?.code === 'validation_not_unique') {
-        toast.push('The username is already taken. Please choose a different username.', { classes: ['errorToast'] });
-      } 
-      
-      // Check if error because username is blank
-      if (err.response?.data?.username?.code === 'validation_required') {
-        toast.push('Username cannot be blank.', { classes: ['errorToast'] });
-      } 
+      const errorMessages = {
+        validation_not_unique: 'The username is already taken. Please choose a different username.',
+        validation_required: 'Username cannot be blank.',
+        validation_min_text_constraint: 'The username is too short. It needs to be at least 3 characters long.',
+        validation_max_text_constraint: 'The username is too long. It needs to be 15 characters or less.',
+        validation_invalid_format: 'The username contains characters that are not allowed. You can only use letters or numbers.',
+      };
 
-      // Check for minimum username lenght
-      else if (err.response?.data?.username?.code === 'validation_min_text_constraint') {
-        toast.push('The username is too short. It needs to be at least 3 characters long.', { classes: ['errorToast'] });
-      }      
-      
-      // Check for maximum username lenght
-      else if (err.response?.data?.username?.code === 'validation_max_text_constraint') {
-        toast.push('The username is too long. It needs to be 15 characters or less.', { classes: ['errorToast'] });
-      }
-
-      // Check for illegal characters
-      else if (err.response?.data?.username?.code === 'validation_invalid_format') {
-        toast.push('The username contains characters that are not allowed. You can only use letters or numbers.', { classes: ['errorToast'] });
-      }
-
-      else {
-        toast.push('An error has occurred. Please try again later.', { classes: ['errorToast'] });
-      }
-      return
+      const message = errorMessages[errorCode] || 'An error has occurred. Please try again later.';
+      toast.push(message, { classes: ['errorToast'] });
     }
+
   }
 
   const factionLogo = $derived($authData?.baseModel?.faction === 'machina'

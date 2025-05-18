@@ -55,72 +55,35 @@
 
       e.is_active = dayjs().isAfter(e.start_time) && dayjs().isBefore(e.end_time)
 
-      switch (e.category) {
-        case "anomaly":
-          e.categoryTitle = "Anomaly event"
-          break
-        case "shard_skirmish":
-          e.categoryTitle = "Shard Skirmish"
-          break
-        case "beacon_skirmish":
-          e.categoryTitle = "Beacon Skirmish"
-          break
-        case "second_sunday":
-          e.categoryTitle = "Second Sunday"
-          break
-        case "first_saturday":
-          e.categoryTitle = "First Saturday"
-          break
-        case "mission_day":
-          e.categoryTitle = "Mission Day"
-          break
-        case "global_event":
-          e.categoryTitle = "Global Event"
-          break
-        case "global_challenge":
-          e.categoryTitle = "Global Challenge"
-          break
-        case "campaign":
-        e.categoryTitle = "Dispatch Campaign"
-          break
-        case "paid_campaign":
-          e.categoryTitle = "Premium Dispatch Campaign"
-          break
-        case "battle_pass":
-          e.categoryTitle = "Reward Campaign"
-          break
-        case "2sday":
-          e.categoryTitle = "2x AP Tuesday"
-          break
-        case "agent_enl":
-          e.categoryTitle = "Agent organized Event (Enlightened)"
-          break
-        case "agent_res":
-          e.categoryTitle = "Agent organized Event (Resistance)"
-          break
-        case "agent_xfac":
-          e.categoryTitle = "Agent organized Event (Crossfaction)"
-          break
-        case "nl1331":
-          e.categoryTitle = "NL-1331 Meetup"
-          break
-        case "special":
-          e.categoryTitle = "Special Event"
-          break
-        case "tko":
-          e.categoryTitle = "Tactical Kinetic Operations/GORUCK"
-          break
-        case "wayfarer":
-          e.categoryTitle = "Wayfarer Challenge"
-          break
-        case "canceled":
-          e.categoryTitle = "Canceled Event"
-          break
-        default:
-          console.log("Unknown Event type: " + e.category)
-          e.categoryTitle = "Unknown Event type"
-          e.category = "special"
-          break
+      const categoryTitles = {
+        anomaly: "Anomaly event",
+        shard_skirmish: "Shard Skirmish",
+        beacon_skirmish: "Beacon Skirmish",
+        second_sunday: "Second Sunday",
+        first_saturday: "First Saturday",
+        mission_day: "Mission Day",
+        global_event: "Global Event",
+        global_challenge: "Global Challenge",
+        campaign: "Dispatch Campaign",
+        paid_campaign: "Premium Dispatch Campaign",
+        battle_pass: "Reward Campaign",
+        "2sday": "2x AP Tuesday",
+        agent_enl: "Agent organized Event (Enlightened)",
+        agent_res: "Agent organized Event (Resistance)",
+        agent_xfac: "Agent organized Event (Crossfaction)",
+        nl1331: "NL-1331 Meetup",
+        special: "Special Event",
+        tko: "Tactical Kinetic Operations/GORUCK",
+        wayfarer: "Wayfarer Challenge",
+        canceled: "Canceled Event",
+      };
+
+      if (categoryTitles[e.category]) {
+        e.categoryTitle = categoryTitles[e.category];
+      } else {
+        console.log("Unknown Event type:", e.category);
+        e.categoryTitle = "Unknown Event type";
+        e.category = "special";
       }
 
       return e
