@@ -67,7 +67,7 @@
 <style>
   h2 {
     text-align: center;
-    margin: calc(var(--badge-size) / 2) 0;
+    margin: calc(var(--badge-size) / 6) 0;
     font-size: 1.75em;
     text-shadow: 0 0 10px black;
     display: flex;
