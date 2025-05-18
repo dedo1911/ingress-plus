@@ -285,7 +285,7 @@ function removeUploadingOverlay() {
         headers: {
           'content-type': 'application/json'
         },
-        body: JSON.stringify({ media: filteredMedia, player: PLAYER })
+        body: JSON.stringify({ medias: filteredMedia, player: PLAYER })
       })
 
       if (response.ok) {
