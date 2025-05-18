@@ -1,12 +1,11 @@
 <script>
-  import { slide } from 'svelte/transition'
   import sortBy from 'lodash.sortby'
   import { toast } from '@zerodevx/svelte-toast'
   import { goto } from '$app/navigation'
   import { browser } from '$app/environment'
   import { badgeSize, authData, ownedBadges } from '$lib/stores'
   import { pb, serverAddress } from '$lib/pocketbase'
-  import zalgo from '$lib/zalgo'
+  import AgentName from '$lib/components/AgentName.svelte'
 
   const thumbSize = (badgeSize) => {
     if (badgeSize <= 64) return '96x96'
@@ -84,12 +83,8 @@
 </svelte:head>
 
 <section bind:clientWidth={width} style="--badge-size: {$badgeSize}px">
-    <h2 style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" >
-      {#if $authData?.baseModel?.faction === 'machina'}
-      <img src="/images/{factionLogo}" height="40" alt={$authData?.baseModel?.faction || 'unaligned'}/>{zalgo(username)}
-      {:else}
-         <img src="/images/{factionLogo}" height="40" alt={$authData?.baseModel?.faction || 'unaligned'}/>{username}
-      {/if}
+    <h2>
+      <AgentName user={{ username: username }} linkable={false} factionLogo={true} />
     </h2>
   {#if $authData?.baseModel?.verification != ''}
       <p>Your Verification level is <a href="/verify"><code>{verification.toUpperCase()}</code></a> | <a href="agent/settings">Open Profile Settings</a></p>
