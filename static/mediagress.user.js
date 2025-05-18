@@ -262,8 +262,7 @@ function removeUploadingOverlay() {
       // todo use dialog?
 
       if (mediaOutsideCapsulesCount > 0 &&
-        !window.confirm(`You currently have ${mediaOutsideCapsulesCount} Media not stored in Capsules. These won't be uploaded.\n\n
-          Please move them into Capsules before retrying — or continue if you don\t want to upload them.`)) {
+        !window.confirm(`You currently have ${mediaOutsideCapsulesCount} Media not stored in Capsules. These won't be uploaded.\n\nPlease move them into Capsules before retrying — or continue if you don\'t want to upload them.`)) {
           uploadInProgress = false
           return
       }
