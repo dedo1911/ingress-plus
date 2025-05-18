@@ -221,7 +221,7 @@ function removeUploadingOverlay() {
       }
 
         if (window.IMPATIENT) {
-          console.warn('[Mediagress] ⚠️ Wait-time bypassed via IMPATIENT console command');
+          console.warn('[Mediagress] Wait-time bypassed via IMPATIENT console command');
           console.warn('[Mediagress] Refresh your browser window to reset bypass');
       }
 
@@ -239,7 +239,7 @@ function removeUploadingOverlay() {
         window.alert(`Failed to fetch your inventory from Intel. This might happen if:\n\n
           - Your session expired\n
           - Intel is temporarily down\n
-          - The server doesn\'t recognize your C.O.R.E. subscription\n
+          - The server doesn't recognize your C.O.R.E. subscription\n
           \nPlease refresh or restart IITC and try again in a moment.`);
         uploadInProgress = false;
         return;
@@ -262,7 +262,8 @@ function removeUploadingOverlay() {
       // todo use dialog?
 
       if (mediaOutsideCapsulesCount > 0 &&
-        !window.confirm(`You currently have ${mediaOutsideCapsulesCount} Media that are not loaded into a capsule; these won't be uploaded. Do you wish to proceed?`)) {
+        !window.confirm(`You currently have ${mediaOutsideCapsulesCount} Media not stored in Capsules. These won't be uploaded.\n\n
+          Please move them into Capsules before retrying — or continue if you don\t want to upload them.`)) {
           uploadInProgress = false
           return
       }
