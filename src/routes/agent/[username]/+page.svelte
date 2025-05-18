@@ -25,6 +25,11 @@
   $effect(() => {
     badgeSize.set(Math.min(128, width / 7))
   })
+
+  const ScannerLink = `https://link.ingress.com/?link=https%3A%2F%2Fintel.ingress.com%2Fagent%2F${encodeURIComponent(publicUser?.username)}&apn=com.nianticproject.ingress&isi=576505181&ibi=com.google.ingress&ifl=https%3A%2F%2Fapps.apple.com%2Fapp%2Fingress%2Fid576505181&ofl=https%3A%2F%2Fingress.com%2F`;
+
+  // Hide link to scanner profile if user has default username
+  const hideLink = /^(users\d{5}|Agent_\d{6})$/.test(publicUser?.username);
 </script>
 
 <svelte:head>
@@ -35,6 +40,14 @@
   <h2 transition:slide style="color: var(--color-faction-{publicUser?.faction || 'unaligned'})">
     <AgentName id={publicUser.id} linkable={false} factionLogo={true} />
   </h2>
+    {#if !hideLink}
+      <p style="text-align: center;">
+        <a target="_blank" rel="noopener noreferrer" href={ScannerLink}>
+          <img src="../images/user.svg" alt="User icon" style="height: 1em; vertical-align: middle;">
+            Open Profile in Ingress
+        </a>
+      </p>
+    {/if}
 
   <div class="badges">
     {#each { length: rows } as _, r}
