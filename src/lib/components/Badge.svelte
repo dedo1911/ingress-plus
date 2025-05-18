@@ -22,6 +22,7 @@
     ? $ownedBadges.some(b => b.badge === badge.id && b.tier >= tier)
     : false)
   const opaque = $derived($authData.isValid ? ($siteSettings.opaqueOwned ? owned : !owned) : false)
+  const placeholder = $derived(badge?.hasPlaceholderData)
 
   const onBadgeClick = () => (showModal = true)
   const onBadgeKeydown = (e) => {
@@ -30,9 +31,19 @@
 </script>
 
 {#if badge }
-  <span onclick={onBadgeClick} onkeydown={onBadgeKeydown} role='button' tabindex='0'>
+  <span onclick={onBadgeClick} onkeydown={onBadgeKeydown} role='button' tabindex='0' class="badge-wrapper">
     <img loading="lazy" height="{$badgeSize}" width="{$badgeSize}" alt="{title}" class:opaque={opaque}
     src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={thumbSize($badgeSize)}" />
+
+    {#if placeholder}
+      <img
+        class="placeholder_overlay"
+        src="images/badges/placeholder_ribbon.png"
+        alt="Placeholder"
+        height="{$badgeSize}"
+        width="{$badgeSize}"
+      />
+    {/if}
   </span>
   <BadgeModal bind:showModal {badge} {tier} {owned} {title} />
 {/if}
@@ -46,5 +57,16 @@
   }
   img.opaque {
     opacity: 0.1;
+  }
+  .badge-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .badge-wrapper img.placeholder_overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
   }
 </style>

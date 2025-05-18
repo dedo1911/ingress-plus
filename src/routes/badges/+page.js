@@ -16,7 +16,8 @@ export async function load ({ fetch }) {
         'expand.badges_via_category.image',
         'expand.badges_via_category.title',
         'expand.badges_via_category.description',
-        'expand.badges_via_category.unobtainable'
+        'expand.badges_via_category.unobtainable',
+        'expand.badges_via_category.hasPlaceholderData'
       ].join(','),
       fetch
     })
