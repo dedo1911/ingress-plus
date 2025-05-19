@@ -76,6 +76,7 @@
         tko: "Tactical Kinetic Operations/GORUCK",
         wayfarer: "Wayfarer Challenge",
         canceled: "Canceled Event",
+        ifs2x: "First Saturday 2X AP"
       };
 
       if (categoryTitles[e.category]) {
