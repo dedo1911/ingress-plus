@@ -6,10 +6,10 @@
   import { browser } from '$app/environment'
 
   const username = $derived($authData?.baseModel?.username || "NONE")
-  const faction = $derived($authData?.baseModel?.faction || "NOT SET")
   const userId = $derived($authData?.baseModel?.id || "NONE")
   const email = $derived($authData?.baseModel?.email || "UNKNOWN")
   const supporter = $derived($authData?.baseModel?.supporter)
+  const verified = $derived($authData?.baseModel?.verification)
 
   let reloadKey = $state(0);
 
@@ -19,11 +19,19 @@
   };
 
   const handleSaveUsername = async () => {
+    if (verified) {
+      toast.push('You must un-verify your account to change your username.', { classes: ['errorToast'] });
+      return;
+    }
     await saveUsername();
     reloadKey += 1; // Force AgentName to reload
   };
 
   const handleSaveFaction = async () => {
+    if (verified) {
+      toast.push('You must un-verify your account to change your faction.', { classes: ['errorToast'] });
+      return;
+    }
     await saveFaction();
     reloadKey += 1; // Force AgentName to reload
   };
@@ -67,6 +75,10 @@
   let selectedFaction = $state($authData?.baseModel?.faction || 'unaligned');
 
   const saveFaction = async () => {
+    if ($authData.baseModel.faction == selectedFaction) {
+      console.log('Faction same as before, skipping')
+      return
+    }
   $authData.baseModel.faction = selectedFaction;
   await pb.collection('users').update($authData.baseModel.id, $authData.baseModel);
   toast.push('Faction has been changed to ' + selectedFaction.charAt(0).toUpperCase() + selectedFaction.slice(1) + '!', {
@@ -82,6 +94,10 @@
 
   const saveUsername = async () => {
     const oldUsername = $authData.baseModel.username
+    if (oldUsername == newUsername) {
+      console.log('Username same as before, skipping')
+      return
+    }
     try {
       $authData.baseModel.username = newUsername
       await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
@@ -108,6 +124,32 @@
   const factionLogo = $derived($authData?.baseModel?.faction === 'machina'
     ? '/machina.png'
     : `/${$authData?.baseModel?.faction || 'unaligned'}.svg`)
+
+    let showUnverifyConfirm = $state(false)
+
+    const handleUnverify = async () => {
+      try {
+        $authData.baseModel.verification = "";
+        await pb.collection('users').update($authData.baseModel.id, $authData.baseModel);
+        toast.push('You have been un-verified. You may now edit your Username or Faction.', { classes: ['successToast'] });
+        showUnverifyConfirm = false;
+      } catch (err) {
+        console.error('Unverify error:', err);
+        toast.push('An error occurred while un-verifying. Please try again later.', { classes: ['errorToast'] });
+      }
+    };
+
+    let disableConfirmButton = $state(false);
+
+    function showConfirmationPrompt() {
+      showUnverifyConfirm = true;
+      disableConfirmButton = true;
+
+      setTimeout(() => {
+        disableConfirmButton = false;
+      }, 1000); // Delay to avoid misclick
+    }
+
 </script>
 
 <svelte:head>
@@ -125,19 +167,19 @@
               />
           </p>
           <p><b>Username</b>: 
-            <input type="text" bind:value={newUsername} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})" />
-            <img src="../images/accept.svg" height="32" alt="Save" onclick={handleSaveUsername} />
+            <input type="text" maxlength="15" bind:value={newUsername} disabled={verified} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'}); cursor: {verified ? 'not-allowed' : 'pointer'}; opacity: {verified ? 0.5 : 1}" />
+            <img src="../images/accept.svg" height="32" alt="Save" onclick={handleSaveUsername} disabled={verified} style="cursor: {verified ? 'not-allowed' : 'pointer'}; opacity: {verified ? 0.5 : 1}"/>
           </p>
           <p>
             <b>Faction</b>: 
-            <select bind:value={selectedFaction}>
+            <select bind:value={selectedFaction} disabled={verified} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'}); cursor: {verified ? 'not-allowed' : 'pointer'}; opacity: {verified ? 0.5 : 1}">
               <option value="enlightened" >Enlightened</option>
               <option value="resistance">Resistance</option>
               {#if supporter === true}
               <option value="machina">Machina</option>
               {/if}
             </select>
-            <button onclick={handleSaveFaction}>
+            <button onclick={handleSaveFaction} style="cursor: {verified ? 'not-allowed' : 'pointer'}; opacity: {verified ? 0.5 : 1}">
               <img src="../images/accept.svg" height="24" alt="Save faction" />
             </button>
           </p>
@@ -161,6 +203,23 @@
             <br>
           <p><b>User ID:</b> <code>ING+{userId}</code></p>
           <p><b>E-mail:</b> <code>{email}</code></p>
+          {#if verified}
+            <p>You are currently verified. You need to un-verify to change your Username or Faction.</p>
+            <div style="text-align: center; margin-top: 0.5em;">
+              {#if showUnverifyConfirm}
+                <button 
+                  class="unverify-button"
+                  disabled={disableConfirmButton}
+                  onclick={handleUnverify}
+                  title={disableConfirmButton ? "Please wait..." : "Click to Confirm Un-Verify"}>Click to Confirm Un-Verify</button>
+                <button class="unverify-button" onclick={() => showUnverifyConfirm = false} style="margin-left: 1em;">Cancel</button>
+              {:else}
+                <button class="unverify-button" onclick={showConfirmationPrompt}>Un-Verify Account</button>
+              {/if}
+            </div>
+          {:else}
+            <p>You are not verified. You may change your Username or Faction.</p>
+          {/if}
           {#if supporter === true}
             <br>
             <p><b>For Supporters:</b></p>
@@ -231,4 +290,20 @@
     margin-top: 1rem;
     cursor: pointer;
   }
+  .unverify-button {
+    padding: 0.5em 1em;
+    background-color: #5e5a75;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .unverify-button:hover {
+    background-color: #4a4660;
+  }
+  .unverify-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
 </style>
