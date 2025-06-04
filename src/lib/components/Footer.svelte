@@ -7,7 +7,7 @@
     to support this project.
   </p>
   <p class="small">
-    Ingress Fan-site. Not officially affiliated with Ingress or Niantic Labs!
+    Ingress Fan-site. Not officially affiliated with Ingress or Niantic Spatial, Inc.!
     All images and icons shown on this website are property of their respective owners.
     <br />
     <a href="/about">About</a> &mdash;
