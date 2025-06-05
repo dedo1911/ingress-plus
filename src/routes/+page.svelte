@@ -13,7 +13,7 @@
         >. Users of this site can create a profile with badges they own in the game
         to share, submit Ingress media and check what Events are currently ongoing
 		or planned.
-        <i>We are not affiliated with Ingress or Niantic.</i>
+        <i>We are not affiliated with Ingress or Niantic Spatial, Inc.</i>
     </p>
 
     <a class="hero hero-right" href="/events">
