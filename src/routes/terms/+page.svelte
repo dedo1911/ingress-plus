@@ -4,7 +4,13 @@
 
 <div>
   <h1>TERMS OF SERVICE</h1>
-  <h3>Last updated June 06th, 2025</h3>
+  <p><em>Effective date: July 6th, 2025</em></p>
+
+  <p>
+    Welcome, Agent! By accessing and using Ingress Plus, you’re joining a community of fellow Ingress players and explorers.
+    We want to keep this site a safe, friendly, and useful resource for everyone. These Terms of Use explain the rules for using the site — please take a moment to read them.
+    By continuing to use Ingress Plus, you agree to follow these Terms. If you ever have questions or spot an issue, feel free to contact us — we’re here to help.
+  </p>
 
   <h2>AGREEMENT TO OUR TERMS</h2>
 
@@ -13,8 +19,8 @@
   <p>
     We operate the website <a href="https://ingress.plus"
       >https://ingress.plus</a
-    > (the "Site"). To use the Site you will need to agree to these Terms of Use which we may update
-    from time to time. We ask you to regularly check this page for any updates to these Terms that we may have posted.
+    > (the "Site"). We may update these Terms from time to time. We will notify users
+    of any significant changes, and the latest version will always be available on our website.
   </p>
 
   <p>
@@ -81,8 +87,7 @@
     text-align: justify;
   }
   h1,
-  h2,
-  h3 {
+  h2 {
     text-align: center;
   }
 </style>
