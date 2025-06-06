@@ -41,7 +41,7 @@
     <ul>
         <li>Acquired badges</li>
         <li>Text and pictures submitted via bug reports</li>
-        <li>Flag for if you have supported the project</li>
+        <li>Supporter Status</li>
     </ul>
 
     <h3>1.3 When Submitting Media via the IITC Mediagress Plugin</h3>
@@ -90,7 +90,10 @@
     </ul>
 
     <h2>4. Contact</h2>
-    <p>If you have any questions about this Privacy Policy or would like to exercise your rights, please contact the site administrators via hello@ingress.plus.</p>
+    <p>If you have any questions about this Privacy Policy or would like to exercise your rights,
+      please contact the site administrators via <a href="mailto:help@ingress.plus"
+      >help@ingress.plus</a
+    >.</p>
 
     <h2>5. Changes to this Policy</h2>
     <p>We may update this Privacy Policy from time to time. We will notify users of any significant changes, and the latest version will always be available on our website.</p>
