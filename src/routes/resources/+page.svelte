@@ -63,7 +63,7 @@
             </li>
         </ul>
     </li>
-    <li><a target="_blank" rel="noopener noreferrer" href="https://wayfarer.nianticlabs.com/">Niantic Wayfarer</a>
+    <li><a target="_blank" rel="noopener noreferrer" href="https://nianticspatial.com/recon">Niantic Spatial Recon</a>
         <ul>
             <li>Review and edit your Portal Submission before they go into voting</li>
             <li>Review other submissions and earn points towards your Recon medal in Ingress</li>
@@ -102,11 +102,6 @@
         <ul>
             <li>Crops and splits images so that they can be used as a banner</li>
             <li>Defacto successor of this <a target="_blank" rel="noopener noreferrer" href="https://www.giacintogarcea.com/ingress/tools/missionset/">Mission Banner Cropper</a> as it hasn't been updated in a while</li>
-        </ul>
-    </li>
-    <li><a target="_blank" rel="noopener noreferrer" href="https://wayfarer.tools/">Unofficial Wayfarer Tools</a>
-        <ul>
-            <li>A collection of tools designed to make Wayfarer better</li>
         </ul>
     </li>
     <li><a target="_blank" rel="noopener noreferrer" href="https://missionday.site/">Mission Day Sites</a>
