@@ -1,5 +1,5 @@
 <svelte:head>
-    <title>Ingress Plus &middot; Terms of use</title>
+    <title>Ingress Plus &middot; Terms of Service</title>
 </svelte:head>
 
 <div>
@@ -8,7 +8,7 @@
 
   <p>
     Welcome, Agent! By accessing and using Ingress Plus, you’re joining a community of fellow Ingress players and explorers.
-    We want to keep this site a safe, friendly, and useful resource for everyone. These Terms of Use explain the rules for using the site — please take a moment to read them.
+    We want to keep this site a safe, friendly, and useful resource for everyone. These Terms of Service explain the rules for using the site — please take a moment to read them.
     By continuing to use Ingress Plus, you agree to follow these Terms. If you ever have questions or spot an issue, feel free to contact us — we’re here to help.
   </p>
 

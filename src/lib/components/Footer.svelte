@@ -12,7 +12,7 @@
     <br />
     <a href="/about">About</a> &mdash;
     <a href="/attributions">Attributions</a> &mdash;
-    <a href="/terms">Terms of use</a> &mdash;
+    <a href="/terms">Terms of Service</a> &mdash;
     <a href="/privacy">Privacy policy</a>
   </p>
   <p class="small">
