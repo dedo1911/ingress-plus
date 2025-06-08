@@ -4,7 +4,7 @@
 
 <div>
   <h1>TERMS OF SERVICE</h1>
-  <p><em>Effective date: July 6th, 2025</em></p>
+  <p><em>Effective date: July 8th, 2025</em></p>
 
   <p>
     Welcome, Agent! By accessing and using Ingress Plus, you’re joining a community of fellow Ingress players and explorers.

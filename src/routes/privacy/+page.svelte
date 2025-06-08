@@ -4,7 +4,7 @@
 
 <div>
   <h1>Privacy Policy for Ingress Plus</h1>
-    <p><em>Effective date: July 6th, 2025</em></p>
+    <p><em>Effective date: July 8th, 2025</em></p>
 
     <p>Welcome, Agent, to Ingress Plus! This project was created to support the Ingress community and enhance your experience in the field. 
     We take your privacy seriously. This Privacy Policy explains what information we collect, how we use it, 
