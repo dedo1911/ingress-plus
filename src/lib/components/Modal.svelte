@@ -16,6 +16,7 @@
   const handleBackdropClick = (event) => {
     if (event.target === dialog) {
       dialog.close()
+      showModal = false
     }
   }
 
