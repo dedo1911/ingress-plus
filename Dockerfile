@@ -13,7 +13,7 @@ RUN yarn build
 
 # Deploy stage
 FROM gcr.io/distroless/nodejs22-debian12
-USER 101
+USER 65532
 COPY --from=build /ingress-plus/build /ingress-plus
 WORKDIR /ingress-plus
 CMD ["index.js"]
