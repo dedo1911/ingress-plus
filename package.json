@@ -11,24 +11,24 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-node": "5.2.12",
-		"@sveltejs/kit": "2.19.0",
-		"@sveltejs/vite-plugin-svelte": "5.0.3",
+		"@sveltejs/kit": "2.21.3",
+		"@sveltejs/vite-plugin-svelte": "5.1.0",
 		"@zerodevx/svelte-toast": "0.9.6",
-		"carta-md": "4.8.1",
+		"carta-md": "4.10.2",
 		"cz-conventional-changelog": "^3.3.0",
-		"eslint": "9.22.0",
+		"eslint": "9.28.0",
 		"eslint-config-standard": "^17.1.0",
 		"eslint-plugin-import": "2.31.0",
-		"eslint-plugin-n": "17.16.2",
+		"eslint-plugin-n": "17.19.0",
 		"eslint-plugin-promise": "7.2.1",
-		"eslint-plugin-svelte": "3.1.0",
+		"eslint-plugin-svelte": "3.9.1",
 		"lodash.sortby": "^4.7.0",
-		"pocketbase": "0.25.2",
-		"sass": "1.85.1",
-		"svelte": "5.23.0",
-		"svelte-multiselect": "11.0.0-rc.1",
+		"pocketbase": "0.26.1",
+		"sass": "1.89.2",
+		"svelte": "5.33.18",
+		"svelte-multiselect": "11.1.1",
 		"svelte-time": "2.0.1",
-		"vite": "6.2.1"
+		"vite": "6.3.5"
 	},
 	"type": "module",
 	"config": {
@@ -38,6 +38,6 @@
 	},
 	"packageManager": "yarn@1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447",
 	"dependencies": {
-		"isomorphic-dompurify": "2.22.0"
+		"isomorphic-dompurify": "2.25.0"
 	}
 }
