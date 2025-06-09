@@ -787,24 +787,22 @@
     "@rollup/plugin-node-resolve" "^16.0.0"
     rollup "^4.9.5"
 
-"@sveltejs/kit@2.21.3":
-  version "2.21.3"
-  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-2.21.3.tgz#b642e4c18d2a992f8457a8f765d6deef55c758a6"
-  integrity sha512-Bd05srNOaqP05qnytjg/KkWNlkcwEpE76s0xGSlgzL4I8pLyrK3c9+a7zMCquoiEEIZF2ecGTn6Fj/lELjaa8A==
+"@sveltejs/kit@2.19.0":
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/@sveltejs/kit/-/kit-2.19.0.tgz#e231feb47e3c50d329f86221d40495815e66ad6f"
+  integrity sha512-UTx28Ad4sYsLU//gqkEo5aFOPFBRT2uXCmXTsURqhurDCvzkVwXruJgBcHDaMiK6RKKpYRteDUaXYqZyGPgCXQ==
   dependencies:
-    "@sveltejs/acorn-typescript" "^1.0.5"
     "@types/cookie" "^0.6.0"
-    acorn "^8.14.1"
     cookie "^0.6.0"
     devalue "^5.1.0"
     esm-env "^1.2.2"
+    import-meta-resolve "^4.1.0"
     kleur "^4.1.5"
     magic-string "^0.30.5"
     mrmime "^2.0.0"
     sade "^1.8.1"
     set-cookie-parser "^2.6.0"
     sirv "^3.0.0"
-    vitefu "^1.0.6"
 
 "@sveltejs/vite-plugin-svelte-inspector@^4.0.1":
   version "4.0.1"
@@ -1000,11 +998,6 @@ acorn@^8.14.0:
   version "8.14.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.14.0.tgz#063e2c70cac5fb4f6467f0b11152e04c682795b0"
   integrity sha512-cl669nCJTZBsL97OF4kUQm5g5hC2uihk0NxY3WENAC0TYdILVkAyHymAntgxGkl7K+t0cXIrH5siy5S4XkFycA==
-
-acorn@^8.14.1:
-  version "8.15.0"
-  resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.15.0.tgz#a360898bc415edaac46c8241f6383975b930b816"
-  integrity sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==
 
 agent-base@^7.1.0:
   version "7.1.0"
@@ -2573,6 +2566,11 @@ import-meta-resolve@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/import-meta-resolve/-/import-meta-resolve-4.0.0.tgz#0b1195915689f60ab00f830af0f15cc841e8919e"
   integrity sha512-okYUR7ZQPH+efeuMJGlq4f8ubUgO50kByRPyt/Cy1Io4PSRsPjxME+YlVaCOx+NIToW7hCsZNFJyTPFFKepRSA==
+
+import-meta-resolve@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/import-meta-resolve/-/import-meta-resolve-4.1.0.tgz#f9db8bead9fafa61adb811db77a2bf22c5399706"
+  integrity sha512-I6fiaX09Xivtk+THaMfAwnA3MVA5Big1WHF1Dfx9hFuvNIWpXnorlkzhcQf6ehrqQiiZECRt1poOAkPmer3ruw==
 
 imurmurhash@^0.1.4:
   version "0.1.4"
