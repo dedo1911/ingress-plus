@@ -233,6 +233,7 @@
     padding: 1em 0;
     border-bottom: 3px double #5e5a75;
     border-radius: 0 0 8px 8px;
+    z-index: 10;
   }
   nav[data-nav="mobile"] ul li {
     padding: 1em 0.5em;
