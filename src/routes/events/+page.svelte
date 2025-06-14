@@ -38,7 +38,7 @@
     const options = {
       filter: showAll ? "" : "homepage_hidden=false",
     }
-    const r = await pb.collection("game_events_list").getList(page, 1 * itemsPerPage, options)
+    const r = await pb.collection("game_events_list").getList(page, itemsPerPage, options)
     totalPages = r.totalPages
     totalItems = r.totalItems
     eventsList = r.items.map((e) => {
@@ -144,7 +144,7 @@
             {:else if e.start_time.isBefore(dayjs()) && e.end_time.isAfter(dayjs())}
               <strong>Ends <Time timestamp={e.end_time} relative live /></strong>
             {:else if e.end_time.isBefore(dayjs())}
-              <strong>Ended <Time timestamp={e.start_time} relative live /></strong>
+              <strong>Ended <Time timestamp={e.end_time} relative live /></strong>
             {/if}
             <small>(
               from <Time timestamp={e.start_time} format="MMMM D, YYYY [at] h:mm A" live />
@@ -165,7 +165,7 @@
 {/snippet}
 
 <div class="container">
-  {#each eventsList as event}
+  {#each eventsList as event (event.id)}
     {@render eventRow(event)}
   {/each}
   <div class="paginator">

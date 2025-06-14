@@ -63,7 +63,7 @@
                  to <Time timestamp={event.end_time} format="MMMM D, YYYY [at] h:mm A" live />
              )</small>
          {:else if event.end_time.isBefore(dayjs())}
-             <strong>Ended <Time timestamp={event.start_time} relative live /></strong>
+             <strong>Ended <Time timestamp={event.end_time} relative live /></strong>
              <small>(
                  from <Time timestamp={event.start_time} format="MMMM D, YYYY [at] h:mm A" live />
                  to <Time timestamp={event.end_time} format="MMMM D, YYYY [at] h:mm A" live />
