@@ -7,9 +7,11 @@
   import { authData, ownedBadges } from '$lib/stores'
 
   let menuOpen = $state(false)
+  let showSubTools = $state(false)
   let pathname = $state('/')
 
   const toggleMenu = () => (menuOpen = !menuOpen)
+  const toggleSubTools = () => (showSubTools = !showSubTools);
 
   const login = async () => {
     menuOpen = false
@@ -96,11 +98,18 @@
       </li>
     </a>
     -->
-    <a href="/resources">
-      <li class="{pathname === '/resources' ? 'active' : ''}">
-        <img src="/images/resources.svg" alt="Resources" /> Resources
-      </li>
-    </a>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+    <li class="tools {pathname.startsWith('/tools') ? 'active' : ''}"
+        onmouseenter={() => showSubTools = true}
+        onmouseleave={() => showSubTools = false}
+        onclick={toggleSubTools}>
+      <img src="/images/tools.svg" alt="Tools" /> Tools &triangledown;
+      <ul class="submenu" class:visible={showSubTools}>
+        <li><img src="/images/cmu.png" alt="CMU icon" /><a href="/tools/cmu_calc">CMU Calculator</a></li>
+        <li><img src="/images/resources.svg" alt="Tools" /><a href="/tools/resources">Resources</a></li>
+      </ul>
+    </li>
     <a href="/stats">
       <li class="{pathname === '/stats' ? 'active' : ''}">
         <img src="/images/statistics.svg" alt="Statistics" /> Statistics
@@ -257,5 +266,34 @@
     h1 {
       font-size: 1.5em;
     }
+  }
+  .tools {
+    position: relative;
+  }
+
+  .submenu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #111;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    z-index: 100;
+    flex-direction: column;
+    min-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  .submenu.visible {
+    display: flex;
+  }
+  .submenu li:hover {
+    background: #222;
+  }
+  .submenu a {
+    color: #fff;
+    text-decoration: none;
   }
 </style>
