@@ -51,6 +51,10 @@
   <option value="SEK">🇸🇪 Swedish Krona (SEK)</option>
   <option value="INR">🇮🇳 Indian Rupee (INR)</option>
   <option value="NOK">🇳🇴 Norwegian Krone (NOK)</option>
+  <option value="SGD">🇸🇬 Singapore Dollar (SGD)</option>
+  <option value="BRL">🇧🇷 Brazilian real (BRL)</option>
+  <!--<option value="DZD">🇩🇿 Algerian Dinar (DZD)</option>-->
+  <option value="NTD">🇹🇼 New Taiwan dollar (NTD)</option>
 </select>
 
 <ul>

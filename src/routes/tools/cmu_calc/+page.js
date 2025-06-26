@@ -168,6 +168,63 @@ export function load() {
     cmuPerCurrency: Math.round((pack.cmu / pack.price) * 100) / 100
     }));
 
+    // CMU cost in SGD (Singapore Dollar, $1)
+    const cmuSGD = [
+        { cmu: 2500, price: 2.98 },
+        { cmu: 7000, price: 6.98 },
+        { cmu: 15000, price: 14.98 },
+        { cmu: 32000, price: 28.98 },
+        { cmu: 90000, price: 68.98 },
+        { cmu: 200000, price: 148.98 }
+    ]
+    .map(pack => ({
+    ...pack,
+    cmuPerCurrency: Math.round((pack.cmu / pack.price) * 100) / 100
+    }));
+
+    // CMU cost in BRL (Brazilian Real, $1)
+    const cmuBRL = [
+        { cmu: 2500, price: 10.90 },
+        { cmu: 7000, price: 27.90 },
+        { cmu: 15000, price: 54.90 },
+        { cmu: 32000, price: 109.90 },
+        { cmu: 90000, price: 279.90 },
+        { cmu: 200000, price: 549.90 }
+    ]
+    .map(pack => ({
+    ...pack,
+    cmuPerCurrency: Math.round((pack.cmu / pack.price) * 100) / 100
+    }));
+
+    // CMU cost in DZD (Algerian dinar, $1)
+    const cmuDZD = [
+        { cmu: 2500, price: 10.90 },
+        { cmu: 7000, price: 27.90 },
+        { cmu: 15000, price: 54.90 },
+        { cmu: 32000, price: 109.90 },
+        { cmu: 90000, price: 279.90 },
+        { cmu: 200000, price: 549.90 }
+    ]
+    .map(pack => ({
+    ...pack,
+    cmuPerCurrency: Math.round((pack.cmu / pack.price) * 100) / 100
+    }));
+
+    // CMU cost in NTD (New Taiwan dollar, NT$1)
+    const cmuNTD = [
+        { cmu: 2500, price: 70.00 },
+        { cmu: 7000, price: 170.00 },
+        { cmu: 15000, price: 330.00 },
+        { cmu: 32000, price: 670.00 },
+        { cmu: 90000, price: 1690.00 },
+        { cmu: 200000, price: 3290.00 }
+    ]
+    .map(pack => ({
+    ...pack,
+    cmuPerCurrency: Math.round((pack.cmu / pack.price) * 100) / 100
+    }));
+
+
     // Packs by currency:
     const packsByCurrency = {
         EUR: cmuEUR,
@@ -181,7 +238,11 @@ export function load() {
         MXN: cmuMXN,
         SEK: cmuSEK,
         INR: cmuINR,
-        NOK: cmuNOK
+        NOK: cmuNOK,
+        SGD: cmuSGD,
+        BRL: cmuBRL,
+        DZD: cmuDZD,
+        NTD: cmuNTD
     };
 
     // Configure currency symbol, whether it should be before or after the number ($5 or 5€ for example) and locale (for correct seperators)
@@ -197,7 +258,11 @@ export function load() {
         MXN: { symbol: '$', symbolAfter: false, locale: "es-MX" },
         SEK: { symbol: ' kr', symbolAfter: true, locale: "sv-SE" },
         INR: { symbol: '₹ ', symbolAfter: false, locale: "en-IN" },
-        NOK: { symbol: ' kr', symbolAfter: true, locale: "nb-NO" }
+        NOK: { symbol: ' kr', symbolAfter: true, locale: "nb-NO" },
+        SGD: { symbol: '$', symbolAfter: false, locale: "en-SG" },
+        BRL: { symbol: 'R$', symbolAfter: false, locale: "pt-BR" },
+        DZD: { symbol: ' DA', symbolAfter: true, locale: "pt-BR" },
+        NTD: { symbol: 'NT$', symbolAfter: false, locale: "zh-TW" }
     };
 
 	return {
