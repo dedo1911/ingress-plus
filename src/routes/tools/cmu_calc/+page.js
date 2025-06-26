@@ -224,6 +224,34 @@ export function load() {
     cmuPerCurrency: Math.round((pack.cmu / pack.price) * 100) / 100
     }));
 
+    // CMU cost in NTD (New Taiwan dollar, NT$1)
+    const cmuPEN = [
+        { cmu: 2500, price: 6.90 },
+        { cmu: 7000, price: 17.90 },
+        { cmu: 15000, price: 37.90 },
+        { cmu: 32000, price: 74.90 },
+        { cmu: 90000, price: 189.90 },
+        { cmu: 200000, price: 379.90 }
+    ]
+    .map(pack => ({
+    ...pack,
+    cmuPerCurrency: Math.round((pack.cmu / pack.price) * 100) / 100
+    }));
+
+    // CMU cost in CNY (Chinese Yuan, ¥1)
+    const cmuCNY = [
+        { cmu: 2500, price: 12.00 },
+        { cmu: 7000, price: 30.00 },
+        { cmu: 15000, price: 68.00 },
+        { cmu: 32000, price: 128.00 },
+        { cmu: 90000, price: 328.00 },
+        { cmu: 200000, price: 648.00 }
+    ]
+    .map(pack => ({
+    ...pack,
+    cmuPerCurrency: Math.round((pack.cmu / pack.price) * 100) / 100
+    }));
+
 
     // Packs by currency:
     const packsByCurrency = {
@@ -242,7 +270,9 @@ export function load() {
         SGD: cmuSGD,
         BRL: cmuBRL,
         DZD: cmuDZD,
-        NTD: cmuNTD
+        NTD: cmuNTD,
+        PEN: cmuPEN,
+        CNY: cmuCNY
     };
 
     // Configure currency symbol, whether it should be before or after the number ($5 or 5€ for example) and locale (for correct seperators)
@@ -262,7 +292,9 @@ export function load() {
         SGD: { symbol: '$', symbolAfter: false, locale: "en-SG" },
         BRL: { symbol: 'R$', symbolAfter: false, locale: "pt-BR" },
         DZD: { symbol: ' DA', symbolAfter: true, locale: "pt-BR" },
-        NTD: { symbol: 'NT$', symbolAfter: false, locale: "zh-TW" }
+        NTD: { symbol: 'NT$', symbolAfter: false, locale: "zh-TW" },
+        PEN: { symbol: 'S/ ', symbolAfter: false, locale: "es-PE" },
+        CNY: { symbol: '¥', symbolAfter: false, locale: "zh-CN" }
     };
 
 	return {
