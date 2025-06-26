@@ -101,8 +101,6 @@
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <li class="tools {pathname.startsWith('/tools') ? 'active' : ''}"
-        onmouseenter={() => showSubTools = true}
-        onmouseleave={() => showSubTools = false}
         onclick={toggleSubTools}>
       <img src="/images/tools.svg" alt="Tools" /> Tools &triangledown;
       <ul class="submenu" class:visible={showSubTools}>
