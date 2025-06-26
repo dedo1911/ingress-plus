@@ -53,14 +53,16 @@
   <option value="NOK">🇳🇴 Norwegian Krone (NOK)</option>
   <option value="SGD">🇸🇬 Singapore Dollar (SGD)</option>
   <option value="BRL">🇧🇷 Brazilian real (BRL)</option>
-  <!--<option value="DZD">🇩🇿 Algerian Dinar (DZD)</option>-->
+  <!--<option value="DZD">🇩🇿 Algerian Dinar (DZD)</option>  | Algeria uses USD apparently-->
   <option value="NTD">🇹🇼 New Taiwan dollar (NTD)</option>
+  <option value="PEN">🇵🇪 Peruvian Sol (PEN)</option>
+  <option value="CNY">🇨🇳 Chinese Yuan (CNY)</option>
 </select>
 
 <ul>
   {#each selectedPacks as pack}
     <li>
-      {pack.cmu} CMU cost {formatPrice(pack.price, selectedCurrency)}, thats {pack.cmuPerCurrency} CMU/{currencyConfig[selectedCurrency].symbol}
+      {pack.cmu} CMU cost {formatPrice(pack.price, selectedCurrency)}, thats {pack.cmuPerCurrency} CMU / {currencyConfig[selectedCurrency].symbol}
     </li>
   {/each}
 </ul>
