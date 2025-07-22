@@ -116,6 +116,20 @@
               alt={e.category}
             />
             {e.categoryTitle}
+            {#if e.category == "paid_campaign" && e.cmu_cost} | 
+              <img
+                style="height:1em"
+                src="images/cmu.png"
+                alt="CMU Cost"
+              /> {e.cmu_cost} CMU
+            {/if}
+            {#if e.category == "battle_pass" && e.cmu_cost} | Upgrade Campaign for 
+              <img
+                style="height:1em"
+                src="images/cmu.png"
+                alt="CMU Cost"
+              /> {e.cmu_cost} CMU
+            {/if}
           </span>
           {#if e.end_time.isAfter(dayjs())}
             <span>
