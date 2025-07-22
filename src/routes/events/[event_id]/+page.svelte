@@ -76,14 +76,14 @@
         style="height:1em"
          src="../images/cmu.png"
          alt="CMU Cost"
-        /> {event.cmu_cost} CMU
+        /> {Intl.NumberFormat().format(event.cmu_cost)} CMU
     {/if}
     {#if event.category == "battle_pass" && event.cmu_cost} | Upgrade Campaign for 
       <img
         style="height:1em"
         src="../images/cmu.png"
         alt="CMU Cost"
-      /> {event.cmu_cost} CMU
+      /> {Intl.NumberFormat().format(event.cmu_cost)} CMU
     {/if}</p>
   <p class="center">
     {@html event.description}
