@@ -69,8 +69,22 @@
                  to <Time timestamp={event.end_time} format="MMMM D, YYYY [at] h:mm A" live />
              )</small>
          {/if}
-		 <br>
-		 <p class="center"><b><img style="height:1em;" src="../images/location.svg" alt="Location" /> {event.location}</b></p>
+    </p>
+		 <p class="center"><b><img style="height:1em;" src="../images/location.svg" alt="Location" /> {event.location}</b>
+    {#if event.category == "paid_campaign" && event.cmu_cost} | 
+      <img
+        style="height:1em"
+         src="../images/cmu.png"
+         alt="CMU Cost"
+        /> {event.cmu_cost} CMU
+    {/if}
+    {#if event.category == "battle_pass" && event.cmu_cost} | Upgrade Campaign for 
+      <img
+        style="height:1em"
+        src="../images/cmu.png"
+        alt="CMU Cost"
+      /> {event.cmu_cost} CMU
+    {/if}</p>
   <p class="center">
     {@html event.description}
   </p>
