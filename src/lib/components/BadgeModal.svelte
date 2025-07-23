@@ -10,12 +10,13 @@
     badge,
     tier,
     owned,
-    wingsOwned,
+    hasWings,
     title
   } = $props()
   let content = $state()
   let badgeData = $state()
   let Requirement = $state()
+  let wingsOwned = $state()
 
   const toggleOwned = async () => {
     if (!$authData.isValid) return
@@ -51,7 +52,7 @@
   }
 
   let ownedCounter = $state(0)
-  let ownedWingsCounter = $state(0)
+  let ownedWingsCounter = $state(1)
 
   const updateCounter = async () => {
     try {
@@ -121,7 +122,7 @@
         src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize * 2}x{$badgeSize * 2}"
         class="badge-image"
       />
-      {#if tier == 4}
+      {#if wingsOwned}
       <img
         height=auto
         width={($badgeSize + ($badgeSize * (57/100))) * 2}
@@ -162,7 +163,7 @@
     <div class="footer">
       {#if ownedCounter > 0 }
         <small transition:slide>{ownedCounter} {ownedCounter === 1 ? 'agent has' : 'agents have'} this badge!</small>
-        {#if badgeData.wings_possible && tier == 4 && ownedWingsCounter > 0 }
+        {#if hasWings && tier == 4 && ownedWingsCounter > 0 }
           <small transition:slide><img
                 style="height:1em"
                 src="images/badges/recursed_flair.png"

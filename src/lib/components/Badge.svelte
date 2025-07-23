@@ -23,6 +23,7 @@
     : false)
   const opaque = $derived($authData.isValid ? ($siteSettings.opaqueOwned ? owned : !owned) : false)
   const placeholder = $derived(badge?.hasPlaceholderData)
+  const hasWings = $derived(badge?.wings_possible)
 
   const onBadgeClick = () => (showModal = true)
   const onBadgeKeydown = (e) => {
@@ -45,7 +46,7 @@
       />
     {/if}
   </span>
-  <BadgeModal bind:showModal {badge} {tier} {owned} {title} />
+  <BadgeModal bind:showModal {badge} {tier} {owned} {title} {hasWings}/>
 {/if}
 
 <style>
