@@ -50,6 +50,7 @@
   }
 
   let ownedCounter = $state(0)
+  let ownedWingsCounter = $state(2)
 
   const updateCounter = async () => {
     try {
@@ -111,12 +112,22 @@
     {:else}
       <span>&nbsp;</span>
     {/if}
-    <img
-      height={$badgeSize * 2}
-      width={$badgeSize * 2}
-      alt={title}
-      src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize * 2}x{$badgeSize * 2}"
-    />
+    <div class="image-wrapper">
+      <img
+        height={$badgeSize * 2}
+        width={$badgeSize * 2}
+        alt={title}
+        src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize * 2}x{$badgeSize * 2}"
+        class="badge-image"
+      />
+      <img
+        height=auto
+        width={($badgeSize + ($badgeSize * (57/100))) * 2}
+        alt="Recursed badge"
+        src="images/badges/recursed_badge.png"
+        class="recursed-badge-image"
+      />
+    </div>
     <a title="Download" href="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?download=true">
       <img src="/images/download.svg" alt="Download" height="32" width="32" />
     </a>
@@ -148,6 +159,13 @@
     <div class="footer">
       {#if ownedCounter > 0 }
         <small transition:slide>{ownedCounter} {ownedCounter === 1 ? 'agent has' : 'agents have'} this badge!</small>
+        {#if badgeData.wings_possible && tier == 4 && ownedWingsCounter > 0 }
+          <small transition:slide><img
+                style="height:1em"
+                src="images/badges/recursed_flair.png"
+                alt="Recursion flair"
+              /> {ownedWingsCounter} of those agents {ownedWingsCounter === 1 ? 'has' : 'have'} earned wings for it!</small>
+        {/if}
       {/if}
       {#if (badgeData?.unlocks_at && dayjs(badgeData?.unlocks_at).isAfter(dayjs()))}
         <small transition:slide>Unlocks <Time timestamp={badgeData?.unlocks_at} relative live /></small>
@@ -193,10 +211,12 @@
   }
   div.footer {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-end;
     margin-top: 1em;
   }
   small {
+    display: block;
     color: #d1d1d1;
     text-align: right;
     width: 100%;
@@ -204,5 +224,22 @@
     right: 0;
     bottom: 0;
     font-size: small;
+  }
+  .image-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  .badge-image {
+    position: relative;
+    z-index: 2;
+    display: block;
+  }
+  .recursed-badge-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    pointer-events: none;
   }
 </style>
