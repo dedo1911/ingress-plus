@@ -10,6 +10,7 @@
     badge,
     tier,
     owned,
+    wingsOwned,
     title
   } = $props()
   let content = $state()
@@ -50,7 +51,7 @@
   }
 
   let ownedCounter = $state(0)
-  let ownedWingsCounter = $state(2)
+  let ownedWingsCounter = $state(0)
 
   const updateCounter = async () => {
     try {
@@ -120,6 +121,7 @@
         src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize * 2}x{$badgeSize * 2}"
         class="badge-image"
       />
+      {#if tier == 4}
       <img
         height=auto
         width={($badgeSize + ($badgeSize * (57/100))) * 2}
@@ -127,6 +129,7 @@
         src="images/badges/recursed_badge.png"
         class="recursed-badge-image"
       />
+      {/if}
     </div>
     <a title="Download" href="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?download=true">
       <img src="/images/download.svg" alt="Download" height="32" width="32" />
