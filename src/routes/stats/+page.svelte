@@ -1,5 +1,5 @@
 <script>
-  import Time from 'svelte-time'
+  import Time, { dayjs }  from 'svelte-time'
   import { serverAddress } from '$lib/pocketbase'
   import AgentName from '$lib/components/AgentName.svelte'
   import { formatNumber } from '$lib/utils.js'
@@ -19,6 +19,8 @@
 
 <div class="page">
   <h1>Statistics</h1>
+  <p><small>Last updated: {dayjs(statistics.updated).format('DD MMM YYYY HH:mm:ss')} 
+    (<Time relative live timestamp={statistics.updated} />)</small></p>
   <div class="stats">
     <div class="stat">
       <span>Total badges:</span>
@@ -138,5 +140,10 @@
     flex-wrap: nowrap;
     margin-bottom: 0.5rem;
     justify-content: space-between;
+  }
+  p {
+    text-align: center;
+    margin: 2em auto;
+    max-width: 800px;
   }
 </style>
