@@ -44,7 +44,7 @@
   <option value="CAD">🇨🇦 Canadian Dollar (CAD)</option>
   <option value="AUD">🇦🇺 Australian Dollar (AUD)</option>
   <option value="GBP">🇬🇧 British Pound (GBP)</option>
-  <option value="YPN">🇯🇵 Japanese Yen (YPN)</option>
+  <option value="JPY">🇯🇵 Japanese Yen (YPN)</option>
   <option value="NZD">🇳🇿 New Zealand Dollar (NZD)</option>
   <option value="TRY">🇹🇷 Turkish lira (TRY)</option>
   <option value="MXN">🇲🇽 Mexican Peso (MXN)</option>

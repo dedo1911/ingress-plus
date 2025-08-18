@@ -71,7 +71,7 @@ export function load() {
     }));
 
     // CMU cost in YPN (Japanese Yen, ¥1)
-    const cmuYPN = [
+    const cmuJPY = [
         { cmu: 2500, price: 320 },
         { cmu: 7000, price: 800 },
         { cmu: 15000, price: 1600 },
@@ -260,7 +260,7 @@ export function load() {
         CAD: cmuCAD,
         AUD: cmuAUD,
         GBP: cmuGBP,
-        YPN: cmuYPN,
+        JPY: cmuJPY,
         NZD: cmuNZD,
         TRY: cmuTRY,
         MXN: cmuMXN,
@@ -282,7 +282,7 @@ export function load() {
         CAD: { symbol: '$', symbolAfter: false, locale: "en-CA" },
         AUD: { symbol: '$', symbolAfter: false, locale: "en-AU" },
         GBP: { symbol: '£', symbolAfter: false, locale: "en-GB" },
-        YPN: { symbol: '¥', symbolAfter: false, locale: "ja-JP" },
+        JPY: { symbol: '¥', symbolAfter: false, locale: "ja-JP" },
         NZD: { symbol: '$', symbolAfter: false, locale: "en-NZ" },
         TRY: { symbol: '₺', symbolAfter: false, locale: "tr-TR" },
         MXN: { symbol: '$', symbolAfter: false, locale: "es-MX" },
