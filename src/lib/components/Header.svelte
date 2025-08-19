@@ -105,6 +105,7 @@
       <img src="/images/tools.svg" alt="Tools" /> Tools &triangledown;
       <ul class="submenu" class:visible={showSubTools}>
         <li><img src="/images/cmu.png" alt="CMU icon" /><a href="/tools/cmu_calc">CMU Calculator</a></li>
+        <li><img src="/images/portal_key.png" alt="Portal Key" /><a href="/tools/nl1331keys">NL1331 Key Tracker</a></li>
         <li><img src="/images/resources.svg" alt="Tools" /><a href="/tools/resources">Resources</a></li>
       </ul>
     </li>
