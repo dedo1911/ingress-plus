@@ -1,5 +1,5 @@
 # Build stage
-FROM node:lts-jod AS build
+FROM node:24 AS build
 
 WORKDIR /ingress-plus
 COPY package.json .
