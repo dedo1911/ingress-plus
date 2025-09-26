@@ -15,7 +15,10 @@
   let totalPages = $state(1)
   let totalItems = $state(1)
   const itemsPerPage = 5
-  let shownEvents = $derived(eventsList.slice((page - 1) * itemsPerPage, page * itemsPerPage))
+
+  const toggleShowAll = () => {
+    showAll = !showAll;
+  }
 
   const prevPage = () => {
     if (page <= 1) return
@@ -82,8 +85,8 @@
 
       return e
     })
-
-    eventsList = [
+  }
+  let filteredList = $derived([
       ...eventsList
         .filter(e => e.is_active)
         .sort((a, b) => a.end_time.valueOf() - b.end_time.valueOf()),
@@ -93,12 +96,9 @@
       ...eventsList
         .filter(e => !e.is_active &&dayjs().isAfter(e.start_time))
         .sort((a, b) => b.end_time.valueOf() - a.end_time.valueOf())
-    ]
+    ].filter(e => showAll || !e.homepage_hidden))
 
-    if (!showAll) {
-      eventsList = eventsList.filter(e => !e.homepage_hidden)
-    }
-  }
+  let shownEvents = $derived(filteredList.slice((page - 1) * itemsPerPage, page * itemsPerPage))
 
   onMount(loadData)
 </script>
