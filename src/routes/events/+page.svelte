@@ -15,33 +15,26 @@
   let totalPages = $state(1)
   let totalItems = $state(1)
   const itemsPerPage = 5
-
-  const toggleShowAll = () => {
-    showAll = !showAll
-    loadData()
-  }
+  let shownEvents = $derived(eventsList.slice((page - 1) * itemsPerPage, page * itemsPerPage))
 
   const prevPage = () => {
     if (page <= 1) return
     page--
-    loadData()
   }
 
   const nextPage = () => {
     if (page >= totalPages) return
     page++
-    loadData()
   }
 
   const loadData = async () => {
     const userTZ = dayjs.tz.guess() || "UTC"
-    const options = {
-      filter: showAll ? "" : "homepage_hidden=false",
-    }
-    const r = await pb.collection("game_events_list").getList(page, itemsPerPage, options)
-    totalPages = r.totalPages
-    totalItems = r.totalItems
-    eventsList = r.items.map((e) => {
+    const r = await pb.collection("game_events_list").getFullList({
+
+    })
+    totalPages = Math.ceil(r.length / itemsPerPage)
+    totalItems = r.length
+    eventsList = r.map((e) => {
       const isLocal = e.time_type === "local"
       e = {
         ...e,
@@ -89,6 +82,22 @@
 
       return e
     })
+
+    eventsList = [
+      ...eventsList
+        .filter(e => e.is_active)
+        .sort((a, b) => a.end_time.valueOf() - b.end_time.valueOf()),
+      ...eventsList
+        .filter(e => !e.is_active && dayjs().isBefore(e.start_time))
+        .sort((a, b) => a.start_time.valueOf() - b.start_time.valueOf()),
+      ...eventsList
+        .filter(e => !e.is_active &&dayjs().isAfter(e.start_time))
+        .sort((a, b) => b.end_time.valueOf() - a.end_time.valueOf())
+    ]
+
+    if (!showAll) {
+      eventsList = eventsList.filter(e => !e.homepage_hidden)
+    }
   }
 
   onMount(loadData)
@@ -179,7 +188,7 @@
 {/snippet}
 
 <div class="container">
-  {#each eventsList as event (event.id)}
+  {#each shownEvents as event (event.id)}
     {@render eventRow(event)}
   {/each}
   <div class="paginator">
