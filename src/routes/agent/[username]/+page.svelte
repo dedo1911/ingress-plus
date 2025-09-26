@@ -26,10 +26,10 @@
     badgeSize.set(Math.min(128, width / 7))
   })
 
-  const ScannerLink = `https://link.ingress.com/?link=https%3A%2F%2Fintel.ingress.com%2Fagent%2F${encodeURIComponent(publicUser?.username)}&apn=com.nianticproject.ingress&isi=576505181&ibi=com.google.ingress&ifl=https%3A%2F%2Fapps.apple.com%2Fapp%2Fingress%2Fid576505181&ofl=https%3A%2F%2Fingress.com%2F`;
+  const ScannerLink = $derived(`https://link.ingress.com/agent/${encodeURIComponent(publicUser?.username)}`);
 
   // Hide link to scanner profile if user has default username
-  const hideLink = /^(users\d{5}|Agent_\d{6})$/.test(publicUser?.username);
+  const hideLink = $derived(/^(users\d{5}|Agent_\d{6})$/.test(publicUser?.username));
 </script>
 
 <svelte:head>
