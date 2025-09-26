@@ -11,7 +11,7 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-node": "5.3.2",
-		"@sveltejs/kit": "2.43.5",
+		"@sveltejs/kit": "2.19.0",
 		"@sveltejs/vite-plugin-svelte": "6.2.1",
 		"@zerodevx/svelte-toast": "0.9.6",
 		"carta-md": "4.11.1",
