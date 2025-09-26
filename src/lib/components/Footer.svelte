@@ -1,8 +1,8 @@
 <footer>
   <p>
     If you like this website consider buying us a
-    <a href="https://ko-fi.com/dedo1911" target="_blank"
-      ><img src="/images/kofi.png" alt="Ko-fi" /> Ko-fi
+    <a href="https://ko-fi.com/dedo1911" target="_blank">
+      <img class="icon" src="/images/kofi.png" alt="Ko-fi" /> Ko-fi
     </a>
     to support this project.
   </p>
@@ -16,17 +16,22 @@
     <a href="/privacy">Privacy policy</a>
   </p>
   <p class="small">
-    Made with <img src="/images/heart.svg" alt="Love" /> using
-    <a href="https://svelte.dev" target="_blank"
-      ><img src="/images/svelte.svg" alt="Svelte" /> Svelte
+    Made with <img class="icon" src="/images/heart.svg" alt="Love" /> using
+    <a href="https://svelte.dev" target="_blank">
+      <img class="icon" src="/images/svelte.svg" alt="Svelte" /> Svelte
     </a>
     and
-    <a href="https://pocketbase.io" target="_blank"
-      ><img src="/images/pocketbase.svg" alt="PocketBase" /> PocketBase
+    <a href="https://pocketbase.io" target="_blank">
+      <img class="icon" src="/images/pocketbase.svg" alt="PocketBase" /> PocketBase
     </a>
     &mdash;
-    <a href="https://github.com/dedo1911/ingress-plus" target="_blank"
-      ><img src="/images/github.svg" alt="GitHub" /> Contribute
+    <a href="https://github.com/dedo1911/ingress-plus" target="_blank">
+      <img class="icon" src="/images/github.svg" alt="GitHub" /> Contribute
+    </a>
+  </p>
+  <p>
+    <a href="https://www.thegreenwebfoundation.org/green-web-check/?url=ingress.plus" target="_blank" rel="nofollow noopener">
+      <img src="/images/greenhost.png" alt="This website runs on green hosting - verified by thegreenwebfoundation.org" />
     </a>
   </p>
 </footer>
@@ -45,7 +50,7 @@
   p.small {
     font-size: small;
   }
-  img {
+  img.icon {
     height: 1.25em;
     vertical-align: sub;
     margin: 0 0.25em;
