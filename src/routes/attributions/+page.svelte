@@ -1,6 +1,7 @@
 <svelte:head>
     <title>Ingress Plus &middot; Attributions</title>
 </svelte:head>
+
 <div>
 
     <h2><img src="/images/user-search.svg" alt="User search icon" />Attributions</h2>
@@ -24,10 +25,10 @@
             <a href="https://pocketbase.io" target="_blank"
               ><img src="/images/pocketbase.svg" alt="PocketBase" /> PocketBase
             </a>
+        </li>
      </ul>
-
-
 </div>
+
 <style>
   div {
     max-width: 1000px;
