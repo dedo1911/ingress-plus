@@ -9,7 +9,7 @@
         Ingress Plus is a fan site for the Niantic game <a
             target="_blank"
             rel="noopener noreferrer"
-            href="https://www.ingress.com">Ingress Prime</a
+            href="https://www.ingress.com">Ingress</a
         >. Users of this site can create a profile with badges they own in the game
         to share, submit Ingress media and check what Events are currently ongoing
 		or planned.
