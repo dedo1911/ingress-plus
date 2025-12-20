@@ -3,6 +3,7 @@
   import Time, { dayjs } from 'svelte-time'
   import utc from 'dayjs/plugin/utc'
   import timezone from 'dayjs/plugin/timezone'
+  import 'add-to-calendar-button'
 
   dayjs.extend(utc)
   dayjs.extend(timezone)
@@ -21,6 +22,13 @@
       ? dayjs(data.event.end_time.substring(0, 19)).tz(userTZ)
       : dayjs(data.event.end_time)
   }
+
+  // We can call .format() directly because event.start_time is now a DayJS object
+  event.cal_start_date = event.start_time.format('YYYY-MM-DD')
+  event.cal_start_time = event.start_time.format('HH:mm')
+  event.cal_end_date   = event.end_time.format('YYYY-MM-DD')
+  event.cal_end_time   = event.end_time.format('HH:mm')
+  event.cal_timezone   = userTZ
   
   if (data.event.image == '') {
 	event.image = `../images/events/${event.category}.png`}
@@ -47,7 +55,23 @@
 <div class="container">
   <h1>{event.title}</h1>
   <p class="center">
-    <img src="{event.image}" alt={event.title} />
+    <img src="{event.image}" alt={event.title} /><br>
+    <add-to-calendar-button
+      name={event.title}
+      description={event.description}
+      location={event.location}
+      startDate={event.cal_start_date}
+      endDate={event.cal_end_date}
+      startTime={event.cal_start_time}
+      endTime={event.cal_end_time}
+      timeZone={event.cal_timezone}
+      options="'Apple','Google','iCal'"
+      lightMode="dark"
+      listStyle="modal"
+      hideBranding=true
+      label="Add {event.title} to Calendar"
+      debug
+    />
   </p>
   <p class="center">
       {#if event.start_time.isAfter(dayjs())}
@@ -84,7 +108,8 @@
         src="../images/cmu.png"
         alt="CMU Cost"
       /> {Intl.NumberFormat().format(event.cmu_cost)} CMU
-    {/if}</p>
+    {/if}
+  </p>
   <p class="center">
     {@html event.description}
   </p>
@@ -112,6 +137,8 @@
     height: auto;
   }
   p.center {
-    text-align: center;
+    display: flex;
+    flex-direction: column; /* Stacks image and button vertically */
+    align-items: center;    /* Centers them horizontally */
   }
 </style>

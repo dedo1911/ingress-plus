@@ -1,10 +1,10 @@
 <script>
   import { onMount } from "svelte"
   import { pb, serverAddress } from "$lib/pocketbase"
-  import { addToCalendar } from "$lib/utils.js"
   import Time, { dayjs } from "svelte-time"
   import utc from "dayjs/plugin/utc"
   import timezone from "dayjs/plugin/timezone"
+  import 'add-to-calendar-button'
 
   dayjs.extend(utc)
   dayjs.extend(timezone)
@@ -48,6 +48,12 @@
           ? dayjs(e.end_time.substring(0, 19)).tz(userTZ)
           : dayjs(e.end_time),
       }
+
+      e.cal_start_date = e.start_time.format('YYYY-MM-DD');
+      e.cal_start_time = e.start_time.format('HH:mm');
+      e.cal_end_date   = e.end_time.format('YYYY-MM-DD');
+      e.cal_end_time   = e.end_time.format('HH:mm');
+      e.cal_timezone   = userTZ; 
 
       e.is_active = dayjs().isAfter(e.start_time) && dayjs().isBefore(e.end_time)
 
@@ -99,7 +105,7 @@
     ].filter(e => showAll || !e.homepage_hidden))
 
   let shownEvents = $derived(filteredList.slice((page - 1) * itemsPerPage, page * itemsPerPage))
-
+  
   onMount(loadData)
 </script>
 
@@ -142,21 +148,23 @@
           </span>
           {#if e.end_time.isAfter(dayjs())}
             <span>
-              <a href={`#event${e.id}`}
-                onclick={addToCalendar({
-                  title: e.title,
-                  description: e.description,
-                  startTime: e.start_time,
-                  endTime: e.end_time,
-                  location: e.location,
-                })} >
-                Add to Calendar
-                <img
-                  style="height:1em"
-                  src="images/add_to_calendar.svg"
-                  alt="Add to Calendar"
-                />
-              </a>
+              <!-- svelte-ignore element_invalid_self_closing_tag -->
+              <add-to-calendar-button
+                name={e.title}
+                description={e.description}
+                location={e.location}
+                startDate={e.cal_start_date}
+                endDate={e.cal_end_date}
+                startTime={e.cal_start_time}
+                endTime={e.cal_end_time}
+                timeZone={e.cal_timezone}
+                options="'Apple','Google','iCal'"
+                lightMode="dark"
+                listStyle="modal"
+                hideBranding=true
+                hideTextLabelButton
+                debug
+              />
             </span>
           {/if}
         </div>
