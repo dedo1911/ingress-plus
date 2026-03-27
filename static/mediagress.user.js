@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name IITC Plugin: Mediagress
 // @category Misc
-// @version 1.0.5
+// @version 1.0.6
 // @namespace https://ingress.plus
 // @downloadURL https://ingress.plus/mediagress.user.js
 // @updateURL https://ingress.plus/mediagress.user.js
@@ -15,6 +15,9 @@
 // @grant none
 // ==/UserScript==
 
+//
+//  Changelog 1.0.6
+//    Updated upload confirmation to list names of newly discovered media
 //
 //  Changelog 1.0.5
 //    Added time remaining before you can upload again if you try within 5 minutes of a prior upload
@@ -249,7 +252,7 @@ function removeUploadingOverlay() {
       if (!rawInventory || !Array.isArray(rawInventory.result) || rawInventory.result.length === 0) {
         console.warn('[Mediagress] Inventory response was empty:', rawInventory);
         window.alert(`We have received an empty inventory from Intel. This sometimes happens if:\n\n
-          - You have been rate limited by trying to access your inventory too often \(via other plugins, for example\)\n
+          - You have been rate limited by trying to access your inventory too often \(including via other plugins, for example\)\n
           - Your C.O.R.E. subscription recently expired\n
           - Intel is having sync issues\n
           - Ingress is currently experiencing server issues\n
@@ -280,7 +283,7 @@ function removeUploadingOverlay() {
         return
       }
 
-      const response = await fetch(`${host}/api/mediagress/v1/upload-media`, {
+      const response = await fetch(`${host}/api/mediagress/v2/upload-media`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json'
@@ -288,13 +291,28 @@ function removeUploadingOverlay() {
         body: JSON.stringify({ medias: filteredMedia, player: PLAYER })
       })
 
+      // Response: {"firstTimeUserUploadCount":0,"newMediaTitles":null,"previouslyUnknownMediaCount":0}
+
       if (response.ok) {
         const responseBody = await response.json()
-        if (responseBody.previouslyUnknownMediaCount) {
-          window.alert(`${filteredMedia.length} media have been uploaded, and ${responseBody.previouslyUnknownMediaCount} were new! Please give us some time to approve and categorize them before they appear on the website.`)
-        } else {
-          window.alert(`${filteredMedia.length} media have been uploaded. Sadly, none of them were new, but we thank you for your contribution none the less!`)
+        let messageLines = []
+
+        if (responseBody.newMediaTitles && Array.isArray(responseBody.newMediaTitles) && responseBody.newMediaTitles.length > 0) {
+          messageLines.push(`You have discovered ${responseBody.firstTimeUserUploadCount} new Media:`)
+          responseBody.newMediaTitles.forEach(title => {
+            messageLines.push(`- ${title}`)
+          })
+          messageLines.push('') // Spacer
         }
+
+        if (responseBody.previouslyUnknownMediaCount) {
+          messageLines.push(`${filteredMedia.length} media have been uploaded, and ${responseBody.previouslyUnknownMediaCount} were new to Mediagress! They are now visible in the databank. Thank you!`)
+        } else {
+          messageLines.push(`${filteredMedia.length} media have been uploaded. Sadly, none of them were new to Mediagress, but we thank you for your contribution none the less!`)
+        }
+
+        window.alert(messageLines.join('\n'))
+
         saveSettings({
           uploadedIds: [...uploadedIds.flat(), ...filteredMedia.map(item => item.storyItem.mediaId)],
           lastUploadTimestamp: Date.now()
