@@ -173,7 +173,8 @@
     text-shadow: 0 0 10px black;
   }
   div.category-section div.badges {
-    margin-top: 0;
+    width: fit-content;
+    margin: 0 auto;
   }
   div.category-section div.badges div:first-child {
     margin-top: 0;
@@ -181,6 +182,6 @@
   hr {
     border: none;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    margin: 1em 0;
+    margin: 1em auto;
   }
 </style>
