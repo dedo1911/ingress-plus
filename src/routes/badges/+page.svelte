@@ -1,5 +1,6 @@
 <script>
-  import { fly } from 'svelte/transition'
+  import { fly, slide } from 'svelte/transition'
+  import { tick } from 'svelte'
   import { categories, badgeSize, siteSettings, authData } from '$lib/stores'
   import Category from '$lib/components/Category.svelte'
   import { onMount } from 'svelte'
@@ -9,10 +10,32 @@
     badgeSize.set(Math.min(128, width / 7))
   })
 
-  const badgeCategories = $derived($categories.map(c => ({
-    ...c,
-    badges: c.badges.filter(b => $siteSettings.showUnobtainable ? true : !b.unobtainable)
-  })))
+  let searchQuery = $state('')
+  let showSearch = $state(false)
+  let searchInput = $state(null)
+
+  const toggleSearch = async () => {
+    showSearch = !showSearch
+    if (!showSearch) {
+      searchQuery = ''
+    } else {
+      await tick()
+      searchInput?.focus()
+    }
+  }
+
+  const badgeCategories = $derived(
+    $categories
+      .map(c => ({
+        ...c,
+        badges: c.badges.filter(b => {
+          if (!$siteSettings.showUnobtainable && b.unobtainable) return false
+          if (searchQuery && !b.title.toLowerCase().includes(searchQuery.toLowerCase())) return false
+          return true
+        })
+      }))
+      .filter(c => c.badges.length > 0)
+  )
 
   const toggleSiteSettings = (name) => {
     return () => {
@@ -50,15 +73,31 @@
 
 <section bind:clientWidth={width}>
     <div class="controls">
-      <button onclick={toggleSiteSettings('showUnobtainable')}>
-        <img src={`/images/${$siteSettings.showUnobtainable ? 'hide' : 'show'}.svg`} height="24" alt="Show unobtainable badges" />
-        {$siteSettings.showUnobtainable ? 'Hide' : 'Show'} unobtainable badges
-      </button>
-      {#if $authData.isValid === true}
-        <button onclick={toggleSiteSettings('opaqueOwned')} transition:fly={{ x: 50, duration: 500 }}>
-          <img src="/images/shuffle.svg" height="24" alt="Invert highlights" />
-          Highlight {$siteSettings.opaqueOwned ? 'obtained' : 'unobtained'}
+      <div class="buttons">
+        <button onclick={toggleSearch} class:active={showSearch}>
+          <img src="/images/glasses.svg" height="24" alt="Search badges" />
+          Search
         </button>
+        <button onclick={toggleSiteSettings('showUnobtainable')}>
+          <img src={`/images/${$siteSettings.showUnobtainable ? 'hide' : 'show'}.svg`} height="24" alt="Show unobtainable badges" />
+          {$siteSettings.showUnobtainable ? 'Hide' : 'Show'} unobtainable
+        </button>
+        {#if $authData.isValid === true}
+          <button onclick={toggleSiteSettings('opaqueOwned')} transition:fly={{ x: 50, duration: 500 }}>
+            <img src="/images/shuffle.svg" height="24" alt="Invert highlights" />
+            Highlight {$siteSettings.opaqueOwned ? 'obtained' : 'unobtained'}
+          </button>
+        {/if}
+      </div>
+      {#if showSearch}
+        <div class="search-bar" transition:slide={{ duration: 250 }}>
+          <input
+            bind:this={searchInput}
+            type="search"
+            placeholder="Search badges…"
+            bind:value={searchQuery}
+          />
+        </div>
       {/if}
     </div>
 
@@ -77,10 +116,15 @@
   }
   div.controls {
     display: flex;
+    flex-direction: column;
     margin: 1em;
-    justify-content: flex-end;
   }
-  div.controls button {
+  div.buttons {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+  div.buttons button {
     background: none;
     border: none;
     cursor: pointer;
@@ -91,11 +135,38 @@
     align-items: center;
     border-bottom: 1px solid rgba(255, 255, 255, 0);
     transition: border 0.3s ease-in-out;
+    white-space: nowrap;
   }
-  div.controls button img {
+  div.buttons button img {
     margin-right: 0.5em;
   }
-  div.controls button:hover {
+  div.buttons button:hover,
+  div.buttons button.active {
     border-bottom: 1px solid rgba(255, 255, 255, 1);
+  }
+  div.search-bar {
+    width: 100%;
+  }
+  div.search-bar input[type="search"] {
+    width: 100%;
+    box-sizing: border-box;
+    background: none;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    font-size: 1em;
+    padding: 0.4em 0.2em;
+    outline: none;
+    transition: border 0.3s ease-in-out;
+  }
+  div.search-bar input[type="search"]:focus {
+    border-bottom-color: rgba(255, 255, 255, 1);
+  }
+  div.search-bar input[type="search"]::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+  div.search-bar :global(input[type="search"]::-webkit-search-cancel-button) {
+    filter: invert(1);
+    cursor: pointer;
   }
 </style>
