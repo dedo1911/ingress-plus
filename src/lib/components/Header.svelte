@@ -3,13 +3,14 @@
   import { slide } from 'svelte/transition'
 
   import { afterNavigate } from '$app/navigation'
+  import { resolve } from '$app/paths'
   import { pb } from '$lib/pocketbase'
   import { authData, ownedBadges } from '$lib/stores'
 
   let menuOpen = $state(false)
   let pathname = $state('/')
 
-  const toggleMenu = () => (menuOpen = !menuOpen)
+  const toggleMenu = () => { menuOpen = !menuOpen }
 
   const login = async () => {
     menuOpen = false
@@ -66,25 +67,25 @@
 {#snippet menu()}
   <ul transition:slide>
     {#if $authData.isValid }
-      <a href="/agent">
+      <a href={resolve('/agent')}>
         <li class="{pathname === '/agent' ? 'active' : '{$authData.model.username}'}">
           <img src="{$authData?.baseModel?.avatar.slice(0, -6)}" alt={$authData.baseModel.username}
-            onerror={() => this.src='/images/user.svg'} />
+            onerror={() => { this.src = '/images/user.svg' }} />
           {$authData.baseModel.username}
         </li>
       </a>
     {/if}
-    <a href="/badges">
+    <a href={resolve('/badges')}>
       <li class="{pathname === '/badges' ? 'active' : ''}">
         <img src="/images/medal.svg" alt="Badges" /> Badges
       </li>
     </a>
-    <a href="/media">
+    <a href={resolve('/media')}>
       <li class="{pathname === '/media' ? 'active' : ''}">
         <img src="/images/mediagress.png" alt="Mediagress" /> Mediagress
       </li>
     </a>
-    <a href="/events">
+    <a href={resolve('/events')}>
       <li class="{pathname === '/events' ? 'active' : ''}">
         <img src="/images/event.svg" alt="Events" /> Events
       </li>
@@ -96,12 +97,12 @@
       </li>
     </a>
     -->
-    <a href="/resources">
+    <a href={resolve('/resources')}>
       <li class="{pathname === '/resources' ? 'active' : ''}">
         <img src="/images/resources.svg" alt="Resources" /> Resources
       </li>
     </a>
-    <a href="/stats">
+    <a href={resolve('/stats')}>
       <li class="{pathname === '/stats' ? 'active' : ''}">
         <img src="/images/statistics.svg" alt="Statistics" /> Statistics
       </li>
@@ -127,7 +128,7 @@
 
 <header>
   <div>
-    <a href="/">
+    <a href={resolve('/')}>
       <img src='/images/favicon.png' alt='Ingress Plus' height="75" width="75" />
       <h1>Ingress Plus</h1>
     </a>

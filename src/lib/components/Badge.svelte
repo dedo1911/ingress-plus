@@ -3,7 +3,7 @@
   import { authData, ownedBadges, badgeSize, siteSettings } from '$lib/stores'
   import BadgeModal from '$lib/components/BadgeModal.svelte'
 
-  let { category, index } = $props()
+  const { category, index } = $props()
 
   const thumbSize = (badgeSize) => {
     if (badgeSize <= 64) return '96x96'
@@ -12,7 +12,7 @@
   }
 
   let showModal = $state(false)
-  
+
   const tiers = $derived(category.tiers.split(',').filter(t => t))
   const hasTiers = $derived(tiers.length > 0)
   const badge = $derived(category.badges[hasTiers ? Math.floor(index / tiers.length) : index])

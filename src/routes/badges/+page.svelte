@@ -62,7 +62,7 @@
       {/if}
     </div>
 
-  {#each badgeCategories as category}
+  {#each badgeCategories as category (category.id)}
     {#if category.badges.length > 0 }
       <Category {width} {category} />
     {/if}

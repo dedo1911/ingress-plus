@@ -1,3 +1,7 @@
+<script>
+  import { resolve } from '$app/paths'
+</script>
+
 <svelte:head>
     <title>Ingress Plus</title>
 </svelte:head>
@@ -12,32 +16,32 @@
             href="https://www.ingress.com">Ingress</a
         >. Users of this site can create a profile with badges they own in the game
         to share, submit Ingress media and check what Events are currently ongoing
-		or planned.
+        or planned.
         <i>We are not affiliated with Ingress or Niantic Spatial, Inc.</i>
     </p>
 
-    <a class="hero hero-right" href="/events">
-        <div style={"background-image: url('/images/homepage/cat_events.png');"}>
+    <a class="hero hero-right" href={resolve('/events')}>
+        <div style="background-image: url('/images/homepage/cat_events.png');">
             <p><img src="/images/event.svg" alt="Events" /> Events</p>
         </div>
     </a>
-    <a class="hero hero-left" href="/badges">
-        <div style={"background-image: url('/images/homepage/cat_badges.png');"}>
+    <a class="hero hero-left" href={resolve('/badges')}>
+        <div style="background-image: url('/images/homepage/cat_badges.png');">
             <p><img src="/images/medal.svg" alt="Badges" /> Badges</p>
         </div>
     </a>
-    <a class="hero hero-right" href="/media">
-        <div style={"background-image: url('/images/homepage/cat_mediagress.jpg');"}>
+    <a class="hero hero-right" href={resolve('/media')}>
+        <div style="background-image: url('/images/homepage/cat_mediagress.jpg');">
             <p><img src="/images/mediagress.png" alt="Mediagress" /> Mediagress</p>
         </div>
     </a>
-    <a class="hero hero-left" href="/bugs">
-        <div style={"background-image: url('/images/homepage/cat_bug_tracker.jpg');"}>
+    <a class="hero hero-left" href={resolve('/bugs')}>
+        <div style="background-image: url('/images/homepage/cat_bug_tracker.jpg');">
             <p><img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker</p>
         </div>
     </a>
-    <a class="hero hero-right" href="/resources">
-        <div style={"background-image: url('/images/homepage/cat_resources.jpg');"}>
+    <a class="hero hero-right" href={resolve('/resources')}>
+        <div style="background-image: url('/images/homepage/cat_resources.jpg');">
             <p><img src="/images/resources.svg" alt="Resources" /> Resources</p>
         </div>
     </a>
