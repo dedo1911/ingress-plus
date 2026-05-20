@@ -1,6 +1,5 @@
 <script>
   import { slide } from 'svelte/transition'
-  import { resolve } from '$app/paths'
   import { pb, serverAddress } from '$lib/pocketbase'
   import { authData, ownedBadges, badgeSize } from '$lib/stores'
   import Modal from '$lib/components/Modal.svelte'
@@ -181,7 +180,7 @@
       />
       {/if}
     </div>
-    <a title="Download" href={resolve(`${serverAddress}/api/files/${badge.collectionId}/${badge.id}/${badge.image[tier]}?download=true`)}>
+    <a title="Download" href="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?download=true">
       <img src="/images/download.svg" alt="Download" height="32" width="32" />
     </a>
   </header>
