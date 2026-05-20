@@ -1,10 +1,11 @@
 <script>
-  import Time from 'svelte-time'
+  import Time, { dayjs } from 'svelte-time'
+  import { resolve } from '$app/paths'
   import { serverAddress } from '$lib/pocketbase'
   import AgentName from '$lib/components/AgentName.svelte'
   import { formatNumber } from '$lib/utils.js'
 
-  let { data } = $props()
+  const { data } = $props()
   const s = $derived(data.statistics)
   const statistics = $derived(s[0][0])
   const topBadges = $derived(s[1].items)
@@ -19,6 +20,8 @@
 
 <div class="page">
   <h1>Statistics</h1>
+  <p><small>Last updated: {dayjs(statistics.updated).format('DD MMM YYYY HH:mm:ss')}
+    (<Time relative live timestamp={statistics.updated} />)</small></p>
   <div class="stats">
     <div class="stat">
       <span>Total badges:</span>
@@ -60,7 +63,7 @@
   <hr />
   <h2>Agents with the most badges<br /><small>(public profiles only)</small></h2>
   <div class="users">
-      {#each topUsers as topUser}
+      {#each topUsers as topUser (topUser.username)}
         <div class="user">
           <AgentName user={{ username: topUser.username, faction: topUser.faction, public: true }} />
           {formatNumber(topUser.count)}
@@ -70,7 +73,7 @@
   <hr />
   <h2>Most Owned Badges</h2>
   <div class="badges">
-    {#each topBadges as badge}
+    {#each topBadges as badge (badge.id)}
       <div class="badge">
         <span>
           <img height="32" width="32" alt="{badge.expand.badge.title}"
@@ -84,7 +87,7 @@
   <hr />
   <h2>Agents that have discovered the most media<br /><small>(public profiles only)</small></h2>
   <div class="users">
-    {#each topMediaUsers as topUser}
+    {#each topMediaUsers as topUser (topUser.username)}
       <div class="user">
         <AgentName user={{ username: topUser.username, faction: topUser.faction, public: true }} />
         {formatNumber(topUser.count)}
@@ -94,9 +97,9 @@
   <hr />
   <h2>Most uploaded media</h2>
   <div class="medias">
-    {#each topMediaUploads as topMedia}
+    {#each topMediaUploads as topMedia (topMedia.media_url_id)}
       <div class="media">
-        <a href="/media/{topMedia.media_url_id}">
+        <a href={resolve(`/media/${topMedia.media_url_id}`)}>
           <img src={topMedia.image_url.replace('http://', 'https://')} height="32" alt={topMedia.short_description} />
           {topMedia.short_description}
         </a>
@@ -138,5 +141,10 @@
     flex-wrap: nowrap;
     margin-bottom: 0.5rem;
     justify-content: space-between;
+  }
+  p {
+    text-align: center;
+    margin: 2em auto;
+    max-width: 800px;
   }
 </style>

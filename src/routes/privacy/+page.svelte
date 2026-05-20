@@ -6,9 +6,9 @@
   <h1>Privacy Policy for Ingress Plus</h1>
     <p><em>Effective date: July 8th, 2025</em></p>
 
-    <p>Welcome, Agent, to Ingress Plus! This project was created to support the Ingress community and enhance your experience in the field. 
-    We take your privacy seriously. This Privacy Policy explains what information we collect, how we use it, 
-    and what choices you have about your data. We aim to be transparent so you can use Ingress Plus without worries. 
+    <p>Welcome, Agent, to Ingress Plus! This project was created to support the Ingress community and enhance your experience in the field.
+    We take your privacy seriously. This Privacy Policy explains what information we collect, how we use it,
+    and what choices you have about your data. We aim to be transparent so you can use Ingress Plus without worries.
     By using Ingress Plus or its related plugins, you agree to this Privacy Policy. Thank you for being part of the community — see you out there!</p>
 
     <h2>1. Personal Data Collected</h2>

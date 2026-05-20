@@ -1,16 +1,17 @@
 <script>
-  import { toast } from "@zerodevx/svelte-toast"
-  import { Carta, MarkdownEditor } from "carta-md"
-  import DOMPurify from "isomorphic-dompurify"
-  import { pb } from "$lib/pocketbase"
-  import { goto } from "$app/navigation"
+  import { toast } from '@zerodevx/svelte-toast'
+  import { Carta, MarkdownEditor } from 'carta-md'
+  import DOMPurify from 'isomorphic-dompurify'
+  import { pb } from '$lib/pocketbase'
+  import { goto } from '$app/navigation'
+  import { resolve } from '$app/paths'
   import { browser } from '$app/environment'
-  import { authData } from "$lib/stores"
+  import { authData } from '$lib/stores'
 
-  let title = $state("")
-  let ingressVersion = $state("")
-  let description = $state("")
-  let ReproductionSteps = $state("")
+  let title = $state('')
+  let ingressVersion = $state('')
+  let description = $state('')
+  let ReproductionSteps = $state('')
   let attachments = $state()
 
   const carta = new Carta({
@@ -18,46 +19,46 @@
   })
 
   $effect(() => {
-    if (browser && $authData.isValid !== true) goto("/bugs")
+    if (browser && $authData.isValid !== true) goto(resolve('/bugs'))
   })
 
   const publishReport = async () => {
-    //Title lengh validation
+    // Title lengh validation
     if (title.length < 3) {
-      toast.push("Title needs to be at least 3 characters long", {
-        classes: ["errorToast"],
+      toast.push('Title needs to be at least 3 characters long', {
+        classes: ['errorToast'],
       })
       return
     }
     if (title.length > 256) {
-      toast.push("Title needs to be less than 256 characters long", {
-        classes: ["errorToast"],
+      toast.push('Title needs to be less than 256 characters long', {
+        classes: ['errorToast'],
       })
       return
     }
 
-    //Ingress version validation
+    // Ingress version validation
     if (
       ingressVersion.length > 0 &&
       !/\b\d+\.\d+\.\d+\b/.test(ingressVersion)
     ) {
       toast.push('Ingress version needs to follow the format "2.XXX.X"', {
-        classes: ["errorToast"],
+        classes: ['errorToast'],
       })
       return
     }
 
-    //Description length validation
+    // Description length validation
     if (description.length < 10) {
-      toast.push("Description needs to be at least 10 characters long", {
-        classes: ["errorToast"],
+      toast.push('Description needs to be at least 10 characters long', {
+        classes: ['errorToast'],
       })
       return
     }
     if (description.length > 1024) {
       toast.push(
-        "Description needs to be less than 1024 characters long. If more space is needed, continue in the comments.",
-        { classes: ["errorToast"] },
+        'Description needs to be less than 1024 characters long. If more space is needed, continue in the comments.',
+        { classes: ['errorToast'] }
       )
       return
     }
@@ -75,8 +76,8 @@
     formData.append('ingress_version', ingressVersion)
     formData.append('reproduction_steps', ReproductionSteps)
     for (const file of attachments || []) formData.append('attachments', file)
-    const entry = await pb.collection("bug_reports").create(formData)
-    goto(`/bugs/${entry.id}`)
+    const entry = await pb.collection('bug_reports').create(formData)
+    goto(resolve(`/bugs/${entry.id}`))
   }
 
   const removeAttachment = (index) => {
@@ -121,7 +122,7 @@
   <hr />
 
   <!-- TODO: Sending attachments broken, didn't understand documentation: https://pocketbase.io/docs/files-handling ^^' -->
-  {#if $authData?.baseModel?.verification != ""}
+  {#if $authData?.baseModel?.verification !== ''}
     <h3>Screenshots (optional)</h3>
     <p align="center">
       You can add up to 5 screenshots to your Bug Report.<br />Do not abuse this
@@ -142,7 +143,7 @@
     </p>
     <div id="filesPreview">
       {#if attachments}
-        {#each Array.from(attachments) as file, index}
+        {#each Array.from(attachments) as file, index (index)}
           <div class="previewRow">
             <div
               class="preview"

@@ -1,8 +1,9 @@
 <script>
   import Time, { dayjs } from 'svelte-time'
+  import { resolve } from '$app/paths'
   import AgentName from '$lib/components/AgentName.svelte'
 
-  let { data } = $props()
+  const { data } = $props()
   const media = $derived(data.media)
 </script>
 
@@ -43,6 +44,7 @@
       <Time timestamp={media.released_at} format="MMMM D, YYYY [at] h:mm A" />
     </p>
     <p class="link">
+      <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
       <a href={media.content_url} target="_blank">
         {media.expand?.destination?.name || 'Open Media'}
       </a>
@@ -52,8 +54,8 @@
     </p>
     <hr />
     <p class="topic">
-      {#each media.expand?.topic || [] as topic}
-        <a href={`/media?t=${topic.id}`}>
+      {#each media.expand?.topic || [] as topic (topic.id)}
+        <a href={resolve(`/media?t=${topic.id}`)}>
           {topic.name}
         </a>
       {/each}

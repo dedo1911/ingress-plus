@@ -3,27 +3,27 @@
   import { badgeSize } from '$lib/stores'
   import Badge from '$lib/components/Badge.svelte'
 
-  let { category, width } = $props()
+  const { category, width } = $props()
 
   const tiers = $derived(category.tiers.split(',').filter(t => t))
   const hasTiers = $derived(tiers.length > 0)
   const badgesPerRow = $derived(hasTiers
     ? Math.max(
-        1,
-        Math.min(tiers.length, Math.floor((width - $badgeSize) / $badgeSize)),
-      )
+      1,
+      Math.min(tiers.length, Math.floor((width - $badgeSize) / $badgeSize))
+    )
     : 6)
     // Math.max(1, Math.floor((width-$badgeSize)/$badgeSize))
   const rows = $derived(hasTiers
     ? Math.ceil((category.badges.length * tiers.length) / badgesPerRow)
     : Math.ceil(category.badges.length / badgesPerRow))
-  
+
   const generateId = (str) =>
     str
-      .replace(/[^\w\s]+/g, "-")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-+|-+$/g, "")
+      .replace(/[^\w\s]+/g, '-')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
       .toLowerCase()
 
   const id = generateId(category.title)
@@ -43,9 +43,9 @@
   <section>
     <h2 {id}><a href={`#${id}`} onclick={() => copyCategoryLink(id)}>{category.title}</a></h2>
     <div>
-      {#each { length: rows } as _, r}
+      {#each { length: rows } as _, r (r)}
         <div>
-          {#each { length: badgesPerRow } as _, c}
+          {#each { length: badgesPerRow } as _, c (c)}
             <Badge {category} index={r * badgesPerRow + c} />
           {/each}
         </div>

@@ -1,10 +1,11 @@
 <script>
-  import { onMount } from "svelte"
-  import { pb, serverAddress } from "$lib/pocketbase"
-  import { addToCalendar } from "$lib/utils.js"
-  import Time, { dayjs } from "svelte-time"
-  import utc from "dayjs/plugin/utc"
-  import timezone from "dayjs/plugin/timezone"
+  import { onMount } from 'svelte'
+  import { resolve } from '$app/paths'
+  import { pb, serverAddress } from '$lib/pocketbase'
+  import { addToCalendar } from '$lib/utils.js'
+  import Time, { dayjs } from 'svelte-time'
+  import utc from 'dayjs/plugin/utc'
+  import timezone from 'dayjs/plugin/timezone'
 
   dayjs.extend(utc)
   dayjs.extend(timezone)
@@ -18,31 +19,27 @@
 
   const toggleShowAll = () => {
     showAll = !showAll
-    loadData()
   }
 
   const prevPage = () => {
     if (page <= 1) return
     page--
-    loadData()
   }
 
   const nextPage = () => {
     if (page >= totalPages) return
     page++
-    loadData()
   }
 
   const loadData = async () => {
-    const userTZ = dayjs.tz.guess() || "UTC"
-    const options = {
-      filter: showAll ? "" : "homepage_hidden=false",
-    }
-    const r = await pb.collection("game_events_list").getList(page, itemsPerPage, options)
-    totalPages = r.totalPages
-    totalItems = r.totalItems
-    eventsList = r.items.map((e) => {
-      const isLocal = e.time_type === "local"
+    const userTZ = dayjs.tz.guess() || 'UTC'
+    const r = await pb.collection('game_events_list').getFullList({
+
+    })
+    totalPages = Math.ceil(r.length / itemsPerPage)
+    totalItems = r.length
+    eventsList = r.map((e) => {
+      const isLocal = e.time_type === 'local'
       e = {
         ...e,
         start_time: isLocal
@@ -56,40 +53,53 @@
       e.is_active = dayjs().isAfter(e.start_time) && dayjs().isBefore(e.end_time)
 
       const categoryTitles = {
-        anomaly: "Anomaly event",
-        shard_skirmish: "Shard Skirmish",
-        beacon_skirmish: "Beacon Skirmish",
-        second_sunday: "Second Sunday",
-        first_saturday: "First Saturday",
-        mission_day: "Mission Day",
-        global_event: "Global Event",
-        global_challenge: "Global Challenge",
-        campaign: "Dispatch Campaign",
-        paid_campaign: "Premium Dispatch Campaign",
-        battle_pass: "Reward Campaign",
-        "2sday": "2x AP Tuesday",
-        agent_enl: "Agent organized Event (Enlightened)",
-        agent_res: "Agent organized Event (Resistance)",
-        agent_xfac: "Agent organized Event (Crossfaction)",
-        nl1331: "NL-1331 Meetup",
-        special: "Special Event",
-        tko: "Tactical Kinetic Operations/GORUCK",
-        wayfarer: "Wayfarer Challenge",
-        canceled: "Canceled Event",
-        ifs2x: "First Saturday 2X AP"
-      };
+        anomaly: 'Anomaly event',
+        shard_skirmish: 'Shard Skirmish',
+        beacon_skirmish: 'Beacon Skirmish',
+        second_sunday: 'Second Sunday',
+        first_saturday: 'First Saturday',
+        mission_day: 'Mission Day',
+        global_event: 'Global Event',
+        global_challenge: 'Global Challenge',
+        campaign: 'Dispatch Campaign',
+        paid_campaign: 'Premium Dispatch Campaign',
+        battle_pass: 'Reward Campaign',
+        '2sday': '2x AP Tuesday',
+        agent_enl: 'Agent organized Event (Enlightened)',
+        agent_res: 'Agent organized Event (Resistance)',
+        agent_xfac: 'Agent organized Event (Crossfaction)',
+        nl1331: 'NL-1331 Meetup',
+        special: 'Special Event',
+        tko: 'Tactical Kinetic Operations/GORUCK',
+        wayfarer: 'Wayfarer Challenge',
+        canceled: 'Canceled Event',
+        ifs2x: 'First Saturday 2X AP'
+      }
 
       if (categoryTitles[e.category]) {
-        e.categoryTitle = categoryTitles[e.category];
+        e.categoryTitle = categoryTitles[e.category]
       } else {
-        console.log("Unknown Event type:", e.category);
-        e.categoryTitle = "Unknown Event type";
-        e.category = "special";
+        console.log('Unknown Event type:', e.category)
+        e.categoryTitle = 'Unknown Event type'
+        e.category = 'special'
       }
 
       return e
     })
   }
+  const filteredList = $derived([
+    ...eventsList
+      .filter(e => e.is_active)
+      .sort((a, b) => a.end_time.valueOf() - b.end_time.valueOf()),
+    ...eventsList
+      .filter(e => !e.is_active && dayjs().isBefore(e.start_time))
+      .sort((a, b) => a.start_time.valueOf() - b.start_time.valueOf()),
+    ...eventsList
+      .filter(e => !e.is_active && dayjs().isAfter(e.start_time))
+      .sort((a, b) => b.end_time.valueOf() - a.end_time.valueOf())
+  ].filter(e => showAll || !e.homepage_hidden))
+
+  const shownEvents = $derived(filteredList.slice((page - 1) * itemsPerPage, page * itemsPerPage))
 
   onMount(loadData)
 </script>
@@ -102,12 +112,12 @@
   <div class="event-container" class:active={e.is_active}>
     <div class="event-row">
       <div class="event-icon">
-        <a href="/events/{e.id}" aria-label="Event details">
-          <span class="event-icon-image" style="background-image: url('{e.image != "" ? `${serverAddress}/api/files/ncmy64l5pb3p039/${e.id}/${e.image}` : `images/events/${e.category}.png`}');" ></span>
+        <a href={resolve(`/events/${e.id}`)} aria-label="Event details">
+          <span class="event-icon-image" style="background-image: url('{e.image !== '' ? `${serverAddress}/api/files/ncmy64l5pb3p039/${e.id}/${e.image}` : `images/events/${e.category}.png`}');" ></span>
         </a>
       </div>
       <div class="event-description">
-        <a href="/events/{e.id}"><h2 id={`event${e.id}`}>{e.title}</h2></a>
+        <a href={resolve(`/events/${e.id}`)}><h2 id={`event${e.id}`}>{e.title}</h2></a>
         <div class="event-meta">
           <span>
             <img
@@ -116,6 +126,20 @@
               alt={e.category}
             />
             {e.categoryTitle}
+            {#if e.category === 'paid_campaign' && e.cmu_cost} |
+              <img
+                style="height:1em"
+                src="images/cmu.png"
+                alt="CMU Cost"
+              /> {Intl.NumberFormat().format(e.cmu_cost)} CMU
+            {/if}
+            {#if e.category === 'battle_pass' && e.cmu_cost} | Upgrade Campaign for
+              <img
+                style="height:1em"
+                src="images/cmu.png"
+                alt="CMU Cost"
+              /> {Intl.NumberFormat().format(e.cmu_cost)} CMU
+            {/if}
           </span>
           {#if e.end_time.isAfter(dayjs())}
             <span>
@@ -150,7 +174,7 @@
               from <Time timestamp={e.start_time} format="MMMM D, YYYY [at] h:mm A" live />
               to <Time timestamp={e.end_time} format="MMMM D, YYYY [at] h:mm A" live />
             )</small>
-            {#if e.repeat_cron != ""}
+            {#if e.repeat_cron !== ''}
               &middot; <strong>Recurring</strong>
             {/if}
           </span>
@@ -165,7 +189,7 @@
 {/snippet}
 
 <div class="container">
-  {#each eventsList as event (event.id)}
+  {#each shownEvents as event (event.id)}
     {@render eventRow(event)}
   {/each}
   <div class="paginator">
@@ -175,7 +199,7 @@
   </div>
 
   <div class="options">
-    <button onclick={toggleShowAll} title={showAll ? "Show less" : "Show more"}>
+    <button onclick={toggleShowAll} title={showAll ? 'Show less' : 'Show more'}>
       <img src="/images/{showAll ? 'checkbox_on' : 'checkbox_off'}.png" alt="Checkbox" />
       Show All Events
     </button>

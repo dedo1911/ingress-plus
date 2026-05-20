@@ -1,6 +1,7 @@
 <script>
     import { onMount } from 'svelte'
     import Time from 'svelte-time'
+    import { resolve } from '$app/paths'
     import { pb } from '$lib/pocketbase'
     import { authData } from '$lib/stores'
     import { formatNumber } from '$lib/utils.js'
@@ -80,7 +81,7 @@
 <div class="header">
     <h1>Bug Tracker</h1>
     {#if $authData.isValid === true}
-    <a href="/bugs/new">
+    <a href={resolve('/bugs/new')}>
         Submit bug report
         <img src="/images/upload.svg" alt="Submit bug report" height="32" style="margin-left: 1em" />
     </a>
@@ -108,8 +109,8 @@
 <hr />
 <div class="container">
     {#key refetch}
-    {#each items as report}
-        <a class="bugreport" href="/bugs/{report.id}">
+    {#each items as report (report.id)}
+        <a class="bugreport" href={resolve(`/bugs/${report.id}`)}>
             <span class="date"><Time timestamp={report.created} relative live /></span>
             <span class="title">{report.title}</span>
             <span class="tag" title={report.expand.status.description}>{report.expand.status.name}</span>

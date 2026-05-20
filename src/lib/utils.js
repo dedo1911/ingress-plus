@@ -8,12 +8,12 @@ export const isIOSSafari = () => {
 }
 
 export const isCrappyIE = () => Boolean(
-  typeof window !== "undefined" &&
+  typeof window !== 'undefined' &&
   window.navigator.msSaveOrOpenBlob &&
   window.Blob
 )
 
-function padCalNum(num) {
+function padCalNum (num) {
   if (num < 10) return `0${num}`
   return `${num}`
 }
@@ -24,16 +24,15 @@ export const formatDate = (dateString) => {
     dateTime.getUTCFullYear(),
     padCalNum(dateTime.getUTCMonth() + 1),
     padCalNum(dateTime.getUTCDate()),
-    "T",
+    'T',
     padCalNum(dateTime.getUTCHours()),
     `${padCalNum(dateTime.getUTCMinutes())}00Z`
-  ].join("")
+  ].join('')
 }
 
 export const buildUrl = (event, useDataURL, rawContent) => {
   const body = []
-  if (!event || !event.startTime || !event.title)
-    throw Error("Both startTime and title fields are mandatory")
+  if (!event || !event.startTime || !event.title) { throw Error('Both startTime and title fields are mandatory') }
 
   body.push(`DTSTART:${formatDate(event.startTime)}`)
   body.push(`SUMMARY:${event.title}`)
@@ -47,13 +46,13 @@ export const buildUrl = (event, useDataURL, rawContent) => {
       const email = matches[2]
       body.push(
         [
-          "ATTENDEE",
+          'ATTENDEE',
           `CN=${name}`,
-          "CUTYPE=INDIVIDUAL",
-          "PARTSTAT=NEEDS-ACTION",
-          "ROLE=REQ-PARTICIPANT",
+          'CUTYPE=INDIVIDUAL',
+          'PARTSTAT=NEEDS-ACTION',
+          'ROLE=REQ-PARTICIPANT',
           `RSVP=TRUE:mailto:${email}`
-        ].join("")
+        ].join('')
       )
     }
   })
@@ -63,22 +62,22 @@ export const buildUrl = (event, useDataURL, rawContent) => {
   if (rawContent) body.push(rawContent)
 
   const url = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "BEGIN:VEVENT",
-    body.join("\n"),
-    "END:VEVENT",
-    "END:VCALENDAR"
-  ].join("\n")
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'BEGIN:VEVENT',
+    body.join('\n'),
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\n')
 
   if (useDataURL) return encodeURI(`data:text/calendarcharset=utf8,${url}`)
   return url
 }
 
-export function downloadBlob(blob, filename) {
-  const linkEl = document.createElement("a")
+export function downloadBlob (blob, filename) {
+  const linkEl = document.createElement('a')
   linkEl.href = window.URL.createObjectURL(blob)
-  linkEl.setAttribute("download", filename)
+  linkEl.setAttribute('download', filename)
   document.body.appendChild(linkEl)
   linkEl.click()
   document.body.removeChild(linkEl)
@@ -102,7 +101,7 @@ export const addToCalendar = (eventData, rawContent = '') => {
   const filename = eventData.title.replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '_').concat('.ics')
   const url = buildUrl(eventData, isIOSSafari(), rawContent)
   const blob = new Blob([url], {
-    type: "text/calendarcharset=utf-8"
+    type: 'text/calendarcharset=utf-8'
   })
 
   // IE
@@ -113,7 +112,7 @@ export const addToCalendar = (eventData, rawContent = '') => {
 
   // Safari
   if (isIOSSafari()) {
-    window.open(url, "_blank")
+    window.open(url, '_blank')
     return
   }
 

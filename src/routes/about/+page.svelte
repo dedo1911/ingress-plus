@@ -16,13 +16,13 @@
 <hr>
 <h3>Admins</h3>
 <p>
-    <AgentName user={{ username: "dedo1911" }} linkable={true} factionLogo={true} /> - 
+    <AgentName user={{ username: 'dedo1911' }} linkable={true} factionLogo={true} /> -
     <a href="https://t.me/dedo1911" target="_blank">
         <img src="/images/telegram.svg" alt="Telegram" />@dedo1911
     </a>
 </p>
 <p>
-    <AgentName user={{ username: "InvestigateXM" }} linkable={true} factionLogo={true} /> - 
+    <AgentName user={{ username: 'InvestigateXM' }} linkable={true} factionLogo={true} /> -
     <a href="https://t.me/InvestigateXM" target="_blank">
         <img src="/images/telegram.svg" alt="Telegram" />@InvestigateXM
     </a>

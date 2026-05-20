@@ -7,7 +7,7 @@
   dayjs.extend(utc)
   dayjs.extend(timezone)
 
-  let { data } = $props()
+  const { data } = $props()
 
   const userTZ = dayjs.tz.guess() || 'UTC'
   const isLocal = data.event.time_type === 'local'
@@ -21,13 +21,14 @@
       ? dayjs(data.event.end_time.substring(0, 19)).tz(userTZ)
       : dayjs(data.event.end_time)
   }
-  
-  if (data.event.image == '') {
-	event.image = `../images/events/${event.category}.png`}
+
+  if (data.event.image === '') {
+    event.image = `../images/events/${event.category}.png`
+  }
 </script>
 
 <svelte:head>
-  <title>Ingress Plus &middot; {event?.title || "Bug Report"}</title>
+  <title>Ingress Plus &middot; {event?.title || 'Bug Report'}</title>
 
   <meta property="og:site_name" content="Ingress Plus">
   <meta property="og:type" content="website">
@@ -69,8 +70,22 @@
                  to <Time timestamp={event.end_time} format="MMMM D, YYYY [at] h:mm A" live />
              )</small>
          {/if}
-		 <br>
-		 <p class="center"><b><img style="height:1em;" src="../images/location.svg" alt="Location" /> {event.location}</b></p>
+    </p>
+    <p class="center"><b><img style="height:1em;" src="../images/location.svg" alt="Location" /> {event.location}</b>
+    {#if event.category === 'paid_campaign' && event.cmu_cost} |
+      <img
+        style="height:1em"
+         src="../images/cmu.png"
+         alt="CMU Cost"
+        /> {Intl.NumberFormat().format(event.cmu_cost)} CMU
+    {/if}
+    {#if event.category === 'battle_pass' && event.cmu_cost} | Upgrade Campaign for
+      <img
+        style="height:1em"
+        src="../images/cmu.png"
+        alt="CMU Cost"
+      /> {Intl.NumberFormat().format(event.cmu_cost)} CMU
+    {/if}</p>
   <p class="center">
     {@html event.description}
   </p>

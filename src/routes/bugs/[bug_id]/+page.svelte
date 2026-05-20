@@ -1,17 +1,17 @@
 <script>
-  import { onMount } from "svelte"
-  import { slide } from "svelte/transition"
-  import Time, { dayjs } from "svelte-time"
-  import { Carta, CartaViewer, MarkdownEditor } from "carta-md"
-  import { toast } from "@zerodevx/svelte-toast"
-  import { page } from "$app/stores"
-  import { pb } from "$lib/pocketbase"
-  import { authData } from "$lib/stores"
-  import AgentName from "$lib/components/AgentName.svelte"
-  import Comment from "$lib/components/Comment.svelte"
-  import BugAttachment from "../../../lib/components/BugAttachment.svelte"
+  import { onMount } from 'svelte'
+  import { slide } from 'svelte/transition'
+  import Time, { dayjs } from 'svelte-time'
+  import { Carta, CartaViewer, MarkdownEditor } from 'carta-md'
+  import { toast } from '@zerodevx/svelte-toast'
+  import { page } from '$app/stores'
+  import { pb } from '$lib/pocketbase'
+  import { authData } from '$lib/stores'
+  import AgentName from '$lib/components/AgentName.svelte'
+  import Comment from '$lib/components/Comment.svelte'
+  import BugAttachment from '../../../lib/components/BugAttachment.svelte'
 
-  let { data } = $props()
+  const { data } = $props()
   let report = $state(data.report)
   let comments = $state()
   let newComment = $state('')
@@ -20,32 +20,32 @@
 
   const reloadData = async (pageData) => {
     report = await pb
-      .collection("bug_reports_public")
+      .collection('bug_reports_public')
       .getFirstListItem(`id="${pageData.params.bug_id}"`, {
-        expand: "status",
+        expand: 'status',
       })
     await loadComments()
   }
 
   const loadComments = async () => {
-    comments = await pb.collection("bug_comments").getFullList({
-      sort: "created",
+    comments = await pb.collection('bug_comments').getFullList({
+      sort: 'created',
       filter: `bug="${report.id}"`,
-      fields: "id,created,comment,user",
+      fields: 'id,created,comment,user',
     })
   }
 
   const postComment = async () => {
     if (newComment.length < 3) {
-      toast.push("Comment too short", { classes: ["errorToast"] })
+      toast.push('Comment too short', { classes: ['errorToast'] })
       return
     }
-    await pb.collection("bug_comments").create({
+    await pb.collection('bug_comments').create({
       bug: report.id,
       user: pb.authStore.model.id,
       comment: newComment,
     })
-    newComment = ""
+    newComment = ''
     await loadComments()
   }
 
@@ -55,36 +55,36 @@
 </script>
 
 <svelte:head>
-  <title>Ingress Plus &middot; {report?.title || "Bug Report"}</title>
+  <title>Ingress Plus &middot; {report?.title || 'Bug Report'}</title>
 
   <meta property="og:site_name" content="Ingress Plus" />
   <meta property="og:type" content="website" />
   <meta
     property="og:title"
-    content={`Ingress Plus: ${report?.title || "Bug Report"}`}
+    content={`Ingress Plus: ${report?.title || 'Bug Report'}`}
   />
   <meta
     property="og:url"
-    content={report ? `https://ingress.plus/bugs/${report.id}` : ""}
+    content={report ? `https://ingress.plus/bugs/${report.id}` : ''}
   />
   <meta
     property="og:description"
-    content={`Report created on ${dayjs(report.created).format("MMMM D, YYYY [at] h:mm A")} by ${report.agent}`}
+    content={`Report created on ${dayjs(report.created).format('MMMM D, YYYY [at] h:mm A')} by ${report.agent}`}
   />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta property="twitter:domain" content="ingress.plus" />
   <meta
     property="twitter:url"
-    content={report ? `https://ingress.plus/bugs/${report.id}` : ""}
+    content={report ? `https://ingress.plus/bugs/${report.id}` : ''}
   />
   <meta
     name="twitter:title"
-    content={`Ingress Plus: ${report?.title || "Media"}`}
+    content={`Ingress Plus: ${report?.title || 'Media'}`}
   />
   <meta
     name="twitter:description"
-    content={`Report created on ${dayjs(report.created).format("MMMM D, YYYY [at] h:mm A")} by ${report.agent}`}
+    content={`Report created on ${dayjs(report.created).format('MMMM D, YYYY [at] h:mm A')} by ${report.agent}`}
   />
 </svelte:head>
 
@@ -132,7 +132,7 @@
   {#if report.attachments.length > 0}
     <h2>Attachments</h2>
     <div class="attachments">
-      {#each report.attachments as attachment}
+      {#each report.attachments as attachment (attachment)}
           <BugAttachment {attachment} {report} />
       {/each}
     </div>
@@ -146,7 +146,7 @@
     {#if comments.length === 0}
       <p transition:slide class="no-comments">Nothing to show yet...</p>
     {:else}
-      {#each comments as comment}
+      {#each comments as comment (comment.id)}
         <Comment {comment} />
       {/each}
     {/if}
