@@ -42,6 +42,7 @@
     padding: 0;
     min-width: min(32em, 100vw);
     max-width: 1000px;
+    overflow: visible;
     animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   dialog::backdrop {

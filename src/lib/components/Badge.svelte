@@ -24,6 +24,11 @@
   const opaque = $derived($authData.isValid ? ($siteSettings.opaqueOwned ? owned : !owned) : false)
   const placeholder = $derived(badge?.hasPlaceholderData)
   const hasWings = $derived(badge?.wings_possible)
+  const wingsOwned = $derived(
+    hasWings &&
+    (hasTiers ? tier === tiers.length - 1 : true) &&
+    $ownedBadges.some(b => b.badge === badge?.id && b.hasWings === true)
+  )
 
   const onBadgeClick = () => (showModal = true)
   const onBadgeKeydown = (e) => {
@@ -45,8 +50,16 @@
         width="{$badgeSize}"
       />
     {/if}
+    {#if wingsOwned}
+      <img
+        class="wings_overlay"
+        class:opaque={opaque}
+        src="images/badges/recursed_flair.png"
+        alt="Wings earned"
+      />
+    {/if}
   </span>
-  <BadgeModal bind:showModal {badge} {tier} {owned} {title} {hasWings}/>
+  <BadgeModal bind:showModal {badge} {tier} {owned} {title} {hasWings} totalTiers={tiers.length}/>
 {/if}
 
 <style>
@@ -69,5 +82,17 @@
     top: 0;
     left: 0;
     pointer-events: none;
+  }
+  .badge-wrapper img.wings_overlay {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 65%;
+    height: auto;
+    pointer-events: none;
+  }
+  .badge-wrapper img.wings_overlay.opaque {
+    opacity: 0.2;
   }
 </style>
