@@ -3,7 +3,7 @@
   import { slide } from 'svelte/transition'
 
   import { afterNavigate } from '$app/navigation'
-  import { resolve } from '$app/paths'
+  import { resolve } from '$lib/utils'
   import { pb } from '$lib/pocketbase'
   import { authData, ownedBadges } from '$lib/stores'
 

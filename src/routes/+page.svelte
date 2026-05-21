@@ -1,5 +1,5 @@
 <script>
-  import { resolve } from '$app/paths'
+  import { resolve } from '$lib/utils'
 </script>
 
 <svelte:head>

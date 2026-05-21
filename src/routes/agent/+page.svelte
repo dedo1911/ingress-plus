@@ -2,7 +2,7 @@
   import sortBy from 'lodash.sortby'
   import { goto } from '$app/navigation'
   import { browser } from '$app/environment'
-  import { resolve } from '$app/paths'
+  import { resolve } from '$lib/utils'
   import { badgeSize, authData, ownedBadges } from '$lib/stores'
   import { serverAddress } from '$lib/pocketbase'
   import AgentName from '$lib/components/AgentName.svelte'

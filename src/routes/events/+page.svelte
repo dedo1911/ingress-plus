@@ -1,8 +1,7 @@
 <script>
   import { onMount } from 'svelte'
-  import { resolve } from '$app/paths'
   import { pb, serverAddress } from '$lib/pocketbase'
-  import { addToCalendar } from '$lib/utils.js'
+  import { addToCalendar, resolve } from '$lib/utils.js'
   import Time, { dayjs } from 'svelte-time'
   import utc from 'dayjs/plugin/utc'
   import timezone from 'dayjs/plugin/timezone'

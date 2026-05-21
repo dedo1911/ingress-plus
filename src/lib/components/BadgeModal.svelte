@@ -1,6 +1,6 @@
 <script>
   import { slide } from 'svelte/transition'
-  import { resolve } from '$app/paths'
+  import { resolve } from '$lib/utils'
   import { pb, serverAddress } from '$lib/pocketbase'
   import { authData, ownedBadges, badgeSize } from '$lib/stores'
   import Modal from '$lib/components/Modal.svelte'

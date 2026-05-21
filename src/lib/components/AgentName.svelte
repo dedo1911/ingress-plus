@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte'
 
-  import { resolve } from '$app/paths'
+  import { resolve } from '$lib/utils'
   import { pb } from '$lib/pocketbase'
   import zalgo from '$lib/zalgo'
 

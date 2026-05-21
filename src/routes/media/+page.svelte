@@ -3,7 +3,7 @@
     import { SvelteURLSearchParams } from 'svelte/reactivity'
     import MultiSelect from 'svelte-multiselect'
     import { replaceState } from '$app/navigation'
-    import { resolve } from '$app/paths'
+    import { resolve } from '$lib/utils'
     import { pb } from '$lib/pocketbase'
 
     const { data } = $props()

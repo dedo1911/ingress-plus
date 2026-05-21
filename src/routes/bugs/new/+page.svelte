@@ -4,7 +4,7 @@
   import DOMPurify from 'isomorphic-dompurify'
   import { pb } from '$lib/pocketbase'
   import { goto } from '$app/navigation'
-  import { resolve } from '$app/paths'
+  import { resolve } from '$lib/utils'
   import { browser } from '$app/environment'
   import { authData } from '$lib/stores'
 
