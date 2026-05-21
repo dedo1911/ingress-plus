@@ -4,7 +4,7 @@
   import { browser } from '$app/environment'
   import { resolve } from '$lib/utils'
   import { badgeSize, authData, ownedBadges } from '$lib/stores'
-  import { VERIFICATION_ENABLED } from '$lib/featureFlags'
+  import { featureFlags } from '$lib/featureFlags'
   import { serverAddress } from '$lib/pocketbase'
   import AgentName from '$lib/components/AgentName.svelte'
 
@@ -43,7 +43,7 @@
     <h2>
       <AgentName user={{ username }} linkable={false} factionLogo={true} />
     </h2>
-  {#if VERIFICATION_ENABLED}
+  {#if $featureFlags.VERIFICATION_ENABLED}
     {#if $authData?.baseModel?.verification !== ''}
       <p>Your Verification level is <a href={resolve('/verify')}><code>{verification.toUpperCase()}</code></a> | <a href={resolve('/agent/settings')}>Open Profile Settings</a></p>
     {:else}
