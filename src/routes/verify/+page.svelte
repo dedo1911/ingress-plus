@@ -1,10 +1,18 @@
 <script>
+    import { goto } from '$app/navigation'
+    import { resolve } from '$lib/utils'
+    import { browser } from '$app/environment'
     import { authData } from '$lib/stores'
+    import { VERIFICATION_ENABLED } from '$lib/featureFlags'
 
     const username = $derived($authData?.baseModel?.username || 'NONE')
     const faction = $derived($authData?.baseModel?.faction || 'NOT SET')
     const verification = $derived($authData?.baseModel?.verification || 'NONE')
     const userId = $derived($authData?.baseModel?.id || 'NONE')
+
+    $effect(() => {
+        if (browser && !VERIFICATION_ENABLED) goto(resolve('/'))
+    })
 </script>
 
 <svelte:head>

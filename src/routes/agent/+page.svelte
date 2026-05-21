@@ -4,6 +4,7 @@
   import { browser } from '$app/environment'
   import { resolve } from '$lib/utils'
   import { badgeSize, authData, ownedBadges } from '$lib/stores'
+  import { VERIFICATION_ENABLED } from '$lib/featureFlags'
   import { serverAddress } from '$lib/pocketbase'
   import AgentName from '$lib/components/AgentName.svelte'
 
@@ -42,11 +43,15 @@
     <h2>
       <AgentName user={{ username }} linkable={false} factionLogo={true} />
     </h2>
-  {#if $authData?.baseModel?.verification !== ''}
+  {#if VERIFICATION_ENABLED}
+    {#if $authData?.baseModel?.verification !== ''}
       <p>Your Verification level is <a href={resolve('/verify')}><code>{verification.toUpperCase()}</code></a> | <a href={resolve('/agent/settings')}>Open Profile Settings</a></p>
-      {:else}
+    {:else}
       <p>You are currently not <a href={resolve('/verify')}>verified</a>. | <a href={resolve('/agent/settings')}>Open Profile Settings</a></p>
-      {/if}
+    {/if}
+  {:else}
+    <p><a href={resolve('/agent/settings')}>Open Profile Settings</a></p>
+  {/if}
 
   <div class="badges">
     {#each { length: rows } as _, r (r)}
