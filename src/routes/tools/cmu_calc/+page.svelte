@@ -1,37 +1,36 @@
 <script>
+    const { data } = $props()
+    const { packsByCurrency, currencyConfig } = data
 
-	export let data;
-	const { packsByCurrency, currencyConfig } = data;
-
-    // Selected currency store (default EUR)
-    let selectedCurrency = 'EUR';
+    // Selected currency (default EUR)
+    let selectedCurrency = $state('EUR')
 
     // Reactive selected packs based on selected currency
-    $: selectedPacks = packsByCurrency[selectedCurrency];
+    const selectedPacks = $derived(packsByCurrency[selectedCurrency])
 
-    function formatPrice(price, currency) {
-        const config = currencyConfig[currency] || {};
-        const { symbol, symbolAfter, locale } = config;
+    const formatPrice = (price, currency) => {
+        const config = currencyConfig[currency] || {}
+        const { symbol, symbolAfter, locale } = config
 
         const formatted = price.toLocaleString(locale || undefined, {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
-        });
+        })
 
-        if (!symbol) return formatted;
-        return symbolAfter ? `${formatted} ${symbol}` : `${symbol}${formatted}`;
+        if (!symbol) return formatted
+        return symbolAfter ? `${formatted} ${symbol}` : `${symbol}${formatted}`
     }
 
-    let inputCmu = '';
+    let inputCmu = $state('')
 
-    $: effectiveCostList = selectedPacks.map(pack => {
-        const effectiveUnitCost = pack.price / pack.cmu;
-        const effectiveCost = Math.round(effectiveUnitCost * inputCmu * 100) / 100;
+    const effectiveCostList = $derived(selectedPacks.map(pack => {
+        const effectiveUnitCost = pack.price / pack.cmu
+        const effectiveCost = Math.round(effectiveUnitCost * inputCmu * 100) / 100
         return {
             ...pack,
             effectiveCost
-        };
-    });
+        }
+    }))
 </script>
 
 <svelte:head>
