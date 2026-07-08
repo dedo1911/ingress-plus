@@ -1,4 +1,6 @@
 <script>
+  import Callout from '$lib/components/Callout.svelte'
+
   const ISSUE_URL = 'https://github.com/dedo1911/ingress-plus/issues/new?template=cmu-calculator---suggest-currency.md'
 
   const { data } = $props()
@@ -76,11 +78,16 @@
 </svelte:head>
 
 {#snippet cmuAmount(cmu)}
-  <img src="/images/tools/cmu_calc/cmu.png" alt="CMU" class="cmu-icon" />{formatCmu(cmu)}
+  <img src="/images/tools/cmu_calc/cmu.png" alt="" class="cmu-icon" />{formatCmu(cmu)}
 {/snippet}
 
 <div class="container">
   <h1>CMU Calculator</h1>
+
+  <p>
+    Compare the price of each CMU pack in your currency, and work out the cheapest way to
+    reach a target amount of CMU using the pack prices below.
+  </p>
 
   {#if currencies.length === 0}
     <p>No currencies configured yet.</p>
@@ -100,22 +107,21 @@
           </select>
         {:else if platformsIdentical}
           <p class="platform-note">Prices are the same for iOS and Android.</p>
-        {:else if onlyOnePlatform}
-          <p class="platform-note">Only available on {iosPacks ? 'iOS' : 'Android'}.</p>
         {/if}
       {/if}
     </div>
 
     {#if !hasAnyPacks}
-      <p class="cta">
+      <Callout variant="warning">
         We currently do not have any data for this currency. You can help us by
         <a href={ISSUE_URL} target="_blank" rel="noopener noreferrer">opening an issue on GitHub</a>
         with the required information.
-      </p>
+      </Callout>
     {:else}
       {#if onlyOnePlatform}
         <p class="cta">
-          You can help us by <a href={ISSUE_URL} target="_blank" rel="noopener noreferrer">opening an issue on GitHub</a>
+          Only available on {iosPacks ? 'iOS' : 'Android'}. You can help us by
+          <a href={ISSUE_URL} target="_blank" rel="noopener noreferrer">opening an issue on GitHub</a>
           with the missing platform's pricing.
         </p>
       {/if}
@@ -158,24 +164,28 @@
 
       {#if hasValidCmu}
         <h2>Effective cost of {formatCmu(parsedCmu)} CMU using each pack:</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>CMU Amount</th>
-              <th>Cost</th>
-              <th>Effective Cost</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each effectiveCostList as pack (pack.cmu)}
+        {#if effectiveCostList.length === 0}
+          <p>No pack prices are available yet to calculate an effective cost from.</p>
+        {:else}
+          <table>
+            <thead>
               <tr>
-                <td>{@render cmuAmount(pack.cmu)}</td>
-                <td>{formatPrice(pack.price, selectedCurrency)}</td>
-                <td>{formatPrice(pack.effectiveCost, selectedCurrency)} for {@render cmuAmount(parsedCmu)}</td>
+                <th>CMU Amount</th>
+                <th>Cost</th>
+                <th>Effective Cost</th>
               </tr>
-            {/each}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {#each effectiveCostList as pack (pack.cmu)}
+                <tr>
+                  <td>{@render cmuAmount(pack.cmu)}</td>
+                  <td>{formatPrice(pack.price, selectedCurrency)}</td>
+                  <td>{formatPrice(pack.effectiveCost, selectedCurrency)}</td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        {/if}
       {:else}
         <p>Enter a CMU amount above to see effective cost per pack.</p>
       {/if}
