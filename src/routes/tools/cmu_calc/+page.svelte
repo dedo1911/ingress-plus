@@ -1,82 +1,241 @@
 <script>
-    const { data } = $props()
-    const { packsByCurrency, currencyConfig } = data
+  const ISSUE_URL = 'https://github.com/dedo1911/ingress-plus/issues/new?template=cmu-calculator---suggest-currency.md'
 
-    // Selected currency (default EUR)
-    let selectedCurrency = $state('EUR')
+  const { data } = $props()
+  const { currencies, packsByCurrency } = data
 
-    // Reactive selected packs based on selected currency
-    const selectedPacks = $derived(packsByCurrency[selectedCurrency])
+  const currencyByCode = $derived(new Map(currencies.map(c => [c.code, c])))
 
-    const formatPrice = (price, currency) => {
-        const config = currencyConfig[currency] || {}
-        const { symbol, symbolAfter, locale } = config
+  let selectedCurrency = $state(currencies[0]?.code ?? '')
+  let selectedPlatform = $state('ios')
 
-        const formatted = price.toLocaleString(locale || undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        })
+  const hasAnyPacks = $derived(!!packsByCurrency[selectedCurrency])
 
-        if (!symbol) return formatted
-        return symbolAfter ? `${formatted} ${symbol}` : `${symbol}${formatted}`
+  // If a currency only has one platform's data, or both platforms have identical
+  // pricing, there's nothing meaningful to choose between - skip the picker.
+  const iosPacks = $derived(packsByCurrency[selectedCurrency]?.ios)
+  const androidPacks = $derived(packsByCurrency[selectedCurrency]?.android)
+  const bothAvailable = $derived(!!iosPacks && !!androidPacks)
+  const platformsIdentical = $derived(bothAvailable && JSON.stringify(iosPacks) === JSON.stringify(androidPacks))
+  const showPlatformSelector = $derived(bothAvailable && !platformsIdentical)
+  const onlyOnePlatform = $derived(hasAnyPacks && !bothAvailable)
+
+  // Keep selectedPlatform valid whenever the available platforms change - e.g. after
+  // switching to a currency that only has one platform's data, selectedPlatform might
+  // point at a platform that no longer has anything to show.
+  $effect(() => {
+    const available = packsByCurrency[selectedCurrency] ?? {}
+    if (!available[selectedPlatform]) {
+      selectedPlatform = available.ios ? 'ios' : (available.android ? 'android' : selectedPlatform)
+    }
+  })
+
+  const selectedPacks = $derived(packsByCurrency[selectedCurrency]?.[selectedPlatform] ?? [])
+  const incompleteData = $derived(selectedPacks.some(p => p.price == null))
+
+  const formatPrice = (price, code) => {
+    const config = currencyByCode.get(code) ?? {}
+    const { symbol, symbol_after: symbolAfter, locale } = config
+    const options = { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+
+    let formatted
+    try {
+      formatted = price.toLocaleString(locale || undefined, options)
+    } catch {
+      // Missing or unresolvable locale (e.g. "en_US" instead of "en-US") - fall back
+      // to the user's own locale instead of throwing.
+      formatted = price.toLocaleString(undefined, options)
     }
 
-    let inputCmu = $state('')
+    if (!symbol) return formatted
+    return symbolAfter ? `${formatted} ${symbol}` : `${symbol}${formatted}`
+  }
 
-    const effectiveCostList = $derived(selectedPacks.map(pack => {
-        const effectiveUnitCost = pack.price / pack.cmu
-        const effectiveCost = Math.round(effectiveUnitCost * inputCmu * 100) / 100
-        return {
-            ...pack,
-            effectiveCost
-        }
-    }))
+  // CMU amounts are formatted using the visitor's own locale, never the currency's -
+  // it's a plain quantity, not a monetary value tied to a specific region.
+  const formatCmu = cmu => cmu.toLocaleString()
+
+  let inputCmu = $state('')
+  const parsedCmu = $derived(Number(inputCmu))
+  const hasValidCmu = $derived(inputCmu !== '' && Number.isFinite(parsedCmu) && parsedCmu > 0)
+
+  const effectiveCostList = $derived(
+    hasValidCmu
+      ? selectedPacks
+        .filter(pack => pack.price != null)
+        .map(pack => ({
+          ...pack,
+          effectiveCost: Math.round((pack.price / pack.cmu) * parsedCmu * 100) / 100
+        }))
+      : []
+  )
 </script>
 
 <svelte:head>
-    <title>Ingress Plus &middot; CMU Calculator</title>
+  <title>Ingress Plus &middot; CMU Calculator</title>
 </svelte:head>
 
-<select bind:value={selectedCurrency}>
-  <option value="EUR">🇪🇺 Euro (EUR)</option>
-  <option value="USD">🇺🇸 US Dollar (USD)</option>
-  <option value="CAD">🇨🇦 Canadian Dollar (CAD)</option>
-  <option value="AUD">🇦🇺 Australian Dollar (AUD)</option>
-  <option value="GBP">🇬🇧 British Pound (GBP)</option>
-  <option value="JPY">🇯🇵 Japanese Yen (YPN)</option>
-  <option value="NZD">🇳🇿 New Zealand Dollar (NZD)</option>
-  <option value="TRY">🇹🇷 Turkish lira (TRY)</option>
-  <option value="MXN">🇲🇽 Mexican Peso (MXN)</option>
-  <option value="SEK">🇸🇪 Swedish Krona (SEK)</option>
-  <option value="INR">🇮🇳 Indian Rupee (INR)</option>
-  <option value="NOK">🇳🇴 Norwegian Krone (NOK)</option>
-  <option value="SGD">🇸🇬 Singapore Dollar (SGD)</option>
-  <option value="BRL">🇧🇷 Brazilian real (BRL)</option>
-  <!--<option value="DZD">🇩🇿 Algerian Dinar (DZD)</option>  | Algeria uses USD apparently-->
-  <option value="NTD">🇹🇼 New Taiwan dollar (NTD)</option>
-  <option value="PEN">🇵🇪 Peruvian Sol (PEN)</option>
-  <option value="CNY">🇨🇳 Chinese Yuan (CNY)</option>
-</select>
+{#snippet cmuAmount(cmu)}
+  <img src="/images/tools/cmu_calc/cmu.png" alt="CMU" class="cmu-icon" />{formatCmu(cmu)}
+{/snippet}
 
-<ul>
-  {#each selectedPacks as pack}
-    <li>
-      {pack.cmu} CMU cost {formatPrice(pack.price, selectedCurrency)}, thats {pack.cmuPerCurrency} CMU / {currencyConfig[selectedCurrency].symbol}
-    </li>
-  {/each}
-</ul>
+<div class="container">
+  <h1>CMU Calculator</h1>
 
-<hr>
-<label>
-  Enter required CMU: <input type="number" bind:value={inputCmu} min="0" placeholder="e.g. 2500" />
-</label>
+  {#if currencies.length === 0}
+    <p>No currencies configured yet.</p>
+  {:else}
+    <div class="controls">
+      <select bind:value={selectedCurrency}>
+        {#each currencies as c (c.code)}
+          <option value={c.code}>{c.name} ({c.code})</option>
+        {/each}
+      </select>
 
-  <h2>Effective cost of {inputCmu} CMU using each pack:</h2>
-  <ul>
-    {#each effectiveCostList as pack}
-      <li>
-        Using {pack.cmu} CMU pack for {formatPrice(pack.price, selectedCurrency)} → 
-        effective cost = {formatPrice(pack.effectiveCost, selectedCurrency)} for {inputCmu} CMU
-      </li>
-    {/each}
-  </ul>
+      {#if hasAnyPacks}
+        {#if showPlatformSelector}
+          <select bind:value={selectedPlatform}>
+            <option value="ios">iOS</option>
+            <option value="android">Android</option>
+          </select>
+        {:else if platformsIdentical}
+          <p class="platform-note">Prices are the same for iOS and Android.</p>
+        {:else if onlyOnePlatform}
+          <p class="platform-note">Only available on {iosPacks ? 'iOS' : 'Android'}.</p>
+        {/if}
+      {/if}
+    </div>
+
+    {#if !hasAnyPacks}
+      <p class="cta">
+        We currently do not have any data for this currency. You can help us by
+        <a href={ISSUE_URL} target="_blank" rel="noopener noreferrer">opening an issue on GitHub</a>
+        with the required information.
+      </p>
+    {:else}
+      {#if onlyOnePlatform}
+        <p class="cta">
+          You can help us by <a href={ISSUE_URL} target="_blank" rel="noopener noreferrer">opening an issue on GitHub</a>
+          with the missing platform's pricing.
+        </p>
+      {/if}
+
+      <table>
+        <thead>
+          <tr>
+            <th>CMU Amount</th>
+            <th>Cost</th>
+            <th>CMU per {currencyByCode.get(selectedCurrency)?.symbol}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each selectedPacks as pack (pack.cmu)}
+            <tr class:unavailable={pack.price == null}>
+              <td>{@render cmuAmount(pack.cmu)}</td>
+              {#if pack.price == null}
+                <td colspan="2">No price data available</td>
+              {:else}
+                <td>{formatPrice(pack.price, selectedCurrency)}</td>
+                <td>{@render cmuAmount(Math.round((pack.cmu / pack.price) * 100) / 100)}</td>
+              {/if}
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+
+      {#if incompleteData}
+        <p class="cta">
+          Some pack prices are missing for this currency. You can help us by
+          <a href={ISSUE_URL} target="_blank" rel="noopener noreferrer">opening an issue on GitHub</a>
+          with the required information.
+        </p>
+      {/if}
+
+      <hr>
+      <label>
+        Enter required CMU: <input type="number" bind:value={inputCmu} min="0" placeholder="e.g. 2500" />
+      </label>
+
+      {#if hasValidCmu}
+        <h2>Effective cost of {formatCmu(parsedCmu)} CMU using each pack:</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>CMU Amount</th>
+              <th>Cost</th>
+              <th>Effective Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each effectiveCostList as pack (pack.cmu)}
+              <tr>
+                <td>{@render cmuAmount(pack.cmu)}</td>
+                <td>{formatPrice(pack.price, selectedCurrency)}</td>
+                <td>{formatPrice(pack.effectiveCost, selectedCurrency)} for {@render cmuAmount(parsedCmu)}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      {:else}
+        <p>Enter a CMU amount above to see effective cost per pack.</p>
+      {/if}
+    {/if}
+  {/if}
+</div>
+
+<style>
+  h1 {
+    text-shadow: 0 0 10px black;
+    text-align: center;
+    margin: 1em auto;
+    max-width: 800px;
+  }
+  div.container {
+    text-align: center;
+    max-width: 1000px;
+    margin: auto;
+    padding: 0 1em;
+    line-height: 1.2em;
+    margin-top: 2em;
+  }
+  div.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+    flex-wrap: wrap;
+    margin: 1em 0;
+  }
+  p.platform-note {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  p.cta {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  table {
+    width: 100%;
+    margin: 1em 0;
+    border-collapse: collapse;
+    background: rgba(14, 11, 28, 0.9);
+    border: 3px double #5e5a75;
+    border-radius: 8px;
+  }
+  th, td {
+    padding: 0.5em 1em;
+  }
+  thead tr {
+    border-bottom: 1px solid #5e5a75;
+  }
+  tbody tr:not(:last-child) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  tr.unavailable {
+    opacity: 0.5;
+  }
+  img.cmu-icon {
+    height: 1em;
+    vertical-align: sub;
+    margin-right: 0.25em;
+  }
+</style>
