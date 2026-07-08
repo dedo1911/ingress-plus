@@ -11,7 +11,7 @@
     return '256x256'
   }
 
-  let { data } = $props()
+  const { data } = $props()
   const publicUser = $derived(data.publicUser)
   const sortedBadges = $derived(sortBy((data?.ownedBadges || []).filter(b => b.expand?.badge?.expand?.category?.profile_visible || false), [
     'expand.badge.expand.category.sorting',
@@ -41,10 +41,10 @@
     badgeSize.set(Math.min(128, width / 7))
   })
 
-  const ScannerLink = $derived(`https://link.ingress.com/agent/${encodeURIComponent(publicUser?.username)}`);
+  const ScannerLink = $derived(`https://link.ingress.com/agent/${encodeURIComponent(publicUser?.username)}`)
 
   // Hide link to scanner profile if user has default username
-  const hideLink = $derived(/^(users\d{5}|Agent_\d{6})$/.test(publicUser?.username));
+  const hideLink = $derived(/^(users\d{5}|Agent_\d{6})$/.test(publicUser?.username))
 </script>
 
 <svelte:head>
@@ -57,6 +57,7 @@
   </h2>
     {#if !hideLink}
       <p style="text-align: center;">
+        <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
         <a target="_blank" rel="noopener noreferrer" href={ScannerLink}>
           <img src="../images/user.svg" alt="User icon" style="height: 1em; vertical-align: middle;">
             Open Profile in Ingress
@@ -73,9 +74,9 @@
 
   {#if !groupByCategory}
     <div class="badges">
-      {#each { length: rows } as _, r}
+      {#each { length: rows } as _, r (r)}
         <div>
-        {#each { length: badgesPerRow } as _, c}
+        {#each { length: badgesPerRow } as _, c (c)}
           {@const badge = sortedBadges[r * badgesPerRow + c]}
           {#if badge}
             <img height="{$badgeSize}" width="{$badgeSize}" alt="{badge.expand.badge.title}"
@@ -87,14 +88,14 @@
     </div>
   {:else}
     <div class="categories">
-      {#each categorizedBadges as group}
+      {#each categorizedBadges as group (group.category.id)}
         {@const catRows = Math.ceil(group.badges.length / badgesPerRow)}
         <div class="category-section">
           <h3>{group.category.title}</h3>
           <div class="badges">
-            {#each { length: catRows } as _, r}
+            {#each { length: catRows } as _, r (r)}
               <div>
-              {#each { length: badgesPerRow } as _, c}
+              {#each { length: badgesPerRow } as _, c (c)}
                 {@const badge = group.badges[r * badgesPerRow + c]}
                 {#if badge}
                   <img height="{$badgeSize}" width="{$badgeSize}" alt="{badge.expand.badge.title}"

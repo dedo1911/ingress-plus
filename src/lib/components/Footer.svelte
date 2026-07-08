@@ -1,3 +1,7 @@
+<script>
+  import { resolve } from '$app/paths'
+</script>
+
 <footer>
   <p>
     If you like this website consider buying us a
@@ -10,10 +14,10 @@
     Ingress Fan-site. Not officially affiliated with Ingress or Niantic Spatial, Inc.!
     All images and icons shown on this website are property of their respective owners.
     <br />
-    <a href="/about">About</a> &mdash;
-    <a href="/attributions">Attributions</a> &mdash;
-    <a href="/terms">Terms of Service</a> &mdash;
-    <a href="/privacy">Privacy policy</a>
+    <a href={resolve('/about')}>About</a> &mdash;
+    <a href={resolve('/attributions')}>Attributions</a> &mdash;
+    <a href={resolve('/terms')}>Terms of Service</a> &mdash;
+    <a href={resolve('/privacy')}>Privacy policy</a>
   </p>
   <p class="small">
     Made with <img class="icon" src="/images/heart.svg" alt="Love" /> using

@@ -1,11 +1,11 @@
 <script>
-  import { serverAddress } from "$lib/pocketbase"
-  import Modal from "./Modal.svelte"
+  import { serverAddress } from '$lib/pocketbase'
+  import Modal from './Modal.svelte'
 
-  let { attachment, report } = $props()
+  const { attachment, report } = $props()
   let showModal = $state(false)
-  const show = () => showModal = true
-  const hide = () => showModal = false
+  const show = () => { showModal = true }
+  const hide = () => { showModal = false }
 </script>
 
 <button onclick={show}>

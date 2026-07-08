@@ -1,10 +1,10 @@
 <script>
   import sortBy from 'lodash.sortby'
-  import { toast } from '@zerodevx/svelte-toast'
   import { goto } from '$app/navigation'
   import { browser } from '$app/environment'
+  import { resolve } from '$app/paths'
   import { badgeSize, authData, ownedBadges } from '$lib/stores'
-  import { pb, serverAddress } from '$lib/pocketbase'
+  import { serverAddress } from '$lib/pocketbase'
   import AgentName from '$lib/components/AgentName.svelte'
 
   const thumbSize = (badgeSize) => {
@@ -13,7 +13,6 @@
     return '256x256'
   }
 
-  let editVisible = $state(false)
   let width = $state(1)
 
   const badgesPerRow = 6
@@ -40,58 +39,15 @@
   let groupByCategory = $state(false)
 
   $effect(() => {
-    if (browser && $authData.isValid === false) goto('/')
+    if (browser && $authData.isValid === false) goto(resolve('/'))
   })
 
   $effect(() => {
     badgeSize.set(Math.min(128, width / 7))
   })
 
-  const toggleFaction = async () => {
-    $authData.baseModel.faction = $authData.baseModel.faction === 'enlightened' ? 'resistance' : 'enlightened'
-    await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-  }
-
-  const togglePublic = async () => {
-    $authData.baseModel.public = !$authData.baseModel.public
-    await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-  }
-
   const username = $derived($authData?.baseModel?.username || '')
-  let newUsername = $state('')
-  $effect(() => {
-    newUsername = username
-  })
-
-  const saveUsername = async () => {
-    const oldUsername = $authData.baseModel.username
-    try {
-      $authData.baseModel.username = newUsername
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-    } catch (err) {
-      $authData.baseModel.username = oldUsername
-      console.error(username, err)
-      toast.push('An error has occurred.', { classes: ['errorToast'] })
-      return
-    }
-    editVisible = false
-  }
-
-  const factionLogo = $derived($authData?.baseModel?.faction === 'machina'
-    ? 'machina.png'
-    : `${$authData?.baseModel?.faction || 'unaligned'}.svg`)
-
   const verification = $derived($authData?.baseModel?.verification || '')
-
-  const copyProfileLink = async () => {
-    try {
-      await navigator.clipboard.writeText(`https://ingress.plus/agent/${newUsername}`)
-      toast.push('Copied to clipboard!', { classes: ['successToast'] })
-    } catch (err) {
-      console.error(err)
-      toast.push('An error has occurred.', { classes: ['errorToast'] })
-    }
-  }
 </script>
 
 <svelte:head>
@@ -100,14 +56,14 @@
 
 <section bind:clientWidth={width} style="--badge-size: {$badgeSize}px">
     <h2>
-      <AgentName user={{ username: username }} linkable={false} factionLogo={true} />
+      <AgentName user={{ username }} linkable={false} factionLogo={true} />
     </h2>
-  {#if $authData?.baseModel?.verification != ''}
-      <p>Your Verification level is <a href="/verify"><code>{verification.toUpperCase()}</code></a></p>
+  {#if $authData?.baseModel?.verification !== ''}
+      <p>Your Verification level is <a href={resolve('/verify')}><code>{verification.toUpperCase()}</code></a></p>
       {:else}
-      <p>You are currently not <a href="/verify">verified</a>.</p>
+      <p>You are currently not <a href={resolve('/verify')}>verified</a>.</p>
       {/if}
-  <p><a href="agent/settings">Open Profile Settings</a></p>
+  <p><a href={resolve('/agent/settings')}>Open Profile Settings</a></p>
 
   <div class="controls">
     <button onclick={() => groupByCategory = !groupByCategory}>
@@ -118,9 +74,9 @@
 
   {#if !groupByCategory}
     <div class="badges">
-      {#each { length: rows } as _, r}
+      {#each { length: rows } as _, r (r)}
         <div>
-        {#each { length: badgesPerRow } as _, c}
+        {#each { length: badgesPerRow } as _, c (c)}
           {@const badge = sortedBadges[r * badgesPerRow + c]}
           {#if badge}
             <img height="{$badgeSize}" width="{$badgeSize}" alt="{badge.expand.badge.title}"
@@ -132,14 +88,14 @@
     </div>
   {:else}
     <div class="categories">
-      {#each categorizedBadges as group}
+      {#each categorizedBadges as group (group.category.id)}
         {@const catRows = Math.ceil(group.badges.length / badgesPerRow)}
         <div class="category-section">
           <h3>{group.category.title}</h3>
           <div class="badges">
-            {#each { length: catRows } as _, r}
+            {#each { length: catRows } as _, r (r)}
               <div>
-              {#each { length: badgesPerRow } as _, c}
+              {#each { length: badgesPerRow } as _, c (c)}
                 {@const badge = group.badges[r * badgesPerRow + c]}
                 {#if badge}
                   <img height="{$badgeSize}" width="{$badgeSize}" alt="{badge.expand.badge.title}"

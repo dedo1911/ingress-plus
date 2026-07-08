@@ -31,7 +31,7 @@
 
   <p>
     Ingress Plus is a non-commercial website that provides information and features
-    in relation to Ingress Prime. Ingress Prime itself is a mobile application
+    in relation to Ingress. Ingress itself is a mobile application
     created by Niantic Spatial, Inc. and is not connected to Ingress Plus in any
     way, be it technically or legally. Ingress Plus does not share any data with Niantic Spatial, Inc.
   </p>

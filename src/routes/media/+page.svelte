@@ -1,10 +1,12 @@
 <script>
     import { onMount } from 'svelte'
+    import { SvelteURLSearchParams } from 'svelte/reactivity'
     import MultiSelect from 'svelte-multiselect'
     import { replaceState } from '$app/navigation'
+    import { resolve } from '$app/paths'
     import { pb } from '$lib/pocketbase'
 
-    let { data } = $props()
+    const { data } = $props()
     const { topics, destinations } = data
 
     let itemsPerPage = $state('20')
@@ -21,7 +23,7 @@
       const options = {
         sort: sorting
       }
-      const params = new URLSearchParams()
+      const params = new SvelteURLSearchParams()
       if (sorting !== '-released_at') {
         params.set('s', sorting)
       }
@@ -46,7 +48,7 @@
       totalItems = r.totalItems
       items = r.items
       const queryString = params.toString()
-      replaceState(`${window.location.pathname}${queryString.length > 0 ? '?' : ''}${queryString}`)
+      replaceState(resolve(`${window.location.pathname}${queryString.length > 0 ? '?' : ''}${queryString}`))
     }
 
     const prevPage = () => {
@@ -107,8 +109,8 @@
         </div>
     </div>
     <div class="media-container">
-        {#each items as media}
-            <a class="media" href={`/media/${media.url_id}`}>
+        {#each items as media (media.id)}
+            <a class="media" href={resolve(`/media/${media.url_id}`)}>
                 <div class="image" style="background-image: url('{media.image_url.replace('http://', 'https://')}"></div>
                 <div class={`level level-${media.level}`}>L<span>{media.level}</span></div>
                 <p>{media.short_description}</p>

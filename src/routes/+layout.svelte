@@ -8,7 +8,7 @@
   import '../style.css'
   import '$lib/styles/editor.scss'
 
-  let { children } = $props()
+  const { children } = $props()
 
   const options = {
     duration: 3000,

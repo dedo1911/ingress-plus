@@ -1,10 +1,11 @@
 <script>
   import { slide } from 'svelte/transition'
+  import { resolve } from '$app/paths'
   import { pb, serverAddress } from '$lib/pocketbase'
   import { authData, ownedBadges, badgeSize } from '$lib/stores'
   import Modal from '$lib/components/Modal.svelte'
   import Time, { dayjs } from 'svelte-time'
-  
+
   let {
     showModal = $bindable(),
     badge,
@@ -45,7 +46,7 @@
 
   const fetchBadge = async () => {
     badgeData = await pb.collection('badges').getFirstListItem(`id="${badge.id}"`)
-    const requirementsArray = badgeData.tier_values.split(",").map(Number)
+    const requirementsArray = badgeData.tier_values.split(',').map(Number)
     Requirement = Number(requirementsArray[tier]).toLocaleString()
   }
 
@@ -75,14 +76,14 @@
     let description = $state(badge.description)
 
     // Special handling for Via Lux Explorer event
-    if (title == "Via Lux Explorer - Bronze") {
-      title = "Via Lux Adventure"
-      description = "Adventured to over 300 unique Portals in September 2016."
+    if (title === 'Via Lux Explorer - Bronze') {
+      title = 'Via Lux Adventure'
+      description = 'Adventured to over 300 unique Portals in September 2016.'
     }
 
-    if (title == "Via Lux Explorer - Silver") {
-      title = "Via Lux Odyssey"
-      description = "Above and beyond. Adventured to over 711 unique Portals in September 2016."
+    if (title === 'Via Lux Explorer - Silver') {
+      title = 'Via Lux Odyssey'
+      description = 'Above and beyond. Adventured to over 711 unique Portals in September 2016.'
     }
 </script>
 
@@ -117,7 +118,7 @@
       alt={title}
       src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize * 2}x{$badgeSize * 2}"
     />
-    <a title="Download" href="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?download=true">
+    <a title="Download" href={resolve(`${serverAddress}/api/files/${badge.collectionId}/${badge.id}/${badge.image[tier]}?download=true`)}>
       <img src="/images/download.svg" alt="Download" height="32" width="32" />
     </a>
   </header>
