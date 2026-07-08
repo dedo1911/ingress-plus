@@ -101,6 +101,10 @@
       {/if}
     </div>
 
+  {#if searchQuery && badgeCategories.length === 0}
+    <p class="no-results">No badges with "{searchQuery}" in their title have been found.</p>
+  {/if}
+
   {#each badgeCategories as category}
     {#if category.badges.length > 0 }
       <Category {width} {category} />
@@ -168,5 +172,10 @@
   div.search-bar :global(input[type="search"]::-webkit-search-cancel-button) {
     filter: invert(1);
     cursor: pointer;
+  }
+  p.no-results {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 2em 1em;
   }
 </style>
