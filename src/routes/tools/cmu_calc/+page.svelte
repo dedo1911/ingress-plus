@@ -35,6 +35,19 @@
   const selectedPacks = $derived(packsByCurrency[selectedCurrency]?.[selectedPlatform] ?? [])
   const incompleteData = $derived(selectedPacks.some(p => p.price == null))
 
+  const otherPlatform = $derived(selectedPlatform === 'ios' ? 'android' : 'ios')
+  const otherPlatformPacks = $derived(showPlatformSelector ? (otherPlatform === 'android' ? androidPacks : iosPacks) : null)
+
+  // Returns the other platform's price and how much cheaper it is (%) for this
+  // tier, or null if not applicable (no comparison data, or this platform is
+  // already the cheaper/equal one).
+  const cheaperElsewhere = pack => {
+    if (!otherPlatformPacks || pack.price == null) return null
+    const other = otherPlatformPacks.find(p => p.cmu === pack.cmu)
+    if (!other || other.price == null || other.price >= pack.price) return null
+    return { price: other.price, percent: Math.round((1 - other.price / pack.price) * 100) }
+  }
+
   const formatPrice = (price, code) => {
     const config = currencyByCode.get(code) ?? {}
     const { symbol, symbol_after: symbolAfter, locale } = config
@@ -136,12 +149,22 @@
         </thead>
         <tbody>
           {#each selectedPacks as pack (pack.cmu)}
+            {@const cheaper = cheaperElsewhere(pack)}
             <tr class:unavailable={pack.price == null}>
               <td>{@render cmuAmount(pack.cmu)}</td>
               {#if pack.price == null}
                 <td colspan="2">No price data available</td>
               {:else}
-                <td>{formatPrice(pack.price, selectedCurrency)}</td>
+                <td class:has-badge={!!cheaper}>
+                  <span class="price">
+                    {formatPrice(pack.price, selectedCurrency)}
+                    {#if cheaper}
+                      <span class="cheaper-badge" title="{cheaper.percent}% cheaper on {otherPlatform === 'ios' ? 'iOS' : 'Android'}">
+                        <img src="/images/tools/cmu_calc/{otherPlatform}.svg" alt="" class="platform-icon" />{formatPrice(cheaper.price, selectedCurrency)} (▼{cheaper.percent}%)
+                      </span>
+                    {/if}
+                  </span>
+                </td>
                 <td>{@render cmuAmount(Math.round((pack.cmu / pack.price) * 100) / 100)}</td>
               {/if}
             </tr>
@@ -233,6 +256,7 @@
   }
   th, td {
     padding: 0.5em 1em;
+    vertical-align: middle;
   }
   thead tr {
     border-bottom: 1px solid #5e5a75;
@@ -247,5 +271,42 @@
     height: 1em;
     vertical-align: sub;
     margin-right: 0.25em;
+  }
+  span.price {
+    position: relative;
+    display: inline-block;
+  }
+  span.cheaper-badge {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+    margin-left: 0.5em;
+    white-space: nowrap;
+    color: #00b056;
+    font-weight: bold;
+    font-size: 0.9em;
+  }
+  img.platform-icon {
+    height: 1em;
+  }
+
+  @media (max-width: 600px) {
+    /* Too little horizontal room for the badge to sit beside the price without
+       overrunning the next column - drop it below the price instead. It stays
+       position: absolute so it still never affects span.price's own centering. */
+    span.cheaper-badge {
+      left: 50%;
+      top: 100%;
+      transform: translateX(-50%);
+      margin-left: 0;
+      margin-top: 0.25em;
+    }
+    td.has-badge {
+      padding-bottom: 1.75em;
+    }
   }
 </style>
