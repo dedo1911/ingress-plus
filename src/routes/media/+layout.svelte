@@ -1,15 +1,16 @@
 <script>
-    let { children } = $props()
+    import { resolve } from '$app/paths'
+    const { children } = $props()
 </script>
 
 <section>
     <div class="header">
-        <a href="/media">
+        <a href={resolve('/media')}>
             <img src='/images/mediagress.png' alt='Mediagress' height="75" style="margin-right: 1em" />
             <h1>Mediagress</h1>
         </a>
         <div>
-            <a href="/media/upload">
+            <a href={resolve('/media/upload')}>
                 Upload new media
                 <img src="/images/upload.svg" alt="Upload" height="32" style="margin-left: 1em" />
             </a>

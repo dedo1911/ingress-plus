@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte'
 
+  import { resolve } from '$app/paths'
   import { pb } from '$lib/pocketbase'
   import zalgo from '$lib/zalgo'
 
@@ -12,9 +13,11 @@
   } = $props()
 
   const url = $derived(linkable && user?.public
-    ? `/agent/${user.username}` : null)
+    ? resolve(`/agent/${user.username}`)
+    : null)
   const logo = $derived(user?.faction === 'machina'
-    ? 'machina.png' : `${user?.faction || 'unaligned'}.svg`)
+    ? 'machina.png'
+    : `${user?.faction || 'unaligned'}.svg`)
 
   onMount(async () => {
     if (id || !user) user = await pb.collection('public_users').getFirstListItem(`id="${id}"`, { requestKey: null })
@@ -26,6 +29,7 @@
 </script>
 
 {#if user && user.faction !== undefined }
+  <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- url is pre-resolved -->
   <a href={url} style="color: var(--color-faction-{user.faction || 'unaligned'})"
     class:supporter-unaligned={user?.hasUsernameGlow && !user?.faction}
     class:supporter-machina={user?.hasUsernameGlow && user?.faction === 'machina'}

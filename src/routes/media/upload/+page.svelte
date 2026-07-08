@@ -1,3 +1,7 @@
+<script>
+  import { resolve } from '$app/paths'
+</script>
+
 <svelte:head>
     <title>Ingress Plus &middot; Media Upload</title>
 </svelte:head>
@@ -10,7 +14,7 @@
     <p>We only support the newest version of IITC-CE. To ensure that everything works as planned, please keep it up-to-date.</p>
     <p><b>NOTE:</b> If you have installed IITC-CE via the Google Play Store on Android, it is <b>out of date</b> as it does not recieve any updates anymore. Make sure to <a href="https://iitc.app/download_mobile" target="_blank">follow the instructions on their site</a> to manually update your IITC-CE app via an APK or F-Droid.</p>
 
-    <a href="/mediagress.user.js" class="download">
+    <a href={resolve('/mediagress.user.js')} class="download">
         DOWNLOAD PLUGIN
     </a>
 
@@ -45,7 +49,7 @@
     <p class="question">What does the message "No new media has been found in your inventory." mean?</p>
     <p class="answer">The Mediagress plugin stores a list of Media you sent to us locally and shows this message if there isn't a new Media to add to that list, meaning there is no new Media to upload. If you do have new media, make sure that it has been loaded into a capsule and try again in 5 minutes.</p>
     <p class="question">What exactly is submitted to Mediagress when I upload Media?</p>
-    <p class="answer">The data that is submitted to us is the data of the Media as well as your Agent data that is reported by the Intel map. <a href="/example_upload.json" target="blank">You can see an example .json that would be sent to us here.</a></p>
+    <p class="answer">The data that is submitted to us is the data of the Media as well as your Agent data that is reported by the Intel map. <a href={resolve('/example_upload.json')} target="blank">You can see an example .json that would be sent to us here.</a></p>
     <p class="question">I have another question!</p>
     <p class="answer">Join us in our @Ingress_Plus Telegram group where we'll answer any questions that might come up <a href="https://t.me/Ingress_Plus" target="_blank">with the link in this channel</a>.</p>
 </div>

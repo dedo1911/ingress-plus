@@ -9,7 +9,7 @@
     <ul>
        <li>
          This website features various images and other resources by <a href="https://www.nianticspatial.com/" target="_blank">Niantic Spatial, Inc.</a>,
-         such as sprites and textures of their game <a href="https://ingress.com/" target="_blank">Ingress Prime</a>
+         such as sprites and textures of their game <a href="https://ingress.com/" target="_blank">Ingress</a>
        </li>
        <li>
          This website features various Vectors and icons by <a href="https://www.svgrepo.com" target="_blank">SVG Repo</a>,

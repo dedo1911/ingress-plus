@@ -105,7 +105,7 @@
     <p class="no-results">No badges with "{searchQuery}" in their title have been found.</p>
   {/if}
 
-  {#each badgeCategories as category}
+  {#each badgeCategories as category (category.id)}
     {#if category.badges.length > 0 }
       <Category {width} {category} />
     {/if}
