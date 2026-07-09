@@ -3,7 +3,7 @@
   import { SvelteToast } from '@zerodevx/svelte-toast'
   import { siteSettings } from '$lib/stores'
   import { pb } from '$lib/pocketbase'
-  import { featureFlags } from '$lib/featureFlags'
+  import { featureFlags, featureFlagsLoaded } from '$lib/featureFlags'
   import Header from '$lib/components/Header.svelte'
   import Footer from '$lib/components/Footer.svelte'
 
@@ -23,6 +23,8 @@
       featureFlags.set(Object.fromEntries(records.map(r => [r.name, r.enabled])))
     } catch (err) {
       console.error('Failed to load feature flags:', err)
+    } finally {
+      featureFlagsLoaded.set(true)
     }
 
     for (const key of Object.keys(window.localStorage)) {

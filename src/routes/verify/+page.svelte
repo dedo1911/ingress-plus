@@ -3,7 +3,7 @@
     import { resolve } from '$lib/utils'
     import { browser } from '$app/environment'
     import { authData } from '$lib/stores'
-    import { featureFlags } from '$lib/featureFlags'
+    import { featureFlags, featureFlagsLoaded } from '$lib/featureFlags'
 
     const username = $derived($authData?.baseModel?.username || 'NONE')
     const faction = $derived($authData?.baseModel?.faction || 'NOT SET')
@@ -11,7 +11,7 @@
     const userId = $derived($authData?.baseModel?.id || 'NONE')
 
     $effect(() => {
-        if (browser && !$featureFlags.VERIFICATION_ENABLED) goto(resolve('/'))
+        if (browser && $featureFlagsLoaded && !$featureFlags.VERIFICATION_ENABLED) goto(resolve('/'))
     })
 </script>
 
