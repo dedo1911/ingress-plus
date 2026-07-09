@@ -20,29 +20,29 @@
         <i>We are not affiliated with Ingress or Niantic Spatial, Inc.</i>
     </p>
 
-    <a class="hero hero-right" href={resolve('/events')}>
-        <div style="background-image: url('/images/homepage/cat_events.png');">
-            <p><img src="/images/event.svg" alt="Events" /> Events</p>
-        </div>
-    </a>
     <a class="hero hero-left" href={resolve('/badges')}>
-        <div style="background-image: url('/images/homepage/cat_badges.png');">
+        <div style="background-image: url('/images/hero_images/cat_badges.png');">
             <p><img src="/images/medal.svg" alt="Badges" /> Badges</p>
         </div>
     </a>
     <a class="hero hero-right" href={resolve('/media')}>
-        <div style="background-image: url('/images/homepage/cat_mediagress.jpg');">
+        <div style="background-image: url('/images/hero_images/cat_mediagress.jpg');">
             <p><img src="/images/mediagress.png" alt="Mediagress" /> Mediagress</p>
         </div>
     </a>
-    <a class="hero hero-left" href={resolve('/bugs')}>
-        <div style="background-image: url('/images/homepage/cat_bug_tracker.jpg');">
-            <p><img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker</p>
+    <a class="hero hero-left" href={resolve('/tools')}>
+        <div style="background-image: url('/images/hero_images/cat_cmu-calc.png');">
+            <p><img src="/images/tools.svg" alt="Resources" /> Tools</p>
         </div>
     </a>
-    <a class="hero hero-right" href={resolve('/resources')}>
-        <div style="background-image: url('/images/homepage/cat_resources.jpg');">
-            <p><img src="/images/resources.svg" alt="Resources" /> Resources</p>
+    <a class="hero hero-right" href={resolve('/events')}>
+        <div style="background-image: url('/images/hero_images/cat_events.png');">
+            <p><img src="/images/event.svg" alt="Events" /> Events</p>
+        </div>
+    </a>
+    <a class="hero hero-left" href={resolve('/bugs')}>
+        <div style="background-image: url('/images/hero_images/cat_bug_tracker.jpg');">
+            <p><img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker</p>
         </div>
     </a>
 </div>

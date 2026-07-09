@@ -10,12 +10,12 @@
     </p>
 
     <a class="hero hero-left" href="/tools/cmu_calc">
-        <div style={"background-image: url('/images/homepage/cat_badges.png');"}>
-            <p><img src="/images/cmu.png" alt="Events" /> CMU Calculator</p>
+        <div style={"background-image: url('/images/hero_images/cat_cmu-calc.png');"}>
+            <p><img src="/images/cmu.png" alt="CMU Calculator" /> CMU Calculator</p>
         </div>
     </a>
     <a class="hero hero-right" href="/tools/resources">
-        <div style={"background-image: url('/images/homepage/cat_resources.jpg');"}>
+        <div style={"background-image: url('/images/hero_images/cat_resources.jpg');"}>
             <p><img src="/images/resources.svg" alt="Resources" /> Resources</p>
         </div>
     </a>
