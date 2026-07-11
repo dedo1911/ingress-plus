@@ -1,4 +1,4 @@
-import { classifyByName, sniffContent } from './detect.js'
+import { classifyByName } from './detect.js'
 import { parseHeaderAndRows } from './delimited.js'
 import { parseTimestamp, findTimeColumnIndex } from './dates.js'
 import { humanizeFilename } from './humanize.js'
@@ -171,14 +171,19 @@ function summarizeUnsupported (classification, fallbackLabel, note) {
   }
 }
 
-function summarizeUnrecognized (fallbackLabel) {
+// Used both for filenames rejected outright by the allowlist and as a defensive
+// fallback for any classification shape this dispatcher doesn't otherwise handle -
+// classifyByName() is a closed function under our control, so the latter shouldn't
+// happen in practice, but degrading to the same rejection message is safer than
+// silently mis-describing a file.
+function summarizeRejected () {
   return {
-    label: fallbackLabel,
-    description: null,
+    label: null,
+    description: 'This file does not seem to come from an Ingress GDPR export. If it does, please let us know.',
     count: null,
     countLabel: '',
     dateRange: null,
-    warnings: ['Unrecognized file - could not determine what this is.']
+    warnings: []
   }
 }
 
@@ -186,7 +191,7 @@ function summarizeUnrecognized (fallbackLabel) {
 // a warning-only summary rather than crashing the whole batch of dropped-in files.
 export async function summarizeFile (file) {
   const fallbackLabel = humanizeFilename(file.name)
-  const classification = classifyByName(file.name) ?? await sniffContent(file)
+  const classification = classifyByName(file.name)
 
   const matchedKey = (classification.matchedBy === 'filename' || classification.matchedBy === 'filename-prefix')
     ? normalizeFilename(file.name)
@@ -217,8 +222,9 @@ export async function summarizeFile (file) {
       case 'zip-redundant':
       case 'zip-unsupported':
         return { ...base, ...summarizeUnsupported(classification, fallbackLabel, 'A zip archive - not analyzed here.') }
+      case 'rejected':
       default:
-        return { ...base, ...summarizeUnrecognized(fallbackLabel) }
+        return { ...base, ...summarizeRejected() }
     }
   } catch (err) {
     console.error(err)

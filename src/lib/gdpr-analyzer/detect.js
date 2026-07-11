@@ -1,4 +1,4 @@
-import { lookupKnownFile } from './catalog.js'
+import { lookupKnownFile, isRecognizedFilename } from './catalog.js'
 
 // Delimiter/shape defaults purely from file extension - independent of whether the
 // filename is also a catalog match, since the delimiter is a container-format concern,
@@ -16,44 +16,22 @@ function getExtension (filename) {
   return match ? match[1].toLowerCase() : ''
 }
 
-// Tier 1: filename/extension only, no file I/O. Returns a catalog match merged with its
-// extension's delimiter, a generic-by-extension routing decision, or null if the
-// extension itself is unrecognized (caller should fall back to sniffContent()).
+// Filename/extension only, no file I/O. A file whose name isn't recognized at all (per
+// catalog.js's isRecognizedFilename allowlist) is rejected outright - there's no
+// content-sniffing fallback, so this always returns a usable classification, never null.
 export function classifyByName (filename) {
+  if (!isRecognizedFilename(filename)) {
+    return { shape: 'rejected', matchedBy: 'unrecognized' }
+  }
+
   const extDefaults = EXTENSION_DEFAULTS[getExtension(filename)] ?? null
   const known = lookupKnownFile(filename)
 
   if (known) return { ...extDefaults, ...known }
-  if (!extDefaults) return null
+  // Recognized by the allowlist but an extension we have no defaults for - shouldn't
+  // happen given the allowlist only contains .tsv/.csv/.txt/.json/.zip names, but treat
+  // it the same as an unrecognized file rather than guessing.
+  if (!extDefaults) return { shape: 'rejected', matchedBy: 'unrecognized' }
 
   return { ...extDefaults, matchedBy: 'filename-generic' }
-}
-
-// Tier 2: only called when classifyByName() returns null (renamed/unknown-extension
-// files). Reads a small sample and sniffs the shape from content instead of the name.
-export async function sniffContent (file) {
-  if (file.size === 0) {
-    return { shape: 'empty', matchedBy: 'content-sniff' }
-  }
-
-  const sample = await file.slice(0, 4096).text()
-  const trimmed = sample.trimStart()
-
-  if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
-    return { shape: 'json-generic', matchedBy: 'content-sniff' }
-  }
-
-  const firstLine = sample.split('\n')[0] ?? ''
-  if (firstLine.includes('\t')) {
-    return { delimiter: '\t', shape: 'generic-tabular', matchedBy: 'content-sniff' }
-  }
-  if (firstLine.includes(',')) {
-    return { delimiter: ',', shape: 'generic-tabular', timeColumn: 'Timestamp', matchedBy: 'content-sniff' }
-  }
-  // profile.txt-style documents are indented "Label: value" lines.
-  if (/^\s*[A-Za-z][A-Za-z0-9 ]*:/.test(firstLine)) {
-    return { shape: 'text-doc', matchedBy: 'content-sniff' }
-  }
-
-  return { shape: 'unrecognized', matchedBy: 'unrecognized' }
 }
