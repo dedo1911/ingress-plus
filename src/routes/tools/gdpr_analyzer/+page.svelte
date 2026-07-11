@@ -264,6 +264,15 @@
     justify-content: flex-end;
     margin: 1em 0 0;
   }
+  div.results-header button {
+    color: #FFF;
+    padding-bottom: 0.25em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0);
+    transition: border 0.3s ease-in-out;
+  }
+  div.results-header button:hover {
+    border-bottom: 1px solid rgba(255, 255, 255, 1);
+  }
   table {
     width: 100%;
     margin: 1em 0;
