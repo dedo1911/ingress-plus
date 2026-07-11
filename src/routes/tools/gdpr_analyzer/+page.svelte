@@ -162,13 +162,12 @@
               <td colspan="3" class="processing">Processing…</td>
             {:else if item.status === 'error'}
               <td colspan="3" class="row-warning">{item.error}</td>
+            {:else if item.result.shape === 'rejected'}
+              <td colspan="3" class="row-rejected">{item.result.description}</td>
             {:else}
               <td class="identified">
                 <div class="label">
                   {item.result.label}
-                  {#if item.result.matchedBy === 'content-sniff' || item.result.matchedBy === 'unrecognized'}
-                    <span class="uncertain" title="Identified from the file's content, not its name">?</span>
-                  {/if}
                 </div>
                 {#if item.result.description}
                   <div class="description">{item.result.description}</div>
@@ -294,21 +293,14 @@
     font-size: 0.9em;
     margin-top: 0.25em;
   }
-  .uncertain {
-    display: inline-block;
-    border-radius: 50%;
-    width: 1.1em;
-    height: 1.1em;
-    line-height: 1.1em;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.2);
-    font-size: 0.75em;
-    cursor: help;
-  }
   .row-warning {
     color: #ffb84d;
     font-size: 0.9em;
     margin-top: 0.25em;
+  }
+  .row-rejected {
+    color: #ff6b6b;
+    font-style: italic;
   }
   td.processing {
     color: rgba(255, 255, 255, 0.6);
