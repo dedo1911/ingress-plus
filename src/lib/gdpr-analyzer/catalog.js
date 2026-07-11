@@ -49,6 +49,17 @@ export const KNOWN_FILES = {
     timeColumn: 'Date and Time',
     description: 'GPS location reported by the game over time.'
   },
+  'portal_history.tsv': {
+    shape: 'tabular',
+    label: 'Portal History',
+    description: 'Portals visited, captured, or scout-controlled - each row is just a type and a coordinate, with no timestamp.'
+  },
+  'fitnessdata.tsv': {
+    shape: 'tabular',
+    label: 'Fitness Data',
+    timeColumn: 'Date and time of logging (UTC)',
+    description: 'Hourly step count, distance, and calorie estimates logged from device fitness tracking while playing.'
+  },
   'logins.tsv': {
     shape: 'tabular',
     label: 'Logins',
