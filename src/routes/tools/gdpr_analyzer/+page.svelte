@@ -57,13 +57,30 @@
     e.target.value = ''
   }
 
-  const onDrop = e => {
+  // A counter rather than a plain boolean - dragenter/dragleave also fire when the
+  // pointer moves over child elements of the dropzone (the label/input/hint text),
+  // which would otherwise cause the highlight to flicker off while dragging within it.
+  let dragCounter = $state(0)
+  const isDraggingOver = $derived(dragCounter > 0)
+
+  const onDragEnter = e => {
     e.preventDefault()
-    addFiles(e.dataTransfer.files)
+    dragCounter++
   }
 
   const onDragOver = e => {
     e.preventDefault()
+  }
+
+  const onDragLeave = e => {
+    e.preventDefault()
+    dragCounter = Math.max(0, dragCounter - 1)
+  }
+
+  const onDrop = e => {
+    e.preventDefault()
+    dragCounter = 0
+    addFiles(e.dataTransfer.files)
   }
 
   const removeFile = id => {
@@ -97,7 +114,14 @@
     sent anywhere.
   </Callout>
 
-  <div class="dropzone" ondragover={onDragOver} ondrop={onDrop}>
+  <div
+    class="dropzone"
+    class:dragging={isDraggingOver}
+    ondragenter={onDragEnter}
+    ondragover={onDragOver}
+    ondragleave={onDragLeave}
+    ondrop={onDrop}
+  >
     <label class="file-upload" for="gdpr-files">Choose files</label>
     <input
       id="gdpr-files"
@@ -208,6 +232,11 @@
     padding: 2em 1em;
     margin: 1em 0;
     text-align: center;
+    transition: background-color 150ms ease-in-out, border-color 150ms ease-in-out;
+  }
+  div.dropzone.dragging {
+    border-color: #9593c3;
+    background: rgba(89, 86, 154, 0.15);
   }
   p.hint {
     margin: 0.75em 0 0;
