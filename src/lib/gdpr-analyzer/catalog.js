@@ -175,3 +175,78 @@ export function lookupKnownFile (filename) {
 
   return null
 }
+
+// The remaining ~151 filenames from a real Niantic GDPR export that aren't rich/unusual
+// enough to need their own KNOWN_FILES entry - mostly the "stat history" family
+// (xm_collected.tsv, hacks.tsv, event_*.tsv, plus_*.tsv, etc.) plus the Player_Journey
+// CSVs. Anything NOT on this list (and not in KNOWN_FILES/PREFIX_MATCHES above) is
+// treated as not coming from a GDPR export at all and is rejected outright, rather than
+// guessed at from its shape - see isRecognizedFilename() below. Generated from a real
+// sample export's actual file listing, not hand-typed.
+const GENERIC_RECOGNIZED_FILENAMES = new Set([
+  'add_mod1.csv', 'add_mod2.csv', 'add_powerup1.csv', 'add_powerup2.csv',
+  'agent_ops_completed.tsv', 'all_portals_approved.tsv', 'apex_mods_used.tsv',
+  'ar_videos_uploaded.tsv', 'aurora_glyph_hacks.tsv', 'beacon_battles.tsv',
+  'buried_memories_anomaly_guids.tsv', 'buried_memories_event_points.tsv',
+  'cargo_amounts_applied.tsv', 'collect_items_or_glyphs_from_portal1.csv',
+  'collect_items_or_glyphs_from_portal2.csv', 'comic_sans_links_created.tsv',
+  'completed_all_daily_quests.tsv', 'courier_ap_gained.tsv', 'create_link1.csv',
+  'create_link2.csv', 'cryptic_memories_anomaly_guids.tsv', 'cryptic_memories_points.tsv',
+  'deploy_resonator1.csv', 'deploy_resonator2.csv', 'deploys.tsv',
+  'didact_controller_fields_created.tsv', 'discoverie_anomaly_guids_2023.tsv',
+  'discoverie_kinetic_capsules.tsv', 'discoverie_reclaimed_guids.tsv',
+  'drone_forced_recalls.tsv', 'drone_hack_portal_guids.tsv', 'drone_range_km.tsv',
+  'drone_visited_portal_guid.tsv', 'drones_sent_home.tsv', 'echo_anomaly_guids_2023.tsv',
+  'eos_imprint_points.tsv', 'eos_imprint_points_enl.tsv', 'eos_imprint_points_res.tsv',
+  'epiphany_dawn_guids.tsv', 'erased_memories_anomaly_guids.tsv',
+  'erased_memories_global_op_points.tsv', 'event_alpha.tsv', 'event_bravo.tsv',
+  'event_charlie.tsv', 'event_delta.tsv', 'event_echo.tsv', 'event_foxtrot.tsv',
+  'event_golf.tsv', 'event_india.tsv', 'event_juliet.tsv', 'event_kilo.tsv',
+  'event_kinetic_capsules_completed.tsv', 'event_mike.tsv', 'event_november.tsv',
+  'event_oscar.tsv', 'event_papa.tsv', 'event_portal_guids_hacked.tsv',
+  'field_test_dispatch_points.tsv', 'first_saturday_events.tsv', 'flip_cards_used.tsv',
+  'flip_portal1.csv', 'flip_portal2.csv', 'free_skus_purchased.tsv', 'fully_deployed.tsv',
+  'glyph_hack_attempts.tsv', 'glyph_hack_points.tsv', 'glyph_the_planet.tsv',
+  'hack_streaks_completed.tsv', 'hacks.tsv', 'inventory_item_recycled.tsv',
+  'keys_hacked.tsv', 'kilometers_walked.tsv', 'kilometers_walked_new.tsv',
+  'kinetic_capsules_completed.tsv', 'kureze_effect_guids.tsv', 'kythera_guids.tsv',
+  'link_held_days.tsv', 'link_length_kilometers.tsv',
+  'link_length_kilometers_times_days_held.tsv', 'links_active.tsv', 'links_created.tsv',
+  'links_destroyed_corrected.tsv', 'machina_links_destroyed.tsv',
+  'machina_portals_neutralized.tsv', 'machina_portals_reclaimed_guids.tsv',
+  'machina_resonators_destroyed.tsv', 'matryoshka_links_created.tsv',
+  'mind_units_controlled.tsv', 'mind_units_controlled_active.tsv',
+  'mind_units_destroyed.tsv', 'mind_units_times_days_held.tsv', 'mission_day_points.tsv',
+  'missions_completed.tsv', 'mods_deployed.tsv', 'mods_destroyed.tsv',
+  'myriad_portal_hacks.tsv', 'nl1331_meetup_points.tsv', 'ocf_events.tsv',
+  'operation_chronos_points.tsv', 'opr_agreements.tsv', 'oprlive_events.tsv',
+  'overclock_glyph_hack_points.tsv', 'passcode_redeemed.tsv', 'peace_week_points.tsv',
+  'player_logs_in1.csv', 'player_logs_in2.csv', 'plus_alpha_anomaly_guids.tsv',
+  'plus_alpha_global_op_pages.tsv', 'plus_alpha_global_op_points.tsv',
+  'plus_beta_season_points.tsv', 'plus_delta_global_field_points.tsv',
+  'plus_delta_global_reso_points.tsv', 'plus_delta_season_points.tsv',
+  'plus_gamma_season_points.tsv', 'plus_theta_season_points.tsv',
+  'portal_guids_captured.tsv', 'portal_guids_visited.tsv', 'portal_held_days.tsv',
+  'portal_powerups_used.tsv', 'portals_approved.tsv', 'portals_approved_annex.tsv',
+  'portals_neutralized.tsv', 'portals_owned.tsv', 'powercube_used.tsv',
+  'query_nearby_vps_wayspots1_3.csv', 'query_nearby_vps_wayspots2_3.csv',
+  'recharge_resonator1.csv', 'recharge_resonator2.csv', 'record_ar_scan1_3.csv',
+  'recursions.tsv', 'region_held_days.tsv', 'regions_active.tsv', 'regions_created.tsv',
+  'regions_destroyed_corrected.tsv', 'resonators_destroyed.tsv',
+  'resonators_upgraded.tsv', 'scout_controller_portal_guids.tsv',
+  'second_sunday_events.tsv', 'sentinel_portals_captured.tsv',
+  'shared_memories_event_points.tsv', 'start_or_end_ar_session1_3.csv',
+  'summer_2022_xm_recharged.tsv', 'superposition_guids.tsv',
+  'umbra_resonator_deployments.tsv', 'upgrade_resonator1.csv', 'upgrade_resonator2.csv',
+  'use_contextual_awareness1_3.csv', 'use_vps1_3.csv', 'use_vps2_3.csv',
+  'xm_collected.tsv', 'xm_recharged.tsv'
+])
+
+// The single gate all detection goes through: is this filename something we've actually
+// seen come out of a real Niantic GDPR export, either as a KNOWN_FILES/PREFIX_MATCHES
+// entry or in the generic list above? If not, the file is rejected outright rather than
+// guessed at from its extension/content.
+export function isRecognizedFilename (filename) {
+  const normalized = normalizeFilename(filename)
+  return !!lookupKnownFile(filename) || GENERIC_RECOGNIZED_FILENAMES.has(normalized)
+}
