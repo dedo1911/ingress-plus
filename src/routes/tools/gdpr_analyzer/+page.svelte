@@ -242,6 +242,11 @@
     margin: 0.75em 0 0;
     color: rgba(255, 255, 255, 0.6);
   }
+  ul {
+    text-align: left;
+    margin: 0.5em 0 0;
+    padding-left: 1.5em;
+  }
   div.results-header {
     display: flex;
     justify-content: flex-end;
