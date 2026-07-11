@@ -32,4 +32,13 @@
     text-decoration: underline;
     font-weight: bold;
   }
+  div.callout.info {
+    background: rgba(89, 86, 154, 0.15);
+    border-color: #5e5a75;
+  }
+  div.callout.info :global(a) {
+    color: #b3b0e6;
+    text-decoration: underline;
+    font-weight: bold;
+  }
 </style>
