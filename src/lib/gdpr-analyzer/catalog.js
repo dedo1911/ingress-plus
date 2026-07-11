@@ -1,3 +1,17 @@
+// Privacy category flags used in each entry's `privacy: [...]` array below. A single
+// file can carry more than one at once (e.g. a file with both the owner's email and
+// other players' names would have `privacy: ['own-email', 'third-party-pii']`) - the
+// UI in +page.svelte lists every flagged category for a file, not just the first one.
+//
+// Currently applied below: 'own-email', 'third-party-pii', 'free-text'.
+// Reserved for future use (not yet attached to any entry): 'location', 'device-info'.
+//
+// - 'own-email'       - the account owner's own email address(es)
+// - 'third-party-pii' - other players' names, codenames, or other identifying info
+// - 'location'        - GPS/location coordinates
+// - 'device-info'     - device fingerprint data (OS, manufacturer, model)
+// - 'free-text'       - freeform text that could contain anything not otherwise listed
+
 // Explicit catalog entries for the ~15-20 export files with a richer or unusual shape,
 // verified against a real Niantic GDPR export. Everything else (the ~120 generic
 // "stat history" files, plus anything not in this list at all) falls back to

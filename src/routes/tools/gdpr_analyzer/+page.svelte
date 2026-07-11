@@ -6,9 +6,15 @@
   import Callout from '$lib/components/Callout.svelte'
   import { summarizeFile } from '$lib/gdpr-analyzer/summarize'
 
+  // Mirrors the category taxonomy documented in $lib/gdpr-analyzer/catalog.js. A file
+  // can carry more than one of these at once - describePrivacyFlags() below lists all
+  // of them, not just the first. 'free-text' is intentionally omitted: it's a caveat
+  // about a file's content, not a distinct thing worth naming on its own.
   const PRIVACY_FLAG_LABELS = {
     'own-email': 'your email address',
-    'third-party-pii': "other players' information"
+    'third-party-pii': "other players' information",
+    location: 'precise location data',
+    'device-info': 'device information'
   }
 
   const describePrivacyFlags = flags => {
