@@ -1,3 +1,7 @@
+<script>
+    import { resolve } from '$app/paths'
+</script>
+
 <svelte:head>
     <title>Ingress Plus</title>
 </svelte:head>
@@ -9,14 +13,19 @@
         We host various tools that can help you play Ingress! You can find these below:
     </p>
 
-    <a class="hero hero-left" href="/tools/cmu_calc">
-        <div style={"background-image: url('/images/hero_images/cat_cmu-calc.png');"}>
+    <a class="hero hero-left" href={resolve('/tools/cmu_calc')}>
+        <div style="background-image: url('/images/hero_images/cat_cmu-calc.png');">
             <p><img src="/images/cmu.png" alt="CMU Calculator" /> CMU Calculator</p>
         </div>
     </a>
-    <a class="hero hero-right" href="/tools/resources">
-        <div style={"background-image: url('/images/hero_images/cat_resources.jpg');"}>
+    <a class="hero hero-right" href={resolve('/tools/resources')}>
+        <div style="background-image: url('/images/hero_images/cat_resources.jpg');">
             <p><img src="/images/resources.svg" alt="Resources" /> Resources</p>
+        </div>
+    </a>
+    <a class="hero hero-left" href={resolve('/tools/gdpr_analyzer')}>
+        <div style="background-image: url('/images/hero_images/cat_bug_tracker.jpg');">
+            <p><img src="/images/private.svg" alt="GDPR Analyzer" /> GDPR Analyzer</p>
         </div>
     </a>
 </div>
