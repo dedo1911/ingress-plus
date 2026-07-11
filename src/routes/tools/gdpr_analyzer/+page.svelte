@@ -200,12 +200,14 @@
 
     {#if flaggedResults.length > 0}
       <Callout variant="warning">
-        <p>Some of the files you added contain sensitive information - be careful sharing or screenshotting them:</p>
-        <ul>
-          {#each flaggedResults as item (item.id)}
-            <li><strong>{item.file.name}</strong> contains {describePrivacyFlags(item.result.privacyFlags)}</li>
-          {/each}
-        </ul>
+        <div class="flagged-list">
+          <p>Some of the files you added contain sensitive information - be careful sharing or screenshotting them:</p>
+          <ul>
+            {#each flaggedResults as item (item.id)}
+              <li><strong>{item.file.name}</strong> contains {describePrivacyFlags(item.result.privacyFlags)}</li>
+            {/each}
+          </ul>
+        </div>
       </Callout>
     {/if}
   {/if}
@@ -242,8 +244,13 @@
     margin: 0.75em 0 0;
     color: rgba(255, 255, 255, 0.6);
   }
-  ul {
+  div.flagged-list {
     text-align: left;
+  }
+  div.flagged-list p {
+    margin: 0;
+  }
+  div.flagged-list ul {
     margin: 0.5em 0 0;
     padding-left: 1.5em;
   }
