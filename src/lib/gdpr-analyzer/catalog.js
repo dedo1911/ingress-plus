@@ -102,13 +102,13 @@ export const KNOWN_FILES = {
   'subscriptions_monthly.tsv': {
     shape: 'tabular',
     label: 'Months Subscribed',
-    description: 'Represents the "Months Subscribed" statistic.'
+    description: 'Represents the "Months Subscribed" statistic and counts the amount of months you have been subscribed to C.O.R.E.'
   },
   'wayfarer_player_data.json': {
     shape: 'json-wayfarer',
     label: 'Wayfarer/Recon Player Data',
     description: 'Portal review activity: submissions rated, assignments received, and reviewer profile.',
-    privacy: ['own-email']
+    privacy: ['own-email', 'location']
   },
   'comm_mentions.tsv': {
     shape: 'tabular',
@@ -119,193 +119,196 @@ export const KNOWN_FILES = {
   'player_journey.zip': {
     shape: 'zip-redundant',
     label: 'Player Journey (zip)',
-    description: 'Contains several files with times and locations of game actions. Unpack the archive and upload the files seperately to analyze them!'
+    description: 'Contains several files with times and locations of game actions. Unpack the archive and upload the files seperately to analyze them!',
+    privacy: ['location']
   },
   'poi_submissions.tsv': {
     shape: 'tabular',
-    label: 'POI Submission',
+    label: 'Portal Submissions',
     timeColumn: 'Submission time (UTC)',
-    description: 'Portal (POI) suggestions submitted for review - the location column packs latitude and longitude into a single field.'
+    description: 'Details of new Portal suggestions submitted for review.',
+    privacy: ['location']
   },
   'poi_location_update_submissions.tsv': {
     shape: 'tabular',
-    label: 'POI Submission',
+    label: 'Portal Edit - Location',
     timeColumn: 'Submission time (UTC)',
-    description: 'Portal (POI) review submission activity.'
+    description: 'Date of Location edit, coordinates of new location as well as game used to submit.',
+    privacy: ['location']
   },
   'poi_text_metadata_update_submission.tsv': {
     shape: 'tabular',
-    label: 'POI Submission',
+    label: 'Portal Edit - Title/Description',
     timeColumn: 'Submission time (UTC)',
-    description: 'Portal (POI) review submission activity.'
+    description: 'Date of new text edit, the new suggestion as well as game used to submit.'
   },
   'poi_image_submissions.tsv': {
     shape: 'tabular',
-    label: 'POI Submission',
+    label: 'Portal Edit - New Photo',
     timeColumn: 'Submission time (UTC)',
-    description: 'Portal (POI) review submission activity.'
+    description: 'Date of new photo submission as well as game used to submit.'
   },
   'poi_video_submissions.tsv': {
     shape: 'tabular',
-    label: 'POI Submission',
+    label: 'Portal Scans',
     timeColumn: 'Submission time (UTC)',
-    description: 'Portal (POI) review submission activity.'
+    description: 'Date of new Portal Scans as well as game used to submit and player level at time of submission.'
   },
   'poi_takedown_request_submissions.tsv': {
     shape: 'tabular',
-    label: 'POI Submission',
+    label: 'Reported Portals',
     timeColumn: 'Submission time (UTC)',
-    description: 'Portal (POI) review submission activity.'
+    description: 'Date of takedown requests as well as game used to submit.'
   },
   'agent_ops_completed.tsv': {
     shape: 'tabular',
-    label: 'Agent Ops Completed',
-    description: 'Lifetime count of Agent Ops (guided in-app missions/challenges) completed, updated over time.'
+    label: 'Daily Bounties Completed',
+    description: 'Represents the "Research Days Completed" statistic and counts the amount of Daily Bounties you have completed.'
   },
   'all_portals_approved.tsv': {
     shape: 'tabular',
-    label: 'All Portals Approved',
-    description: 'A log of portal candidate approvals recorded over time.'
+    label: 'Portals Approved',
+    description: 'Represents the "Seer Points" statistic and counts the amount of your Portals that have been approved and went live in Ingress.'
   },
   'apex_mods_used.tsv': {
     shape: 'tabular',
-    label: 'APEX Mods Used',
-    description: 'Lifetime count of APEX-tier mods used, updated over time.'
+    label: 'APEX used',
+    description: 'Amount of APEX used.'
   },
   'ar_videos_uploaded.tsv': {
     shape: 'tabular',
-    label: 'AR Videos Uploaded',
-    description: 'A log of AR video uploads, over time.'
+    label: 'Portal Scans Uploaded',
+    description: 'Represents the "Portal Scans Uploaded" statistic and counts the amount of Portal Scans uploaded.'
   },
   'aurora_glyph_hacks.tsv': {
     shape: 'tabular',
-    label: 'Aurora Glyph Hacks',
-    description: "A log of glyph hacks performed during the 'Aurora' event, over time."
+    label: 'Aurora Glyph Hack Challenge',
+    description: 'A log of points gained during the original Aurora Glyph Hack Challenge.'
   },
   'beacon_battles.tsv': {
     shape: 'tabular',
-    label: 'Beacon Battles',
-    description: 'A log of Beacon (seasonal in-game battle feature) participation, over time.'
+    label: 'Battle Beacon Battles',
+    description: 'Represents the "Battle Beacon Combatent" statistic and counts participation in Battle Beacon Battles.'
   },
   'buried_memories_anomaly_guids.tsv': {
     shape: 'tabular',
     label: 'Buried Memories Anomaly',
-    description: "A log of anomaly-portal participation during the 'Buried Memories' live event, over time."
+    description: '[UNCONFIRMED] Lists each Portal you have interacted with during an on-site Buried Memories Anomaly by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if it is visited again.'
   },
   'buried_memories_event_points.tsv': {
     shape: 'tabular',
-    label: 'Buried Memories Event Points',
-    description: "Points earned during the 'Buried Memories' live event, updated over time."
+    label: 'Buried Memories: Global Link and Field Op',
+    description: "Points earned during the 'Buried Memories: Global Link and Field Op' event."
   },
   'cargo_amounts_applied.tsv': {
     shape: 'tabular',
-    label: 'Cargo Amounts Applied',
-    description: 'Cumulative cargo bonus applied, updated over time.'
+    label: 'C.A.R.G.O. amounts purchased',
+    description: 'Lists when you bought C.A.R.G.O. as well as the amount of extra Inventory space that was granted.'
   },
   'comic_sans_links_created.tsv': {
     shape: 'tabular',
-    label: 'Comic Sans Links Created',
-    description: 'Links created as part of a specific link-shape challenge/medal, updated over time.'
+    label: 'Comic Sans Link Challenge Links Created',
+    description: 'Lists the amount of Links created as part of the Comic Sans Link Challenge Event.'
   },
   'completed_all_daily_quests.tsv': {
     shape: 'tabular',
-    label: 'All Daily Quests Completed',
-    description: 'Lifetime count of days all daily quests were completed, updated over time.'
+    label: 'Daily Bounty Milestones Claimed',
+    description: 'Represents the "Research Days Completed" statistic and counts all days in which you claimed the two Daily Bounty milestones.'
   },
   'courier_ap_gained.tsv': {
     shape: 'tabular',
-    label: 'Courier AP Gained',
-    description: 'AP earned via the Courier medal (carrying keys long distances), updated over time.'
+    label: 'Courier Meet You Out There Challenge',
+    description: 'AP earned during the "Courier Meet You Out There Challenge" event.'
   },
   'cryptic_memories_anomaly_guids.tsv': {
     shape: 'tabular',
     label: 'Cryptic Memories Anomaly',
-    description: "A log of anomaly-portal participation during the 'Cryptic Memories' live event, over time."
+    description: '[UNCONFIRMED] Lists each Portal you have interacted with during an on-site Cryptic Memories Anomaly by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if it is visited again.'
   },
   'cryptic_memories_points.tsv': {
     shape: 'tabular',
-    label: 'Cryptic Memories Points',
-    description: "Points earned during the 'Cryptic Memories' live event, updated over time."
+    label: 'Cryptic Memories Global Op',
+    description: "Points earned during the 'Cryptic Memories Global Op' event."
   },
   'deploys.tsv': {
     shape: 'tabular',
-    label: 'Deploys',
-    description: 'Lifetime count of resonators deployed on portals, updated over time.'
+    label: 'Resonators Deployed',
+    description: 'Livetime count of Resonators deployed.'
   },
   'didact_controller_fields_created.tsv': {
     shape: 'tabular',
-    label: 'Didact Controller Fields Created',
-    description: "Fields created while under the 'Didact' controller/effect, updated over time."
+    label: 'Didact Field Challenge',
+    description: "Points earned during the 'Didact Field Challenge' event."
   },
   'discoverie_anomaly_guids_2023.tsv': {
     shape: 'tabular',
-    label: 'Discoverie Anomaly (2023)',
-    description: "A log of anomaly-portal participation during the 2023 'Discoverie' anomaly, over time."
+    label: 'Discoverie Anomaly',
+    description: '[UNCONFIRMED] Lists each Portal you have interacted with during an on-site Discoverie Anomaly by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if it is visited again..'
   },
   'discoverie_kinetic_capsules.tsv': {
     shape: 'tabular',
-    label: 'Discoverie Kinetic Capsules',
-    description: "Kinetic Capsules obtained during the 'Discoverie' anomaly series, updated over time."
+    label: 'Discoverie Kinetic Challenge',
+    description: "Points earned during the 'Discoverie Kinetic Challenge' event."
   },
   'discoverie_reclaimed_guids.tsv': {
     shape: 'tabular',
-    label: 'Discoverie Reclaimed Portals',
-    description: "A log of portals reclaimed during the 'Discoverie' anomaly, over time."
+    label: 'Discoverie Reclaimer Challenge',
+    description: "Points earned during the 'Discoverie Reclaimer Challenge' event."
   },
   'drone_forced_recalls.tsv': {
     shape: 'tabular',
-    label: 'Drone Forced Recalls',
-    description: 'Lifetime count of drones forcibly recalled (e.g. running out of range/battery), updated over time.'
+    label: 'Forced Drone Recalls',
+    description: 'Represents the "Forced Drone Recalls" statistic and counts the amount of times your drone was returned to you by a Portal Allignment change.'
   },
   'drone_hack_portal_guids.tsv': {
     shape: 'tabular',
-    label: 'Drone Hack Portals',
-    description: 'A log of portals hacked remotely via drone, over time.'
+    label: 'Unique Portals Drone Hacked',
+    description: 'Lists the Portals your Drone has hacked (not just visited) by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if hacked again.'
   },
   'drone_range_km.tsv': {
     shape: 'tabular',
-    label: 'Drone Range (Kilometers)',
-    description: 'Cumulative distance traveled by drones, updated over time.'
+    label: 'Drone Distance',
+    description: 'Each entry lists the current linear distance from the first Portal the Drone was deployed on to the one it has just been sent to.'
   },
   'drone_visited_portal_guid.tsv': {
     shape: 'tabular',
-    label: 'Drone Visited Portals',
-    description: 'A log of portals visited by drone, over time.'
+    label: 'nique Portals Drone Visited',
+    description: 'Represents the "Unique Portals Drone Visited" statistic and lists the Portals your Drone has visited by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if it is visited again.'
   },
   'drones_sent_home.tsv': {
     shape: 'tabular',
-    label: 'Drones Sent Home',
-    description: 'Lifetime count of drones returned home, updated over time.'
+    label: 'Drones Returned',
+    description: 'Represents the "Drones Returned" statistic and lists the count of Drones that got recalled due to a Portal Allignment change caused by you (Capture, Destroy, Flip).'
   },
   'echo_anomaly_guids_2023.tsv': {
     shape: 'tabular',
-    label: 'Echo Anomaly (2023)',
-    description: "A log of anomaly-portal participation during the 2023 'Echo' anomaly, over time."
+    label: 'Echo Anomaly',
+    description: '[UNCONFIRMED] Lists each Portal you have interacted with during an on-site Echo Anomaly by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if it is visited again.'
   },
   'eos_imprint_points.tsv': {
     shape: 'tabular',
-    label: 'EoS Imprint Points',
-    description: "Points earned during the 'EoS Imprint' live event, updated over time."
+    label: 'EOS Imprint Points',
+    description: "'Pure' points earned during the 'EOS Imprint' event, without counting the retroactive 25% bonus to RES Agents for winning the Kythera Anomaly."
   },
   'eos_imprint_points_enl.tsv': {
     shape: 'tabular',
-    label: 'EoS Imprint Points (Enlightened)',
-    description: "Enlightened faction-wide points earned during the 'EoS Imprint' live event, updated over time."
+    label: 'EOS Imprint Points (Enlightened)',
+    description: "Final point count taken into account during the 'EOS Imprint' event if you were an ENL Agent."
   },
   'eos_imprint_points_res.tsv': {
     shape: 'tabular',
-    label: 'EoS Imprint Points (Resistance)',
-    description: "Resistance faction-wide points earned during the 'EoS Imprint' live event, updated over time."
+    label: 'EOS Imprint Points (Resistance)',
+    description: "Final point count taken into account during the 'EOS Imprint' event if you were a RES Agent."
   },
   'epiphany_dawn_guids.tsv': {
     shape: 'tabular',
-    label: 'Epiphany Dawn',
-    description: "A log of participation during the 'Epiphany Dawn' live event, over time."
+    label: 'Epiphany Dawn Anomaly',
+    description: '[UNCONFIRMED] Lists each Portal you have interacted with during an on-site Epiphany Dawn Anomaly by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if it is visited again'
   },
   'erased_memories_anomaly_guids.tsv': {
     shape: 'tabular',
     label: 'Erased Memories Anomaly',
-    description: "A log of anomaly-portal participation during the 'Erased Memories' live event, over time."
+    description: '[UNCONFIRMED] Lists each Portal you have interacted with during an on-site Erased Memories Anomaly by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if it is visited again'
   },
   'erased_memories_global_op_points.tsv': {
     shape: 'tabular',
@@ -315,477 +318,477 @@ export const KNOWN_FILES = {
   'event_alpha.tsv': {
     shape: 'tabular',
     label: 'Event Alpha',
-    description: "Points/progress earned during the 'Alpha' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_bravo.tsv': {
     shape: 'tabular',
     label: 'Event Bravo',
-    description: "Points/progress earned during the 'Bravo' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_charlie.tsv': {
     shape: 'tabular',
     label: 'Event Charlie',
-    description: "Points/progress earned during the 'Charlie' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_delta.tsv': {
     shape: 'tabular',
     label: 'Event Delta',
-    description: "Points/progress earned during the 'Delta' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_echo.tsv': {
     shape: 'tabular',
     label: 'Event Echo',
-    description: "Points/progress earned during the 'Echo' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_foxtrot.tsv': {
     shape: 'tabular',
     label: 'Event Foxtrot',
-    description: "Points/progress earned during the 'Foxtrot' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_golf.tsv': {
     shape: 'tabular',
     label: 'Event Golf',
-    description: "Points/progress earned during the 'Golf' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_india.tsv': {
     shape: 'tabular',
     label: 'Event India',
-    description: "Points/progress earned during the 'India' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_juliet.tsv': {
     shape: 'tabular',
     label: 'Event Juliet',
-    description: "Points/progress earned during the 'Juliet' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_kilo.tsv': {
     shape: 'tabular',
     label: 'Event Kilo',
-    description: "Points/progress earned during the 'Kilo' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_kinetic_capsules_completed.tsv': {
     shape: 'tabular',
-    label: 'Event Kinetic Capsules Completed',
-    description: 'Kinetic Capsule challenges completed during a specific live event, updated over time.'
+    label: 'Optima Kinetic Challenge',
+    description: 'Points earned during the "Optima Kinetic Challenge" event.'
   },
   'event_mike.tsv': {
     shape: 'tabular',
     label: 'Event Mike',
-    description: "Points/progress earned during the 'Mike' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_november.tsv': {
     shape: 'tabular',
     label: 'Event November',
-    description: "Points/progress earned during the 'November' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_oscar.tsv': {
     shape: 'tabular',
     label: 'Event Oscar',
-    description: "Points/progress earned during the 'Oscar' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_papa.tsv': {
     shape: 'tabular',
     label: 'Event Papa',
-    description: "Points/progress earned during the 'Papa' live event, updated over time."
+    description: '[UNKNOWN]'
   },
   'event_portal_guids_hacked.tsv': {
     shape: 'tabular',
     label: 'Event Portal Hacks',
-    description: 'A log of portals hacked during a specific live event, over time.'
+    description: '[UNKNOWN]'
   },
   'field_test_dispatch_points.tsv': {
     shape: 'tabular',
-    label: 'Field Test Dispatch Points',
-    description: "Points earned from 'Field Test' dispatch-related activity, updated over time."
+    label: 'Field Test: Dispatch',
+    description: "Assignments completed during the 'Field Test: Dispatch' Campaign."
   },
   'first_saturday_events.tsv': {
     shape: 'tabular',
     label: 'First Saturday Events',
-    description: "A log of participation in monthly 'First Saturday' community events, over time."
+    description: "Represents the 'First Saturday Events' statistic and counts the amount of First Saturday Events you have intended."
   },
   'flip_cards_used.tsv': {
     shape: 'tabular',
     label: 'Flip Cards Used',
-    description: 'Lifetime count of Portal Flip Cards used, updated over time.'
+    description: 'Lifetime count of Portal Flip Cards used.'
   },
   'free_skus_purchased.tsv': {
     shape: 'tabular',
     label: 'Free Items Claimed',
-    description: 'Lifetime count of free in-app items claimed, updated over time.'
+    description: 'Lifetime count of free in-app items claimed.'
   },
   'fully_deployed.tsv': {
     shape: 'tabular',
     label: 'Fully Deployed',
-    description: 'Lifetime count of portals fully deployed (all resonator slots filled), updated over time.'
+    description: 'Lifetime count of Portals fully deployed (last resonator slots filled).'
   },
   'glyph_hack_attempts.tsv': {
     shape: 'tabular',
     label: 'Glyph Hack Attempts',
-    description: 'Lifetime count of glyph hack attempts, updated over time.'
+    description: 'Lifetime count of glyph hack attempts.'
   },
   'glyph_hack_points.tsv': {
     shape: 'tabular',
     label: 'Glyph Hack Points',
-    description: 'Cumulative points earned from glyph hacking, updated over time.'
+    description: 'Represents the "Glyph Hack Points" statistic and counts points earned from Glyph Hacking.'
   },
   'glyph_the_planet.tsv': {
     shape: 'tabular',
     label: 'Glyph the Planet',
-    description: "Progress toward the 'Glyph the Planet' medal, updated over time."
+    description: "Amount of Glyph Hack Points earned during the 'Glyph the Planet' Event."
   },
   'hack_streaks_completed.tsv': {
     shape: 'tabular',
-    label: 'Hack Streaks Completed',
-    description: 'Lifetime count of hack streaks completed, updated over time.'
+    label: 'Completed Hackstreaks',
+    description: 'Represents the "Completed Hackstreaks" statistic and counts the amount of 7-Day Hackstreaks you have completed.'
   },
   'hacks.tsv': {
     shape: 'tabular',
     label: 'Hacks',
-    description: 'Lifetime count of portals hacked, updated over time.'
+    description: 'Represents the "Hacks" statistic and counts the amount of Portals hacked.'
   },
   'inventory_item_recycled.tsv': {
     shape: 'tabular',
     label: 'Inventory Items Recycled',
-    description: 'Lifetime count of inventory items recycled for XM, updated over time.'
+    description: 'Lifetime count of inventory items recycled.'
   },
   'keys_hacked.tsv': {
     shape: 'tabular',
     label: 'Keys Hacked',
-    description: 'Lifetime count of portal keys obtained via hacking, updated over time.'
+    description: 'Lifetime count of Portal Keys obtained via hacking.'
   },
   'kilometers_walked.tsv': {
     shape: 'tabular',
-    label: 'Kilometers Walked',
-    description: 'Cumulative distance walked while playing, updated over time.'
+    label: 'Distance Walked',
+    description: 'Represents the "Distance Walked" statistic and counts the amount of distance walked.'
   },
   'kilometers_walked_new.tsv': {
     shape: 'tabular',
-    label: 'Kilometers Walked (New)',
-    description: 'A newer/replacement tracker for cumulative distance walked, updated over time.'
+    label: 'Distance Walked (New)',
+    description: 'Counts the Distance Walked from around 2020 when the Distance calculation was updated to more closely match the one from Pokemon GO.'
   },
   'kinetic_capsules_completed.tsv': {
     shape: 'tabular',
     label: 'Kinetic Capsules Completed',
-    description: 'Lifetime count of Kinetic Capsule challenges completed, updated over time.'
+    description: 'Represents the "Kinetic Capsules Completed" statistic and counts the amount of Kinetic Capsules that have been claimed.'
   },
   'kureze_effect_guids.tsv': {
     shape: 'tabular',
     label: 'Kureze Effect',
-    description: "A log of participation during the 'Kureze' anomaly/storyline, over time."
+    description: '[UNCONFIRMED] Lists each Portal you have interacted with during an on-site Kureze Effect Anomaly by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if it is visited again'
   },
   'kythera_guids.tsv': {
     shape: 'tabular',
     label: 'Kythera',
-    description: "A log of participation during the 'Kythera' anomaly/storyline, over time."
+    description: '[UNCONFIRMED] Lists each Portal you have interacted with during an on-site Kythera Anomaly by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if it is visited again'
   },
   'link_held_days.tsv': {
     shape: 'tabular',
-    label: 'Link Held Days',
-    description: 'Cumulative link-days held, updated over time.'
+    label: 'Time of Link Maintained',
+    description: '[SPECULATIVE] Each Entry lists the final age of a Link as it was destroyed. The highest number in the list is used for the "Max Time Link Maintained" statistic.'
   },
   'link_length_kilometers.tsv': {
     shape: 'tabular',
-    label: 'Link Length (Kilometers)',
-    description: 'Cumulative length of links created, in kilometers, updated over time.'
+    label: 'Link Lengths',
+    description: '[SPECULATIVE] Each Entry lists the length of a Link as it was created. The highest number in the list is used for the "Longest Link Ever Created" statistic.'
   },
   'link_length_kilometers_times_days_held.tsv': {
     shape: 'tabular',
     label: 'Link Length × Days Held',
-    description: 'Cumulative link length multiplied by days held, updated over time.'
+    description: '[SPECULATIVE] Each Entry lists the length of a Link as it was created multiplied by the final age of a Link as it was destroyed. The highest number in the list is used for the "Max Link Kength x Days" statistic.'
   },
   'links_active.tsv': {
     shape: 'tabular',
     label: 'Active Links',
-    description: 'The current number of links you have active - a present-day snapshot.'
+    description: 'The current number of links you had active during the point your GDPR export was created.'
   },
   'links_created.tsv': {
     shape: 'tabular',
     label: 'Links Created',
-    description: 'Lifetime count of links created, updated over time.'
+    description: 'Represents the "Links Created" statistic and counts the amount of Links you have created.'
   },
   'links_destroyed_corrected.tsv': {
     shape: 'tabular',
     label: 'Links Destroyed',
-    description: 'Lifetime count of enemy links destroyed, updated over time.'
+    description: 'Represents the "Enemy Links Destroyed" statistic and counts the amount of Links you have destroyed.'
   },
   'machina_links_destroyed.tsv': {
     shape: 'tabular',
     label: 'Machina Links Destroyed',
-    description: 'Lifetime count of Machina faction links destroyed, updated over time.'
+    description: 'Represents the "Machina Links Destroyed" statistic and counts the amount of Machina Links you have destroyed.'
   },
   'machina_portals_neutralized.tsv': {
     shape: 'tabular',
     label: 'Machina Portals Neutralized',
-    description: 'Lifetime count of Machina faction portals neutralized, updated over time.'
+    description: 'Represents the "Machina Portals Neutralized" statistic and counts the amount of Machina Portals you have destroyed.'
   },
   'machina_portals_reclaimed_guids.tsv': {
     shape: 'tabular',
     label: 'Machina Portals Reclaimed',
-    description: 'A log of portals reclaimed from the Machina faction, over time.'
+    description: 'Represents the "Machina Portals Reclaimed" statistic and lists each Portal you have reclaimed from Machina by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if it is reclaimed again.'
   },
   'machina_resonators_destroyed.tsv': {
     shape: 'tabular',
     label: 'Machina Resonators Destroyed',
-    description: 'Lifetime count of Machina faction resonators destroyed, updated over time.'
+    description: 'Represents the "Machina Resonators Destroyed" statistic and counts the amount of Machina Resonators you have destroyed.'
   },
   'matryoshka_links_created.tsv': {
     shape: 'tabular',
     label: 'Matryoshka Links Created',
-    description: 'Links created as part of nested (Matryoshka) triangle fields, updated over time.'
+    description: 'Links created as part of the Matryoshka Event.'
   },
   'mind_units_controlled.tsv': {
     shape: 'tabular',
-    label: 'Mind Units Controlled',
-    description: 'Cumulative Mind Units (MU) controlled via fields, updated over time.'
+    label: 'Mind Units Captured',
+    description: 'Lists the amount of MU captured per field when created.'
   },
   'mind_units_controlled_active.tsv': {
     shape: 'tabular',
     label: 'Mind Units Controlled (Active)',
-    description: 'The current number of Mind Units you control - a present-day snapshot.'
+    description: 'The current number of MU you had active during the point your GDPR export was created.'
   },
   'mind_units_destroyed.tsv': {
     shape: 'tabular',
     label: 'Mind Units Destroyed',
-    description: 'Cumulative enemy Mind Units destroyed, updated over time.'
+    description: 'Counts the amount of MU that you have liberated by destroying Enemy Fields.'
   },
   'mind_units_times_days_held.tsv': {
     shape: 'tabular',
     label: 'Mind Units × Days Held',
-    description: 'Cumulative Mind Units controlled multiplied by days held, updated over time.'
+    description: '[SPECULATIVE] Each Entry lists the MU of a Field as it was created multiplied by the final age of a Field as it was destroyed. The highest number in the list is used for the "Largest Field MUs x Days" statistic.'
   },
   'mission_day_points.tsv': {
     shape: 'tabular',
-    label: 'Mission Day Points',
-    description: "Points earned during 'Mission Day' events, over time."
+    label: 'Mission Days Attended',
+    description: "Represents the 'Mission Day(s) Attended' statistic and counts the amount of Mission Days you have attended and completed."
   },
   'missions_completed.tsv': {
     shape: 'tabular',
-    label: 'Missions Completed',
-    description: 'A log of missions completed, over time.'
+    label: 'Unique Missions Completed',
+    description: 'Lists each Mission you have completed by incrementaly assigning them a number starting at 1. A Mission will be assigned the same number if it is completed again.'
   },
   'mods_deployed.tsv': {
     shape: 'tabular',
     label: 'Mods Deployed',
-    description: 'Lifetime count of mods installed on portals, updated over time.'
+    description: 'Represents the "Mods Deployed" statistic and counts the amount of Mods you have deployed.'
   },
   'mods_destroyed.tsv': {
     shape: 'tabular',
     label: 'Mods Destroyed',
-    description: 'Lifetime count of enemy mods destroyed, updated over time.'
+    description: 'Counts the amount of Mods you have destroyed.'
   },
   'myriad_portal_hacks.tsv': {
     shape: 'tabular',
-    label: 'Myriad Portal Hacks',
-    description: "A log of hacks performed as part of the 'Myriad' feature/event, over time."
+    label: 'Myriad Hack Challenge',
+    description: 'Lists each Portal you have hacked during the Myriad Hack Challenge by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if it is hacked again.'
   },
   'nl1331_meetup_points.tsv': {
     shape: 'tabular',
-    label: 'NL-1331 Meetup Points',
-    description: "Points earned attending 'NL-1331' storyline meetup events, over time."
+    label: 'NL-1331 Meetups Attended',
+    description: "Represents the 'NL-1331 Meetups Attended' statistic and counts the amount of NL-1331 Events you have attended."
   },
   'ocf_events.tsv': {
     shape: 'tabular',
-    label: 'OCF Events',
-    description: "A log of participation in 'OCF' events, over time."
+    label: 'Operation Clear Field Events',
+    description: "Represents the 'Clear Fields Events' statistic and counts the amount of OCF Events you have attended."
   },
   'operation_chronos_points.tsv': {
     shape: 'tabular',
-    label: 'Operation Chronos Points',
-    description: "Points earned during the 'Operation Chronos' event, updated over time."
+    label: 'Operation Chronos',
+    description: "Points earned during the 'Operation Chronos' event."
   },
   'opr_agreements.tsv': {
     shape: 'tabular',
     label: 'OPR Agreements',
-    description: 'A log of Wayfarer (OPR) review agreement outcomes, over time.'
+    description: 'Represents the "OPR Agreements" statistic and counts the amount of Agreements you gained during OPR/Wayfarer.'
   },
   'oprlive_events.tsv': {
     shape: 'tabular',
     label: 'OPR Live Events',
-    description: 'A log of participation in live Wayfarer (OPR) review events, over time.'
+    description: "Represents the 'OPR Live Events' statistic and counts the amount of OPR Live Events you have attended."
   },
   'overclock_glyph_hack_points.tsv': {
     shape: 'tabular',
-    label: 'Overclock Glyph Hack Points',
-    description: "Points earned from glyph hacking during 'Overclock' bonus periods, updated over time."
+    label: 'Overclock Hack Points',
+    description: "Represents the 'Overclock Hack Points' statistic and counts the amount of Overclock Glyph Hack points you have gained through completed Overclock hacks."
   },
   'passcode_redeemed.tsv': {
     shape: 'tabular',
     label: 'Passcodes Redeemed',
-    description: 'Lifetime count of passcodes (promo codes) redeemed, updated over time.'
+    description: 'Lifetime count of passcodes redeemed.'
   },
   'peace_week_points.tsv': {
     shape: 'tabular',
-    label: 'Peace Week Points',
-    description: "Points earned during the 'Peace Week' live event, updated over time."
+    label: 'Peace Week',
+    description: "Points earned during the 'Peace Week' live event. ENL Agents gained 1 Point per Links, RES Agents gained 1.25 Points per Link."
   },
   'plus_alpha_anomaly_guids.tsv': {
     shape: 'tabular',
-    label: 'Plus Alpha Anomaly',
-    description: "A log of participation during the 'Plus Alpha' anomaly, over time."
+    label: '+Alpha',
+    description: '[UNCONFIRMED] Lists each Portal you have interacted with during an on-site +Alpha Anomaly by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if it is visited again'
   },
   'plus_alpha_global_op_pages.tsv': {
     shape: 'tabular',
-    label: 'Plus Alpha Global Op Pages',
-    description: "Story pages unlocked during the 'Plus Alpha' Global Operation, updated over time."
+    label: '+Alpha Global Op',
+    description: "Assignments completed during the '+Alpha Global Op' Campaign."
   },
   'plus_alpha_global_op_points.tsv': {
     shape: 'tabular',
-    label: 'Plus Alpha Global Op Points',
-    description: "Points earned during the 'Plus Alpha' Global Operation, updated over time."
+    label: '+Alpha Global Op Points',
+    description: "Poins earned during the '+Alpha Global Op' event."
   },
   'plus_beta_season_points.tsv': {
     shape: 'tabular',
-    label: 'Plus Beta Season Points',
-    description: "Points earned during the 'Plus Beta' seasonal storyline, updated over time."
+    label: '+Beta Tokens',
+    description: 'Counts the +Beta Tokens earned during the +Beta Anomaly Season.'
   },
   'plus_delta_global_field_points.tsv': {
     shape: 'tabular',
-    label: 'Plus Delta Global Field Points',
-    description: "Field-creation points earned during the 'Plus Delta' Global Operation, updated over time."
+    label: '+Delta Field Points',
+    description: 'Counts the +Delta Field Points earned during the +Delta Field Campaign.'
   },
   'plus_delta_global_reso_points.tsv': {
     shape: 'tabular',
-    label: 'Plus Delta Global Resonator Points',
-    description: "Resonator-deployment points earned during the 'Plus Delta' Global Operation, updated over time."
+    label: '+Delta Reso Points',
+    description: 'Counts the +Delta Reso Points earned during the +Delta Reso Campaign.'
   },
   'plus_delta_season_points.tsv': {
     shape: 'tabular',
-    label: 'Plus Delta Season Points',
-    description: "Points earned during the 'Plus Delta' seasonal storyline, updated over time."
+    label: '+Delta Tokens',
+    description: 'Counts the +Delta Tokens earned during the +Delta Anomaly Season.'
   },
   'plus_gamma_season_points.tsv': {
     shape: 'tabular',
-    label: 'Plus Gamma Season Points',
-    description: "Points earned during the 'Plus Gamma' seasonal storyline, updated over time."
+    label: '+Gamma Tokens',
+    description: '[UNCONFIRMED] Counts the +Gamma Tokens earned during the +Delta Anomaly Season.'
   },
   'plus_theta_season_points.tsv': {
     shape: 'tabular',
-    label: 'Plus Theta Season Points',
-    description: "Points earned during the 'Plus Theta' seasonal storyline, updated over time."
+    label: '+Theta Tokens',
+    description: 'Counts the +Theta Tokens earned during the +Delta Anomaly Season.'
   },
   'portal_guids_captured.tsv': {
     shape: 'tabular',
     label: 'Portals Captured',
-    description: 'A log of portals captured, over time (despite the filename, no real portal identifier is included - just a sequential count).'
+    description: 'Logs each Portal captured and assigns it an ID incrementing by 1 for each unique Portal. If you capture a Portal that you have already captured the same ID will be logged again.'
   },
   'portal_guids_visited.tsv': {
     shape: 'tabular',
     label: 'Portals Visited',
-    description: 'A log of portals visited, over time (despite the filename, no real portal identifier is included - just a sequential count).'
+    description: 'Logs each Portal Visited and assigns it an ID incrementing by 1 for each unique Portal. If you visit a Portal that you have already visited the same ID will be logged again.'
   },
   'portal_held_days.tsv': {
     shape: 'tabular',
     label: 'Portal Held Days',
-    description: 'Cumulative portal-days held, updated over time.'
+    description: '[UNCONFIRMED] Logs how long ago a Portal you have captured is at the moment it is destroyed.'
   },
   'portal_powerups_used.tsv': {
     shape: 'tabular',
-    label: 'Portal Power-ups Used',
-    description: 'A log of portal power-ups (e.g. Ultra Link, ADA/Jarvis) used, over time.'
+    label: 'Portal Power-Ups Used',
+    description: 'Logs each Portal you have used a Power Up on and assigns it an ID incrementing by 1 for each unique Portal. If you deploy a Power Up on a Portal on which you have already deployed one the same ID will be logged again.'
   },
   'portals_approved.tsv': {
     shape: 'tabular',
     label: 'Portals Approved',
-    description: 'A log of Wayfarer portal candidates approved, over time.'
+    description: 'Counts the amount of Portals that have been approved and gone live in Ingress during a short time frame in March 2022. Small chunk of data that is missing from the main list in portals_approved_annex.tsv.'
   },
   'portals_approved_annex.tsv': {
     shape: 'tabular',
-    label: 'Portals Approved (Annex)',
-    description: 'A supplementary log of Wayfarer portal candidates approved, over time.'
+    label: 'Portals Approved',
+    description: 'Counts the amount of Portals that have been approved and gone live in Ingress. Is missing a small chunk of data of March 2022 which can be found in portals_approved.tsv.'
   },
   'portals_neutralized.tsv': {
     shape: 'tabular',
     label: 'Portals Neutralized',
-    description: 'A log of enemy portals neutralized, over time.'
+    description: 'Logs each Portal you have neutralized and assigns it an ID incrementing by 1 for each unique Portal. If you neutralize a Portal which has already been neutralized by you before the same ID will be logged again.'
   },
   'portals_owned.tsv': {
     shape: 'tabular',
     label: 'Portals Owned',
-    description: 'The current number of portals you own - a present-day snapshot.'
+    description: 'The current number of Portals you owned during the point your GDPR export was created.'
   },
   'powercube_used.tsv': {
     shape: 'tabular',
     label: 'Power Cubes Used',
-    description: 'Lifetime count of Power Cubes used to recharge, updated over time.'
+    description: 'Lists when a Power Cube has been used. [UNCONFIRMED: Excluding Hypercubes?]'
   },
   'recursions.tsv': {
     shape: 'tabular',
     label: 'Recursions',
-    description: 'Lifetime count of Recursions (agent rebirths after reaching max level), updated over time.'
+    description: 'Lists the date and time of each of your Recursions.'
   },
   'region_held_days.tsv': {
     shape: 'tabular',
-    label: 'Region Held Days',
-    description: 'Cumulative field-days held, updated over time.'
+    label: 'Field Held Days',
+    description: '[UNCONFIRMED] Lists the age of each of your Fields at the moment it was destroyed.'
   },
   'regions_active.tsv': {
     shape: 'tabular',
-    label: 'Active Regions',
-    description: 'The current number of control fields (regions) you have active - a present-day snapshot.'
+    label: 'Active Fields',
+    description: 'The current number of Fields you owned during the point your GDPR export was created.'
   },
   'regions_created.tsv': {
     shape: 'tabular',
-    label: 'Regions Created',
-    description: 'Lifetime count of control fields (regions) created, updated over time.'
+    label: 'Fields Created',
+    description: 'Lifetime count of Fields created.'
   },
   'regions_destroyed_corrected.tsv': {
     shape: 'tabular',
-    label: 'Regions Destroyed',
-    description: 'Lifetime count of enemy control fields destroyed, updated over time.'
+    label: 'Fields Destroyed',
+    description: 'Lifetime count of enemy Fields destroyed.'
   },
   'resonators_destroyed.tsv': {
     shape: 'tabular',
     label: 'Resonators Destroyed',
-    description: 'Lifetime count of enemy resonators destroyed, updated over time.'
+    description: 'Lifetime count of enemy Resonators destroyed.'
   },
   'resonators_upgraded.tsv': {
     shape: 'tabular',
     label: 'Resonators Upgraded',
-    description: 'Lifetime count of resonators upgraded, updated over time.'
+    description: 'Lifetime count of resonators Upgraded, updated over time.'
   },
   'scout_controller_portal_guids.tsv': {
     shape: 'tabular',
-    label: 'Scout Controller Portals',
-    description: 'A log of portals interacted with via the Scout Controller drone feature, over time.'
+    label: 'Scout Controlled Portals',
+    description: 'Logs each Portal you have Scout Controlled and assigns it an ID incrementing by 1 for each unique Portal. If you regain Scout Controller on a Portal on which you had already gained it once before the same ID will be logged again.'
   },
   'second_sunday_events.tsv': {
     shape: 'tabular',
     label: 'Second Sunday Events',
-    description: "A log of participation in monthly 'Second Sunday' community events, over time."
+    description: 'Counts the amount of Second Sunday Events you have completed.'
   },
   'sentinel_portals_captured.tsv': {
     shape: 'tabular',
-    label: 'Sentinel Portals Captured',
-    description: "Portals captured and held toward the 'Sentinel' medal, updated over time."
+    label: 'Operation Sentinel Captures',
+    description: 'Counts Portals captured during the Operation Sentinel event.'
   },
   'shared_memories_event_points.tsv': {
     shape: 'tabular',
-    label: 'Shared Memories Event Points',
-    description: "Points earned during the 'Shared Memories' live event, updated over time."
+    label: 'Shared Memories Global Shared Link Challenge',
+    description: 'Counts the amount of Points gained during the Shared Memories Global Shared Link Challenge.'
   },
   'summer_2022_xm_recharged.tsv': {
     shape: 'tabular',
-    label: 'Summer 2022 XM Recharged',
-    description: 'XM spent recharging resonators during the Summer 2022 seasonal event, updated over time.'
+    label: 'Summer Solstice Event',
+    description: 'Counts the XM spent recharging resonators during the Summer Solstice 2022 event.'
   },
   'superposition_guids.tsv': {
     shape: 'tabular',
     label: 'Superposition',
-    description: "A log of participation during the 'Superposition' anomaly/storyline, over time."
+    description: '[UNCONFIRMED] Lists each Portal you have interacted with during an on-site Superposition Anomaly by incrementaly assigning them a number starting at 1. A Portal will be assigned the same number if it is visited again'
   },
   'umbra_resonator_deployments.tsv': {
     shape: 'tabular',
-    label: 'Umbra Resonator Deployments',
-    description: "A log of resonator deployments during the 'Umbra' event, over time."
+    label: 'Umbra Global Challenge',
+    description: 'Logs each Resonator Slot you have deployed to during the Umbra Global Challenge and assigns it an ID incrementing by 1 for each unique Slot. If you deploy in a Resonator Slot on which you had already deployed the same ID will be logged again.'
   },
   'xm_collected.tsv': {
     shape: 'tabular',
     label: 'XM Collected',
-    description: 'Lifetime XM (Exotic Matter) collected from portals, updated over time.'
+    description: 'Logs each instance of XM collected, together with its amount.'
   },
   'xm_recharged.tsv': {
     shape: 'tabular',
     label: 'XM Recharged',
-    description: 'Lifetime XM spent recharging resonators, updated over time.'
+    description: 'Logs each instance of XM recharged, together with its amount.'
   }
 }
 
@@ -811,86 +814,100 @@ export const PATTERN_MATCHES = [
   {
     pattern: /^add_mod\d+(_\d+)?\.csv$/,
     shape: 'tabular',
-    label: 'Add Mod',
-    description: 'GPS location recorded each time a mod was added to a deployed resonator.'
+    label: 'Mods Deployed',
+    description: 'GPS location of Portals you have deployed a Mod on.',
+    privacy: ['location']
   },
   {
     pattern: /^add_powerup\d+(_\d+)?\.csv$/,
     shape: 'tabular',
     label: 'Add Power-up',
-    description: 'GPS location recorded each time a power-up was applied to a resonator.'
+    description: 'GPS location of Portals you have deployed a Portal Powerup on.',
+    privacy: ['location']
   },
   {
     pattern: /^collect_items_or_glyphs_from_portal\d+(_\d+)?\.csv$/,
     shape: 'tabular',
     label: 'Collect Items or Glyphs from Portal',
-    description: 'GPS location recorded each time items or glyph rewards were collected from a portal.'
+    description: 'GPS location of Portals you have hacked.',
+    privacy: ['location']
   },
   {
     pattern: /^create_link\d+(_\d+)?\.csv$/,
     shape: 'tabular',
     label: 'Create Link',
-    description: 'GPS location recorded each time a link was created.'
+    description: 'GPS location of Portals you have created a link from.',
+    privacy: ['location']
   },
   {
     pattern: /^deploy_resonator\d+(_\d+)?\.csv$/,
     shape: 'tabular',
     label: 'Deploy Resonator',
-    description: 'GPS location recorded each time a resonator was deployed.'
+    description: 'GPS location of Portals you have deployed a Resonator on.',
+    privacy: ['location']
   },
   {
     pattern: /^flip_portal\d+(_\d+)?\.csv$/,
     shape: 'tabular',
     label: 'Flip Portal',
-    description: 'GPS location recorded each time a portal was flipped to the other faction.'
+    description: 'GPS location of Portals you have deployed a Flipcard on.',
+    privacy: ['location']
   },
   {
     pattern: /^player_logs_in\d+(_\d+)?\.csv$/,
     shape: 'tabular',
     label: 'Player Logs In',
-    description: 'GPS location recorded each time you logged into the game.'
+    description: 'GPS location recorded each time you logged into the game.',
+    privacy: ['location']
   },
   {
     pattern: /^query_nearby_vps_wayspots\d+(_\d+)?\.csv$/,
     shape: 'tabular',
     label: 'Query Nearby VPS Wayspots',
-    description: 'GPS location and device info recorded each time the app queried nearby AR-enabled (VPS) Wayspots.'
+    description: 'GPS location and device info recorded each time the app queried nearby VPS Wayspots. [UNCONFIRMED: Location is location of Portals you activate Overclock from?]',
+    privacy: ['location', 'device-info']
   },
   {
     pattern: /^recharge_resonator\d+(_\d+)?\.csv$/,
     shape: 'tabular',
     label: 'Recharge Resonator',
-    description: 'GPS location recorded each time a resonator was recharged.'
+    description: 'GPS location of Portals you have recharged.',
+    privacy: ['location']
   },
   {
     pattern: /^record_ar_scan\d+(_\d+)?\.csv$/,
     shape: 'tabular',
     label: 'Record AR Scan',
-    description: 'Device info recorded each time an AR scan was performed (no location included in this file).'
+    description: 'Device info recorded each time a Portal Scan was started/uploaded.',
+    privacy: ['device-info']
   },
   {
     pattern: /^start_or_end_ar_session\d+(_\d+)?\.csv$/,
     shape: 'tabular',
     label: 'Start or End AR Session',
-    description: 'Device info recorded each time an AR session started or ended (no location included in this file).'
+    description: '[UNKNOWN, likely when Overclock hacks were started or stopped?]',
+    privacy: ['device-info']
   },
   {
     pattern: /^upgrade_resonator\d+(_\d+)?\.csv$/,
     shape: 'tabular',
     label: 'Upgrade Resonator',
-    description: 'GPS location recorded each time a resonator was upgraded.'
+    description: 'GPS location of Portals you have upgraded Resonators on.',
+    privacy: ['location']
   },
   {
     pattern: /^use_vps\d+(_\d+)?\.csv$/,
     shape: 'tabular',
     label: 'Use VPS',
-    description: 'GPS location and device info recorded each time AR/VPS positioning was used.'
+    description: 'GPS location of Portals and device info recorded each time VPS positioning was used for Overclock.',
+    privacy: ['location', 'device-info']
   },
   {
     pattern: /^use_contextual_awareness\d+(_\d+)?\.csv$/,
     shape: 'tabular',
     label: 'Use Contextual Awareness',
-    description: 'Device info recorded each time the contextual awareness AR feature was used (no location included in this file).'
+    description: 'Device info recorded each time the "contextual awareness" AR feature was used [UNCONFORMED, likey means when Portal Scans used Portal Meshing]..',
+    privacy: ['device-info']
   }
 ]
 
