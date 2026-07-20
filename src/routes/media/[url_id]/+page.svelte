@@ -1,6 +1,6 @@
 <script>
   import Time, { dayjs } from 'svelte-time'
-  import { resolve } from '$lib/utils'
+  import { resolve } from '$app/paths'
   import AgentName from '$lib/components/AgentName.svelte'
 
   const { data } = $props()

@@ -1,7 +1,3 @@
-import { base } from '$app/paths'
-
-export const resolve = (path) => base + path
-
 export const formatNumber = n => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
 export const isIOSSafari = () => {

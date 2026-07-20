@@ -6,7 +6,7 @@
   import AgentName from '$lib/components/AgentName.svelte'
   import { browser } from '$app/environment'
   import { goto } from '$app/navigation'
-  import { resolve } from '$lib/utils'
+  import { resolve } from '$app/paths'
 
   const username = $derived($authData?.baseModel?.username || 'NONE')
   const userId = $derived($authData?.baseModel?.id || 'NONE')

@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte'
     import Time from 'svelte-time'
-    import { resolve } from '$lib/utils'
+    import { resolve } from '$app/paths'
     import { pb } from '$lib/pocketbase'
     import { authData } from '$lib/stores'
     import { formatNumber } from '$lib/utils.js'

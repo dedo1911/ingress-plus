@@ -2,7 +2,7 @@
   import sortBy from 'lodash.sortby'
   import { goto } from '$app/navigation'
   import { browser } from '$app/environment'
-  import { resolve } from '$lib/utils'
+  import { resolve } from '$app/paths'
   import { badgeSize, authData, ownedBadges } from '$lib/stores'
   import { featureFlags } from '$lib/featureFlags'
   import { serverAddress } from '$lib/pocketbase'

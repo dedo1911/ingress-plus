@@ -1,5 +1,5 @@
 <script>
-    import { resolve } from '$lib/utils'
+    import { resolve } from '$app/paths'
     const { children } = $props()
 </script>
 

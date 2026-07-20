@@ -1,6 +1,6 @@
 <script>
     import { goto } from '$app/navigation'
-    import { resolve } from '$lib/utils'
+    import { resolve } from '$app/paths'
     import { browser } from '$app/environment'
     import { authData } from '$lib/stores'
     import { featureFlags, featureFlagsLoaded } from '$lib/featureFlags'
@@ -11,7 +11,7 @@
     const userId = $derived($authData?.baseModel?.id || 'NONE')
 
     $effect(() => {
-        if (browser && $featureFlagsLoaded && !$featureFlags.VERIFICATION_ENABLED) goto(resolve('/'))
+      if (browser && $featureFlagsLoaded && !$featureFlags.VERIFICATION_ENABLED) goto(resolve('/'))
     })
 </script>
 
