@@ -1,5 +1,6 @@
 <script>
   import { resolve } from '$app/paths'
+  import { featureFlags } from '$lib/featureFlags'
 </script>
 
 <svelte:head>
@@ -40,11 +41,13 @@
             <p><img src="/images/event.svg" alt="Events" /> Events</p>
         </div>
     </a>
-    <a class="hero hero-left" href={resolve('/bugs')}>
-        <div style="background-image: url('/images/hero_images/cat_bug_tracker.jpg');">
-            <p><img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker</p>
-        </div>
-    </a>
+    {#if $featureFlags.BUG_REPORTS_ENABLED}
+        <a class="hero hero-left" href={resolve('/bugs')}>
+            <div style="background-image: url('/images/hero_images/cat_bug_tracker.jpg');">
+                <p><img src="/images/bugs.svg" alt="Bug Tracker" /> Bug Tracker</p>
+            </div>
+        </a>
+    {/if}
 </div>
 
 <style>
