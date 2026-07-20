@@ -9,6 +9,7 @@ export async function load ({ fetch }) {
       sort: '-sorting',
       expand: 'badges_via_category',
       fields: [
+        'id',
         'title',
         'tiers',
         'expand.badges_via_category.collectionId',
