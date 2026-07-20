@@ -111,18 +111,7 @@
     }
   })
 
-    let description = $state(badge.description)
-
-    // Special handling for Via Lux Explorer event
-    if (title === 'Via Lux Explorer - Bronze') {
-      title = 'Via Lux Adventure'
-      description = 'Adventured to over 300 unique Portals in September 2016.'
-    }
-
-    if (title === 'Via Lux Explorer - Silver') {
-      title = 'Via Lux Odyssey'
-      description = 'Above and beyond. Adventured to over 711 unique Portals in September 2016.'
-    }
+  const description = $derived(badge.description)
 </script>
 
 <Modal bind:showModal>
