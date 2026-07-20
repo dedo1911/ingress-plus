@@ -174,7 +174,7 @@
       {#if wingsOwned && isHighestTier}
       <img
         height=auto
-        width={($badgeSize + ($badgeSize * (57/100))) * 2}
+        width={($badgeSize + ($badgeSize * (57 / 100))) * 2}
         alt="Recursed badge"
         src="images/badges/recursed_badge.png"
         class="recursed-badge-image"
