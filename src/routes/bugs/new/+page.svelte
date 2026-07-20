@@ -7,6 +7,7 @@
   import { resolve } from '$app/paths'
   import { browser } from '$app/environment'
   import { authData } from '$lib/stores'
+  import { featureFlags } from '$lib/featureFlags'
 
   let title = $state('')
   let ingressVersion = $state('')
@@ -122,7 +123,7 @@
   <hr />
 
   <!-- TODO: Sending attachments broken, didn't understand documentation: https://pocketbase.io/docs/files-handling ^^' -->
-  {#if $authData?.baseModel?.verification !== ''}
+  {#if $featureFlags.VERIFICATION_ENABLED && $authData?.baseModel?.verification !== ''}
     <h3>Screenshots (optional)</h3>
     <p align="center">
       You can add up to 5 screenshots to your Bug Report.<br />Do not abuse this
@@ -155,7 +156,7 @@
         {/each}
       {/if}
     </div>
-  {:else}
+  {:else if $featureFlags.VERIFICATION_ENABLED}
     <p>
       If your Verification level is at least "BASIC" you can also upload images.
       Verification is done manually and at the discrecion of the admins only at
