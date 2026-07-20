@@ -11,11 +11,17 @@
     badge,
     tier,
     owned,
-    title
+    hasWings,
+    title,
+    totalTiers
   } = $props()
   let content = $state()
   let badgeData = $state()
   let Requirement = $state()
+  const wingsOwned = $derived(
+    hasWings && $ownedBadges.some(b => b.badge === badge.id && b.hasWings === true)
+  )
+  const isHighestTier = $derived(tier === Math.max(0, totalTiers - 1))
 
   const toggleOwned = async () => {
     if (!$authData.isValid) return
@@ -50,7 +56,31 @@
     Requirement = Number(requirementsArray[tier]).toLocaleString()
   }
 
+  const toggleWings = async () => {
+    if (!$authData.isValid) return
+    const existingRecord = $ownedBadges.find(b => b.badge === badge.id)
+    if (wingsOwned) {
+      const el = await pb.collection('user_badges').update(existingRecord.id, { hasWings: false })
+      ownedBadges.update(bs => [...bs.filter(b => b.id !== el.id), el])
+    } else {
+      if (existingRecord) {
+        const el = await pb.collection('user_badges').update(existingRecord.id, { tier, hasWings: true })
+        ownedBadges.update(bs => [...bs.filter(b => b.id !== el.id), el])
+      } else {
+        const el = await pb.collection('user_badges').create({
+          user: pb.authStore.model.id,
+          badge: badge.id,
+          tier,
+          hasWings: true
+        })
+        ownedBadges.update(bs => [...bs, el])
+      }
+    }
+    await updateCounter()
+  }
+
   let ownedCounter = $state(0)
+  let ownedWingsCounter = $state(0)
 
   const updateCounter = async () => {
     try {
@@ -62,6 +92,14 @@
       ownedCounter = owned.reduce((acc, o) => acc + o.count, 0)
     } catch {
       ownedCounter = 0
+    }
+    if (hasWings) {
+      try {
+        const wings = await pb.collection('wings_counts').getFirstListItem(`badge = '${badge.id}'`)
+        ownedWingsCounter = wings.count
+      } catch {
+        ownedWingsCounter = 0
+      }
     }
   }
 
@@ -78,40 +116,65 @@
 
 <Modal bind:showModal>
   <header>
-    {#if $authData.isValid && !!badgeData}
-      {#if badge.unobtainable || (badgeData?.locked_tier > 0 && [tier] >= badgeData?.locked_tier) || (badgeData?.unlocks_at && dayjs(badgeData?.unlocks_at).isAfter(dayjs()))}
-        <button disabled>
+    <div class="left-controls">
+      {#if $authData.isValid && !!badgeData}
+        {#if badge.unobtainable || (badgeData?.locked_tier > 0 && [tier] >= badgeData?.locked_tier) || (badgeData?.unlocks_at && dayjs(badgeData?.unlocks_at).isAfter(dayjs()))}
+          <button disabled>
+              <img
+              src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
+              alt="Checkbox"
+              height="32"
+              width="32"
+              />
+          </button>
+        {:else}
+          <button onclick={toggleOwned} title={owned ? 'Mark not owned' : 'Mark owned'}>
+              <img
+                src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
+                alt="Checkbox"
+                height="32"
+                width="32"
+              />
+          </button>
+        {/if}
+        {#if hasWings && isHighestTier && !badge.unobtainable}
+          <button onclick={toggleWings} title={wingsOwned ? 'Mark wings not obtained' : 'Mark wings obtained'}>
             <img
-            src="/images/{owned ? 'checkbox_on' : 'checkbox_locked'}.png"
-            alt="Checkbox"
-            height="32"
-            width="32"
-            />
-        </button>
-      {:else}
-        <button onclick={toggleOwned} title={owned ? 'Mark not owned' : 'Mark owned'}>
-            <img
-              src="/images/{owned ? 'checkbox_on' : 'checkbox_off'}.png"
+              src="/images/{wingsOwned ? 'checkbox_on' : 'checkbox_off'}.png"
               alt="Checkbox"
               height="32"
               width="32"
             />
-        </button>
+            <img src="images/badges/recursed_flair.png" alt="Wings" height="32" />
+          </button>
+        {/if}
+      {:else}
+        <span>&nbsp;</span>
       {/if}
-    {:else}
-      <span>&nbsp;</span>
-    {/if}
-    <img
-      height={$badgeSize * 2}
-      width={$badgeSize * 2}
-      alt={title}
-      src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize * 2}x{$badgeSize * 2}"
-    />
+    </div>
+    <div class="image-wrapper">
+      <img
+        height={$badgeSize * 2}
+        width={$badgeSize * 2}
+        alt={title}
+        src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize * 2}x{$badgeSize * 2}"
+        class="badge-image"
+      />
+      {#if wingsOwned && isHighestTier}
+      <img
+        height=auto
+        width={($badgeSize + ($badgeSize * (57 / 100))) * 2}
+        alt="Recursed badge"
+        src="images/badges/recursed_badge.png"
+        class="recursed-badge-image"
+      />
+      {/if}
+    </div>
     <a title="Download" href={resolve(`${serverAddress}/api/files/${badge.collectionId}/${badge.id}/${badge.image[tier]}?download=true`)}>
       <img src="/images/download.svg" alt="Download" height="32" width="32" />
     </a>
   </header>
-  <section bind:this={content} style="--badge-size: {$badgeSize}px">
+  <section bind:this={content} style="--badge-size: {$badgeSize}px" class:has-wings={wingsOwned && isHighestTier}>
     <h2>
       {#if badgeData?.core_only}
         <img src="/images/core.png" alt="C.O.R.E" class="core-flare" />
@@ -138,6 +201,9 @@
     <div class="footer">
       {#if ownedCounter > 0 }
         <small transition:slide>{ownedCounter} {ownedCounter === 1 ? 'agent has' : 'agents have'} this badge!</small>
+        {#if hasWings && isHighestTier && ownedWingsCounter > 0 }
+          <small transition:slide>{ownedWingsCounter} of these Agents {ownedWingsCounter === 1 ? 'has' : 'have'} earned Recursion Wings for it!</small>
+        {/if}
       {/if}
       {#if (badgeData?.unlocks_at && dayjs(badgeData?.unlocks_at).isAfter(dayjs()))}
         <small transition:slide>Unlocks <Time timestamp={badgeData?.unlocks_at} relative live /></small>
@@ -154,15 +220,31 @@
     filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.75));
     position: sticky;
     z-index: 9999;
+    overflow: visible;
   }
   header button, header span, header a {
     flex: 1;
-    margin: 4.5em 0 0 1em;
+    margin: 6.5em 0 0 1em;
     text-align: left;
-}
+  }
+  .left-controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin: 6.5em 0 0 1em;
+    text-align: left;
+    gap: 0.5em;
+  }
+  .left-controls button, .left-controls span {
+    flex: none;
+    margin: 0;
+  }
   header a {
     text-align: right;
     margin: 3.75em 0.75em 0 0;
+  }
+  section.has-wings {
+    padding-top: calc(var(--badge-size) * 1.5);
   }
   section h2 {
     margin: 0.5em 0 0 0;
@@ -183,10 +265,12 @@
   }
   div.footer {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-end;
     margin-top: 1em;
   }
   small {
+    display: block;
     color: #d1d1d1;
     text-align: right;
     width: 100%;
@@ -194,5 +278,22 @@
     right: 0;
     bottom: 0;
     font-size: small;
+  }
+  .image-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  .badge-image {
+    position: relative;
+    z-index: 2;
+    display: block;
+  }
+  .recursed-badge-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    pointer-events: none;
   }
 </style>
