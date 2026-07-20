@@ -87,7 +87,7 @@ h2 a:link, h2 a:visited, h2 a:hover, h2 a:active {
 input[type=file] {
   display: none;
 }
-input[type=text], select, label.file-upload {
+input[type=text], input[type=number], select, label.file-upload {
   font-size: 1.25em;
   background: rgba(14, 11, 28, 0.9);
   border: 3px double #5e5a75;
