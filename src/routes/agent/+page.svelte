@@ -66,7 +66,7 @@
   <p><a href={resolve('/agent/settings')}>Open Profile Settings</a></p>
 
   <div class="controls">
-    <button onclick={() => groupByCategory = !groupByCategory}>
+    <button onclick={() => (groupByCategory = !groupByCategory)}>
       <img src="/images/shuffle.svg" height="24" alt="Toggle view" />
       {groupByCategory ? 'Default order' : 'Group by category'}
     </button>
