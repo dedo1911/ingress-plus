@@ -5,6 +5,7 @@
   import { formatNumber } from '$lib/utils'
   import Callout from '$lib/components/Callout.svelte'
   import { summarizeFile } from '$lib/gdpr-analyzer/summarize'
+  import LocationHeatmap from './LocationHeatmap.svelte'
 
   // Mirrors the category taxonomy documented in $lib/gdpr-analyzer/catalog.js. A file
   // can carry more than one of these at once - describePrivacyFlags() below lists all
@@ -100,6 +101,43 @@
   const flaggedResults = $derived(
     queue.filter(item => item.status === 'done' && item.result.privacyFlags.length > 0)
   )
+
+  // Files are processed sequentially (see drainQueue), so with several files queued at once
+  // there's a real gap between dropping them in and analysis results (the heatmap panel below,
+  // and eventually more analysis besides) actually appearing. This covers that gap generically
+  // across whatever analysis exists now or gets added later, rather than being specific to any
+  // one result type.
+  const analyzingCount = $derived(
+    queue.filter(item => item.status === 'pending' || item.status === 'processing').length
+  )
+  // drainQueue works one item at a time, so at most one item is ever 'processing' -
+  // surfacing its name matters most for a file like game_log.tsv, which is large enough
+  // that sitting on it for a while without any file-level feedback could read as stuck.
+  const currentlyProcessing = $derived(queue.find(item => item.status === 'processing'))
+
+  // Automatic-analysis panel: dynamically populated from whichever queued files carry
+  // extractable location data (see `heatGroups` in $lib/gdpr-analyzer/summarize.js), rather
+  // than a fixed list - dropping a second matching file grows the source toggle in place. The
+  // user's toggle picks are kept separate from the derived "what's actually available" state so
+  // stale picks (e.g. after removing a file) fall back to the first available option instead of
+  // pointing at nothing.
+  const heatmapSources = $derived(
+    queue
+      .filter(item => item.status === 'done' && item.result.heatGroups)
+      .map(item => ({ id: item.id, fileLabel: item.result.label, groups: item.result.heatGroups }))
+  )
+
+  let userSelectedSourceId = $state(null)
+  let userSelectedGroupKey = $state(null)
+
+  const activeSource = $derived(
+    heatmapSources.find(s => s.id === userSelectedSourceId) ?? heatmapSources[0] ?? null
+  )
+  const activeGroupKeys = $derived(activeSource ? Object.keys(activeSource.groups) : [])
+  const activeGroupKey = $derived(
+    activeGroupKeys.includes(userSelectedGroupKey) ? userSelectedGroupKey : (activeGroupKeys[0] ?? null)
+  )
+  const activePoints = $derived(activeSource && activeGroupKey ? activeSource.groups[activeGroupKey] : [])
 </script>
 
 <svelte:head>
@@ -138,6 +176,48 @@
     />
     <p class="hint">…or drag and drop files here</p>
   </div>
+
+  {#if analyzingCount > 0}
+    <div class="analyzing-indicator">
+      <span class="spinner" aria-hidden="true"></span>
+      Analyzing {analyzingCount} file{analyzingCount === 1 ? '' : 's'}…
+      {#if currentlyProcessing}
+        - {currentlyProcessing.file.name}
+      {/if}
+    </div>
+  {/if}
+
+  {#if heatmapSources.length > 0}
+    <div class="analysis-panel">
+      {#if heatmapSources.length > 1}
+        <div class="toggle-row">
+          {#each heatmapSources as source (source.id)}
+            <button
+              type="button"
+              class="toggle-pill"
+              class:active={source.id === activeSource.id}
+              onclick={() => { userSelectedSourceId = source.id }}
+            >{source.fileLabel}</button>
+          {/each}
+        </div>
+      {/if}
+
+      {#if activeGroupKeys.length > 1}
+        <div class="toggle-row">
+          {#each activeGroupKeys as groupKey (groupKey)}
+            <button
+              type="button"
+              class="toggle-pill"
+              class:active={groupKey === activeGroupKey}
+              onclick={() => { userSelectedGroupKey = groupKey }}
+            >{groupKey}</button>
+          {/each}
+        </div>
+      {/if}
+
+      <LocationHeatmap points={activePoints} />
+    </div>
+  {/if}
 
   {#if queue.length > 0}
     <div class="results-header">
@@ -248,6 +328,54 @@
   p.hint {
     margin: 0.75em 0 0;
     color: rgba(255, 255, 255, 0.6);
+  }
+  div.analyzing-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+    margin: 1em 0;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  span.spinner {
+    width: 1em;
+    height: 1em;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #9593c3;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  div.analysis-panel {
+    margin: 1em 0;
+  }
+  div.toggle-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5em;
+    margin-bottom: 0.75em;
+  }
+  button.toggle-pill {
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(14, 11, 28, 0.9);
+    border: 1px solid #5e5a75;
+    border-radius: 999px;
+    padding: 0.35em 1em;
+    transition: color 150ms ease-in-out, border-color 150ms ease-in-out, background-color 150ms ease-in-out;
+  }
+  button.toggle-pill:hover {
+    color: #FFF;
+    border-color: #9593c3;
+  }
+  button.toggle-pill.active {
+    color: #FFF;
+    background: rgba(89, 86, 154, 0.35);
+    border-color: #9593c3;
   }
   div.flagged-list {
     text-align: left;

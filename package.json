@@ -19,6 +19,8 @@
 		"eslint": "9.36.0",
 		"eslint-plugin-svelte": "3.17.1",
 		"globals": "^17.5.0",
+		"leaflet": "^1.9.4",
+		"leaflet.heat": "^0.2.0",
 		"lodash.sortby": "^4.7.0",
 		"neostandard": "0.13.0",
 		"pocketbase": "0.26.8",

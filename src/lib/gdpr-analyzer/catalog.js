@@ -55,20 +55,23 @@ export const KNOWN_FILES = {
     label: 'Game Log',
     timeColumn: 'Event Time',
     description: 'The master event log (captures, hacks, links, comms, purchases, and more), listed one action at a time.',
-    privacy: ['location']
+    privacy: ['location'],
+    locationColumns: { lat: 'Latitude', lng: 'Longitude' }
   },
   'gameplaylocationhistory.tsv': {
     shape: 'tabular',
     label: 'Location History',
     timeColumn: 'Date and Time',
     description: 'GPS locations reported by the game over time.',
-    privacy: ['location']
+    privacy: ['location'],
+    locationColumns: { lat: 'Latitude of location reported by game', lng: 'Longitude of location reported by game' }
   },
   'portal_history.tsv': {
     shape: 'tabular',
     label: 'Portal History',
     description: 'Locations of Portals visited, captured, or scout-controlled.',
-    privacy: ['location']
+    privacy: ['location'],
+    locationColumns: { lat: 'Latitude', lng: 'Longitude', groupBy: 'Type' }
   },
   'fitnessdata.tsv': {
     shape: 'tabular',

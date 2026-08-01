@@ -1,29 +1,74 @@
 import { classifyByName } from './detect.js'
 import { parseHeaderAndRows } from './delimited.js'
 import { parseTimestamp, findTimeColumnIndex } from './dates.js'
+import { parseCoordinatePair } from './coordinates.js'
 import { humanizeFilename } from './humanize.js'
 import { normalizeFilename } from './catalog.js'
 
 const WAYFARER_ARRAY_KEYS = ['OprSubmissionLog', 'OprAssignmentLog', 'OprSkippedLog', 'OprUpgradeLog']
 
+// Coordinates are bucketed into a coarse grid (rather than kept as one point per row) so the
+// heat layer stays smooth and memory stays bounded by distinct-location count rather than row
+// count, regardless of how large the source file is.
+const HEATMAP_GRID_PRECISION = 3
+
+// Converts the { groupKey -> { cellKey -> weight } } accumulator built during the row loop
+// below into the [lat, lng, weight] tuples leaflet.heat consumes directly.
+function buildHeatGroups (grid) {
+  const heatGroups = {}
+  for (const [groupKey, cells] of grid) {
+    heatGroups[groupKey] = Array.from(cells, ([cellKey, weight]) => {
+      const [lat, lng] = cellKey.split(',').map(Number)
+      return [lat, lng, weight]
+    })
+  }
+  return heatGroups
+}
+
 // Every tabular catalog entry (exact, prefix, or pattern match - see catalog.js) already
-// carries its own label/description, so this is just row counting + date range now;
-// no more runtime header-shape sniffing to generate a description on the fly.
+// carries its own label/description, so this is mostly row counting + date range; entries that
+// also set `locationColumns` (see catalog.js) additionally get a `heatGroups` result for the
+// location heatmap panel, built in this same single pass over the rows rather than a second
+// walk over the file.
 function summarizeTabular (text, classification, fallbackLabel) {
   const { headers, rows } = parseHeaderAndRows(text, classification.delimiter)
   const warnings = []
   const timeIndex = findTimeColumnIndex(headers, classification.timeColumn)
+  const label = classification.label ?? fallbackLabel
+
+  const locationColumns = classification.locationColumns ?? null
+  const latIndex = locationColumns ? headers.indexOf(locationColumns.lat) : -1
+  const lngIndex = locationColumns ? headers.indexOf(locationColumns.lng) : -1
+  const groupIndex = locationColumns?.groupBy ? headers.indexOf(locationColumns.groupBy) : -1
+  const grid = locationColumns ? new Map() : null
 
   let count = 0
   let start = null
   let end = null
   for (const row of rows) {
     count++
-    if (timeIndex === -1) continue
-    const date = parseTimestamp(row[timeIndex])
-    if (!date) continue
-    if (!start || date < start) start = date
-    if (!end || date > end) end = date
+
+    if (timeIndex !== -1) {
+      const date = parseTimestamp(row[timeIndex])
+      if (date) {
+        if (!start || date < start) start = date
+        if (!end || date > end) end = date
+      }
+    }
+
+    if (grid && latIndex !== -1 && lngIndex !== -1) {
+      const point = parseCoordinatePair(row[latIndex], row[lngIndex])
+      if (point) {
+        const groupKey = groupIndex !== -1 ? row[groupIndex] : label
+        const cellKey = `${point.lat.toFixed(HEATMAP_GRID_PRECISION)},${point.lng.toFixed(HEATMAP_GRID_PRECISION)}`
+        let cells = grid.get(groupKey)
+        if (!cells) {
+          cells = new Map()
+          grid.set(groupKey, cells)
+        }
+        cells.set(cellKey, (cells.get(cellKey) ?? 0) + 1)
+      }
+    }
   }
 
   if (timeIndex === -1) {
@@ -31,12 +76,13 @@ function summarizeTabular (text, classification, fallbackLabel) {
   }
 
   return {
-    label: classification.label ?? fallbackLabel,
+    label,
     description: classification.description ?? null,
     count,
     countLabel: 'rows',
     dateRange: start && end ? { start, end } : null,
-    warnings
+    warnings,
+    ...(grid ? { heatGroups: buildHeatGroups(grid) } : {})
   }
 }
 
