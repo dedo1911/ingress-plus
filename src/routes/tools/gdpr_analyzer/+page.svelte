@@ -3,6 +3,7 @@
   // any server. Files the user adds are read via the browser's File API only.
   import Time from 'svelte-time'
   import { toast } from '@zerodevx/svelte-toast'
+  import { resolve } from '$app/paths'
   import { formatNumber } from '$lib/utils'
   import Callout from '$lib/components/Callout.svelte'
   import { summarizeFile } from '$lib/gdpr-analyzer/summarize'
@@ -246,17 +247,23 @@
 </svelte:head>
 
 <div class="container">
-  <h1>GDPR Analyzer</h1>
+  <div class="header">
+    <h1>GDPR Analyzer</h1>
+    <a class="faq-button" href={resolve('/tools/gdpr_analyzer/faq')}>
+      <img src="/images/help.svg" alt="" />
+      How does this tool work?
+    </a>
+  </div>
 
   <p>
-    Requested your data from Niantic? Drop the files you got in below to see what each
-    one is, how many rows it has, and what date range it covers. This is a simple file
-    identification tool - it doesn't dig into or visualize the data itself.
+    If you have requested your Ingress data via a GDPR data request, you can use this tool to analyze and visualize various information from it you don't normally see in your Scanner!
   </p>
 
   <Callout variant="info">
-    Everything happens right here in your browser - files you add are never uploaded or
-    sent anywhere.
+    All processing happens in your browser. No data is uploaded or sent to us or anyone else.<br>
+    <a class="info-link" href={resolve('/tools/gdpr_analyzer/faq')}>
+      <img src="/images/help.svg" alt="" />More information
+    </a>
   </Callout>
 
   <div
@@ -464,12 +471,6 @@
 </div>
 
 <style>
-  h1 {
-    text-shadow: 0 0 10px black;
-    text-align: center;
-    margin: 1em auto;
-    max-width: 800px;
-  }
   div.container {
     text-align: center;
     max-width: 1000px;
@@ -477,6 +478,45 @@
     padding: 0 1em;
     line-height: 1.2em;
     margin-top: 2em;
+  }
+  div.header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+    margin: 1em 0;
+  }
+  div.header h1 {
+    text-shadow: 0 0 10px black;
+    margin: 0;
+  }
+  a.faq-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(14, 11, 28, 0.9);
+    border: 1px solid #5e5a75;
+    border-radius: 999px;
+    padding: 0.5em 1.2em;
+    white-space: nowrap;
+    transition: color 150ms ease-in-out, border-color 150ms ease-in-out, background-color 150ms ease-in-out;
+  }
+  a.faq-button:hover {
+    color: #FFF;
+    border-color: #9593c3;
+    background: rgba(89, 86, 154, 0.35);
+  }
+  a.faq-button img {
+    height: 1.2em;
+  }
+  a.info-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+  }
+  a.info-link img {
+    height: 1em;
   }
   div.dropzone {
     border: 3px double #5e5a75;
