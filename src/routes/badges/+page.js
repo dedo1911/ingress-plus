@@ -9,6 +9,7 @@ export async function load ({ fetch }) {
       sort: '-sorting',
       expand: 'badges_via_category',
       fields: [
+        'id',
         'title',
         'tiers',
         'expand.badges_via_category.collectionId',
@@ -17,7 +18,8 @@ export async function load ({ fetch }) {
         'expand.badges_via_category.title',
         'expand.badges_via_category.description',
         'expand.badges_via_category.unobtainable',
-        'expand.badges_via_category.hasPlaceholderData'
+        'expand.badges_via_category.hasPlaceholderData',
+        'expand.badges_via_category.wings_possible',
       ].join(','),
       fetch
     })

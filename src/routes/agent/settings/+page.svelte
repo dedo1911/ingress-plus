@@ -1,5 +1,6 @@
 <script>
   import { authData } from '$lib/stores'
+  import { featureFlags } from '$lib/featureFlags'
   import { pb } from '$lib/pocketbase'
   import { toast } from '@zerodevx/svelte-toast'
   import AgentName from '$lib/components/AgentName.svelte'
@@ -195,9 +196,16 @@
           <p><b>User ID:</b> <code>ING+{userId}</code></p>
           <p><b>E-mail:</b> <code>{email}</code></p>
           {#if verified}
-            <p>You are currently verified. You need to un-verify to change your Username or Faction.</p>
+            {#if $featureFlags.VERIFICATION_ENABLED}
+              <p>You are currently verified. You need to un-verify to change your Username or Faction.</p>
+            {:else}
+              <p>Verification is currently disabled. You must un-verify to edit your Username or Faction.</p>
+            {/if}
             <div style="text-align: center; margin-top: 0.5em;">
               {#if showUnverifyConfirm}
+                {#if !$featureFlags.VERIFICATION_ENABLED}
+                  <p class="unverify-warning">Verification is disabled and you will not be able to re-verify yourself.</p>
+                {/if}
                 <button
                   class="unverify-button"
                   disabled={disableConfirmButton}
@@ -208,7 +216,7 @@
                 <button class="unverify-button" onclick={showConfirmationPrompt}>Un-Verify Account</button>
               {/if}
             </div>
-          {:else}
+          {:else if $featureFlags.VERIFICATION_ENABLED}
             <p>You are not verified. You may change your Username or Faction.</p>
           {/if}
           {#if supporter === true}
@@ -295,6 +303,10 @@
   .unverify-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+  p.unverify-warning {
+    color: #e07b54;
+    margin-bottom: 0.75em;
   }
 
 </style>

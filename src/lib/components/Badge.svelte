@@ -23,6 +23,12 @@
     : false)
   const opaque = $derived($authData.isValid ? ($siteSettings.opaqueOwned ? owned : !owned) : false)
   const placeholder = $derived(badge?.hasPlaceholderData)
+  const hasWings = $derived(badge?.wings_possible)
+  const wingsOwned = $derived(
+    hasWings &&
+    (hasTiers ? tier === tiers.length - 1 : true) &&
+    $ownedBadges.some(b => b.badge === badge?.id && b.hasWings === true)
+  )
 
   const onBadgeClick = () => (showModal = true)
   const onBadgeKeydown = (e) => {
@@ -32,6 +38,7 @@
 
 {#if badge }
   <span onclick={onBadgeClick} onkeydown={onBadgeKeydown} role='button' tabindex='0' class="badge-wrapper">
+    <span class="sr-only">{title}</span>
     <img loading="lazy" height="{$badgeSize}" width="{$badgeSize}" alt="{title}" class:opaque={opaque}
     src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={thumbSize($badgeSize)}" />
 
@@ -44,8 +51,16 @@
         width="{$badgeSize}"
       />
     {/if}
+    {#if wingsOwned}
+      <img
+        class="wings_overlay"
+        class:opaque={opaque}
+        src="images/badges/recursed_flair.png"
+        alt="Wings earned"
+      />
+    {/if}
   </span>
-  <BadgeModal bind:showModal {badge} {tier} {owned} {title} />
+  <BadgeModal bind:showModal {badge} {tier} {owned} {title} {hasWings} totalTiers={tiers.length}/>
 {/if}
 
 <style>
@@ -68,5 +83,29 @@
     top: 0;
     left: 0;
     pointer-events: none;
+  }
+  .badge-wrapper img.wings_overlay {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 65%;
+    height: auto;
+    pointer-events: none;
+  }
+  .badge-wrapper img.wings_overlay.opaque {
+    opacity: 0.2;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 </style>

@@ -4,6 +4,7 @@
   import { siteSettings } from '$lib/stores'
   import Header from '$lib/components/Header.svelte'
   import Footer from '$lib/components/Footer.svelte'
+  import LoadingBar from '$lib/components/LoadingBar.svelte'
 
   import '../style.css'
   import '$lib/styles/editor.scss'
@@ -28,6 +29,7 @@
 </script>
 
 <SvelteToast {options} />
+<LoadingBar />
 
 <main>
 <Header />
