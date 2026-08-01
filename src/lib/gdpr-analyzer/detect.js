@@ -1,4 +1,4 @@
-import { lookupKnownFile } from './catalog.js'
+import { lookupKnownFile, normalizeFilename } from './catalog.js'
 
 // Delimiter (and, for CSV, the default time column) purely from file extension -
 // independent of the catalog match itself, since these are container-format concerns,
@@ -25,4 +25,14 @@ export function classifyByName (filename) {
 
   const extDefaults = EXTENSION_DEFAULTS[getExtension(filename)] ?? null
   return { ...extDefaults, ...known }
+}
+
+// Identity key for "this is the same file as one already added", used to replace a stale
+// upload rather than let it sit alongside a newer one. Only meaningful for exact-filename and
+// prefix matches, where there's genuinely one canonical file per export - numbered/pattern
+// matches (e.g. Add_Mod1.csv vs Add_Mod2.csv) and unrecognized files return null, since those
+// are legitimately distinct files that must never replace each other.
+export function getMatchedKey (filename) {
+  const { matchedBy } = classifyByName(filename)
+  return (matchedBy === 'filename' || matchedBy === 'filename-prefix') ? normalizeFilename(filename) : null
 }

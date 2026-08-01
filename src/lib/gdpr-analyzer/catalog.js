@@ -100,7 +100,12 @@ export const KNOWN_FILES = {
     shape: 'tabular',
     label: 'In-app purchases',
     timeColumn: 'Time',
-    description: 'Date and time of buying CMU or purchasing items in the in-app store, as well as details about each article and when the awarded items were used.'
+    description: 'Date and time of buying CMU or purchasing items in the in-app store, as well as details about each article and when the awarded items were used.',
+    // Admin CMU-balance adjustments (Transaction Type "OPS ADJUST CMU") can carry another
+    // player's codename in the free-text reason - confirmed against a real export, not
+    // theoretical - hence the flag even though most rows in this file are not PII.
+    privacy: ['third-party-pii'],
+    purchaseColumns: { type: 'Transaction Type', item: 'Item', description: 'Transaction Description' }
   },
   'subscriptions_monthly.tsv': {
     shape: 'tabular',

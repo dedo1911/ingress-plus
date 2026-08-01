@@ -2,10 +2,13 @@
   // Fully client-side tool - no +page.js/load(), nothing is fetched from PocketBase or
   // any server. Files the user adds are read via the browser's File API only.
   import Time from 'svelte-time'
+  import { toast } from '@zerodevx/svelte-toast'
   import { formatNumber } from '$lib/utils'
   import Callout from '$lib/components/Callout.svelte'
   import { summarizeFile } from '$lib/gdpr-analyzer/summarize'
+  import { getMatchedKey } from '$lib/gdpr-analyzer/detect'
   import LocationHeatmap from './LocationHeatmap.svelte'
+  import PurchaseSummary from './PurchaseSummary.svelte'
 
   // Mirrors the category taxonomy documented in $lib/gdpr-analyzer/catalog.js. A file
   // can carry more than one of these at once - describePrivacyFlags() below lists all
@@ -18,12 +21,24 @@
     'device-info': 'device information'
   }
 
-  const describePrivacyFlags = flags => {
-    const labels = flags.map(f => PRIVACY_FLAG_LABELS[f]).filter(Boolean)
+  // Shorter, tag-style versions of the same categories, used inline in the collapsed
+  // verified-but-inactive file list rather than the full sentence phrasing above.
+  const PRIVACY_TAG_LABELS = {
+    'own-email': 'Email',
+    'third-party-pii': "Other Players' Info",
+    location: 'Location',
+    'device-info': 'Device Info'
+  }
+
+  const joinLabels = (flags, labelMap) => {
+    const labels = flags.map(f => labelMap[f]).filter(Boolean)
     if (labels.length === 0) return ''
     if (labels.length === 1) return labels[0]
     return `${labels.slice(0, -1).join(', ')} and ${labels.at(-1)}`
   }
+
+  const describePrivacyFlags = flags => joinLabels(flags, PRIVACY_FLAG_LABELS)
+  const describePrivacyTags = flags => joinLabels(flags, PRIVACY_TAG_LABELS)
 
   let queue = $state([])
   let nextId = 0
@@ -33,16 +48,21 @@
     if (draining) return
     draining = true
     try {
-      for (const item of queue) {
-        if (item.status !== 'pending') continue
-        item.status = 'processing'
+      // Re-queries the queue for the next pending item each pass rather than iterating a
+      // captured array/for-of, since addFiles can splice an in-flight replaced file out of the
+      // queue mid-drain (see the replace-on-duplicate logic below) - a live for-of loop would
+      // have its indices shifted out from under it by that splice and could skip whatever
+      // file landed in the gap.
+      let next
+      while ((next = queue.find(item => item.status === 'pending'))) {
+        next.status = 'processing'
         try {
-          item.result = await summarizeFile(item.file)
-          item.status = 'done'
+          next.result = await summarizeFile(next.file)
+          next.status = 'done'
         } catch (err) {
-          console.error(err)
-          item.error = 'Failed to process this file.'
-          item.status = 'error'
+          console.error(`Failed to analyze ${next.file.name}:`, err)
+          next.error = 'Failed to process this file. See the browser console for details.'
+          next.status = 'error'
         }
       }
     } finally {
@@ -50,12 +70,53 @@
     }
   }
 
-  const addFiles = fileList => {
-    for (const file of Array.from(fileList)) {
-      const isDuplicate = queue.some(item => item.file.name === file.name && item.file.size === file.size)
-      if (isDuplicate) continue
-      queue.push({ id: nextId++, file, status: 'pending', result: null, error: null })
+  const addFiles = (fileList, isFolderFlags = []) => {
+    const duplicateNames = []
+    const replacedNames = []
+
+    const files = Array.from(fileList)
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      // One file's name/metadata tripping up matching shouldn't stop the rest of the batch
+      // from being added, or skip the drainQueue() call below - a file already pushed before
+      // such a failure would otherwise sit at 'pending' until some unrelated future drop
+      // happened to call drainQueue() again.
+      try {
+        const isFolder = isFolderFlags[i] ?? false
+        const isDuplicate = queue.some(item => item.file.name === file.name && item.file.size === file.size)
+        if (isDuplicate) {
+          duplicateNames.push(file.name)
+          continue
+        }
+
+        const matchedKey = getMatchedKey(file.name)
+        if (matchedKey) {
+          const existingIndex = queue.findIndex(item => item.matchedKey === matchedKey)
+          if (existingIndex !== -1) {
+            const [replaced] = queue.splice(existingIndex, 1)
+            replacedNames.push(replaced.file.name)
+          }
+        }
+
+        queue.push({ id: nextId++, file, matchedKey, isFolder, status: 'pending', result: null, error: null })
+      } catch (err) {
+        console.error(`Failed to add ${file.name}:`, err)
+      }
     }
+
+    // Batched into one toast per category per drop, rather than one per file, so dropping a
+    // folder's worth of already-added files doesn't spam a toast for each one.
+    if (duplicateNames.length === 1) {
+      toast.push(`${duplicateNames[0]} has already been added`)
+    } else if (duplicateNames.length > 1) {
+      toast.push(`${duplicateNames.length} of the files you added were already in the list`)
+    }
+    if (replacedNames.length === 1) {
+      toast.push(`Previous ${replacedNames[0]} replaced`)
+    } else if (replacedNames.length > 1) {
+      toast.push(`${replacedNames.length} previous files replaced`)
+    }
+
     drainQueue()
   }
 
@@ -87,7 +148,15 @@
   const onDrop = e => {
     e.preventDefault()
     dragCounter = 0
-    addFiles(e.dataTransfer.files)
+    // e.dataTransfer.files can't distinguish a dropped folder from a real (if unusual) zero-byte
+    // extension-less file on its own - webkitGetAsEntry() on the parallel `items` list is the
+    // actual signal, checked here (at drop time, before it's too late to ask) rather than
+    // guessed at display time. `items` and `files` share the same order for file-kind entries,
+    // which is all a plain OS file/folder drag ever produces.
+    const isFolderFlags = Array.from(e.dataTransfer.items ?? [])
+      .filter(item => item.kind === 'file')
+      .map(item => item.webkitGetAsEntry?.()?.isDirectory ?? false)
+    addFiles(e.dataTransfer.files, isFolderFlags)
   }
 
   const removeFile = id => {
@@ -98,8 +167,31 @@
     queue = []
   }
 
+  // Verified-but-inactive files carry their own inline privacy tag in their own list instead
+  // (see verifiedNotAnalyzedItems below) - only files with an actual detail row need the
+  // separate warning callout, since that's the only other place privacy info could get missed.
   const flaggedResults = $derived(
-    queue.filter(item => item.status === 'done' && item.result.privacyFlags.length > 0)
+    queue.filter(item => item.status === 'done' && item.result.hasActiveAnalysis && item.result.privacyFlags.length > 0)
+  )
+
+  // Only files that feed some actual analysis (today: the heatmap - see `hasActiveAnalysis` in
+  // $lib/gdpr-analyzer/summarize.js) get a full detail row; every other recognized file just
+  // adds to a running count instead of the table, since a title/description/row-count for a
+  // file nothing does anything with yet isn't worth the clutter. The catalog data itself is
+  // untouched - only what this page chooses to render from it.
+  const verifiedNotAnalyzedItems = $derived(
+    queue.filter(item => item.status === 'done' && item.result.shape !== 'rejected' && !item.result.hasActiveAnalysis)
+  )
+  const unrecognizedItems = $derived(
+    queue.filter(item => item.status === 'done' && item.result.shape === 'rejected')
+  )
+  const verifiedNotAnalyzedCount = $derived(verifiedNotAnalyzedItems.length)
+  const unrecognizedCount = $derived(unrecognizedItems.length)
+  const visibleQueueItems = $derived(
+    queue.filter(item =>
+      item.status === 'pending' || item.status === 'processing' || item.status === 'error' ||
+      (item.status === 'done' && item.result.hasActiveAnalysis)
+    )
   )
 
   // Files are processed sequentially (see drainQueue), so with several files queued at once
@@ -138,6 +230,15 @@
     activeGroupKeys.includes(userSelectedGroupKey) ? userSelectedGroupKey : (activeGroupKeys[0] ?? null)
   )
   const activePoints = $derived(activeSource && activeGroupKey ? activeSource.groups[activeGroupKey] : [])
+
+  // Same "automatic analysis" area as the heatmap above, but its own independent panel rather
+  // than folded into the heatmap's source/group toggles - a stats table and a map aren't the
+  // same kind of widget, and more than one file could carry a purchaseSummary in the future.
+  const purchaseSummaries = $derived(
+    queue
+      .filter(item => item.status === 'done' && item.result.purchaseSummary)
+      .map(item => ({ id: item.id, fileLabel: item.result.label, summary: item.result.purchaseSummary }))
+  )
 </script>
 
 <svelte:head>
@@ -215,73 +316,137 @@
         </div>
       {/if}
 
-      <LocationHeatmap points={activePoints} />
+      <svelte:boundary onerror={(error) => console.error('Location heatmap failed to render:', error)}>
+        <LocationHeatmap points={activePoints} />
+        {#snippet failed(error, reset)}
+          <Callout variant="error">
+            Something went wrong while showing the location heatmap - the rest of the page should
+            still work. Check the browser console for details.
+            <button type="button" onclick={reset}>Try again</button>
+          </Callout>
+        {/snippet}
+      </svelte:boundary>
     </div>
   {/if}
+
+  {#each purchaseSummaries as source (source.id)}
+    <div class="analysis-panel">
+      <h2 class="panel-heading">{source.fileLabel}</h2>
+      <svelte:boundary onerror={(error) => console.error(`Purchase summary for ${source.fileLabel} failed to render:`, error)}>
+        <PurchaseSummary summary={source.summary} />
+        {#snippet failed(error, reset)}
+          <Callout variant="error">
+            Something went wrong while showing this file's summary - the rest of the page should
+            still work. Check the browser console for details.
+            <button type="button" onclick={reset}>Try again</button>
+          </Callout>
+        {/snippet}
+      </svelte:boundary>
+    </div>
+  {/each}
 
   {#if queue.length > 0}
     <div class="results-header">
       <button onclick={clearAll}>Clear all</button>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>File</th>
-          <th>Identified as</th>
-          <th>Count</th>
-          <th>Date range</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {#each queue as item (item.id)}
+    {#if visibleQueueItems.length > 0}
+      <table>
+        <thead>
           <tr>
-            <td>{item.file.name}</td>
-            {#if item.status === 'pending' || item.status === 'processing'}
-              <td colspan="3" class="processing">Processing…</td>
-            {:else if item.status === 'error'}
-              <td colspan="3" class="row-warning">{item.error}</td>
-            {:else if item.result.shape === 'rejected'}
-              <td colspan="3" class="row-rejected">{item.result.description}</td>
-            {:else}
-              <td class="identified">
-                <div class="label">
-                  {item.result.label}
-                </div>
-                {#if item.result.description}
-                  <div class="description">{item.result.description}</div>
-                {/if}
-                {#if item.result.warnings.length > 0}
-                  <div class="row-warning">{item.result.warnings.join(' ')}</div>
-                {/if}
-              </td>
-              <td>
-                {#if item.result.count != null}
-                  {formatNumber(item.result.count)} {item.result.countLabel}
-                {:else}
-                  &mdash;
-                {/if}
-              </td>
-              <td>
-                {#if item.result.dateRange}
-                  <Time timestamp={item.result.dateRange.start} format="YYYY-MM-DD" />
-                  &ndash;
-                  <Time timestamp={item.result.dateRange.end} format="YYYY-MM-DD" />
-                {:else}
-                  &mdash;
-                {/if}
-              </td>
-            {/if}
-            <td>
-              <span class="remove" onclick={() => removeFile(item.id)} role="button" tabindex="0"
-                onkeydown={e => { if (e.key === 'Enter' || e.key === ' ') removeFile(item.id) }}
-                aria-label="Remove {item.file.name}"></span>
-            </td>
+            <th>File</th>
+            <th>Identified as</th>
+            <th>Count</th>
+            <th>Date range</th>
+            <th></th>
           </tr>
-        {/each}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {#each visibleQueueItems as item (item.id)}
+            <tr>
+              <td>{item.file.name}</td>
+              {#if item.status === 'pending' || item.status === 'processing'}
+                <td colspan="3" class="processing">Processing…</td>
+              {:else if item.status === 'error'}
+                <td colspan="3" class="row-warning">{item.error}</td>
+              {:else}
+                <td class="identified">
+                  <div class="label">
+                    {item.result.label}
+                  </div>
+                  {#if item.result.description}
+                    <div class="description">{item.result.description}</div>
+                  {/if}
+                  {#if item.result.warnings.length > 0}
+                    <div class="row-warning">{item.result.warnings.join(' ')}</div>
+                  {/if}
+                </td>
+                <td>
+                  {#if item.result.count != null}
+                    {formatNumber(item.result.count)} {item.result.countLabel}
+                  {:else}
+                    &mdash;
+                  {/if}
+                </td>
+                <td>
+                  {#if item.result.dateRange}
+                    <Time timestamp={item.result.dateRange.start} format="YYYY-MM-DD" />
+                    &ndash;
+                    <Time timestamp={item.result.dateRange.end} format="YYYY-MM-DD" />
+                  {:else}
+                    &mdash;
+                  {/if}
+                </td>
+              {/if}
+              <td>
+                <span class="remove" onclick={() => removeFile(item.id)} role="button" tabindex="0"
+                  onkeydown={e => { if (e.key === 'Enter' || e.key === ' ') removeFile(item.id) }}
+                  aria-label="Remove {item.file.name}"></span>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    {/if}
+
+    {#if verifiedNotAnalyzedCount > 0}
+      <p class="hint">
+        {verifiedNotAnalyzedCount} file{verifiedNotAnalyzedCount === 1 ? '' : 's'}
+        {verifiedNotAnalyzedCount === 1 ? 'has' : 'have'} been added that
+        {verifiedNotAnalyzedCount === 1 ? 'has' : 'have'} been verified to be part of a GDPR dump,
+        but cannot be analyzed by this tool yet.
+      </p>
+      <details class="file-list-details">
+        <summary>Show file names</summary>
+        <ul>
+          {#each verifiedNotAnalyzedItems as item (item.id)}
+            <li>
+              <strong>{item.result.label}</strong> - <span class="muted">{item.file.name}{item.isFolder ? ' (folder)' : ''}</span>
+              {#if item.result.privacyFlags.length > 0}
+                - <span class="row-warning">Contains {describePrivacyTags(item.result.privacyFlags)} data</span>
+              {/if}
+            </li>
+          {/each}
+        </ul>
+      </details>
+    {/if}
+
+    {#if unrecognizedCount > 0}
+      <p class="row-rejected">
+        {unrecognizedCount} file{unrecognizedCount === 1 ? '' : 's'}
+        {unrecognizedCount === 1 ? 'has' : 'have'} been added that
+        {unrecognizedCount === 1 ? 'does' : 'do'} not seem to come from an Ingress GDPR export. If
+        {unrecognizedCount === 1 ? 'it does' : 'they do'}, please let us know.
+      </p>
+      <details class="file-list-details">
+        <summary>Show file names</summary>
+        <ul>
+          {#each unrecognizedItems as item (item.id)}
+            <li>{item.file.name}{item.isFolder ? ' (folder)' : ''}</li>
+          {/each}
+        </ul>
+      </details>
+    {/if}
 
     {#if flaggedResults.length > 0}
       <Callout variant="warning">
@@ -353,6 +518,12 @@
   div.analysis-panel {
     margin: 1em 0;
   }
+  h2.panel-heading {
+    text-align: left;
+    font-size: 1.1em;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 0.5em;
+  }
   div.toggle-row {
     display: flex;
     flex-wrap: wrap;
@@ -386,6 +557,30 @@
   div.flagged-list ul {
     margin: 0.5em 0 0;
     padding-left: 1.5em;
+  }
+  details.file-list-details {
+    text-align: left;
+    margin: 0.25em 0 1em;
+  }
+  details.file-list-details summary {
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9em;
+  }
+  details.file-list-details summary:hover {
+    color: #FFF;
+  }
+  details.file-list-details ul {
+    margin: 0.5em 0 0;
+    padding-left: 1.5em;
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  details.file-list-details ul strong {
+    color: #FFF;
+  }
+  details.file-list-details .muted {
+    color: rgba(255, 255, 255, 0.6);
   }
   div.results-header {
     display: flex;
