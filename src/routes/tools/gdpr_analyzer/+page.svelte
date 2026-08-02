@@ -261,7 +261,7 @@
 
   <Callout variant="info">
     All processing happens in your browser. No data is uploaded or sent to us or anyone else.<br>
-    <a class="info-link" href={resolve('/tools/gdpr_analyzer/faq')}>
+    <a class="info-link" href="{resolve('/tools/gdpr_analyzer/faq')}#is-my-data-private">
       <img src="/images/help.svg" alt="" />More information
     </a>
   </Callout>

@@ -1,7 +1,22 @@
 <script>
+  import { onMount } from 'svelte'
   import { toast } from '@zerodevx/svelte-toast'
   import { resolve } from '$app/paths'
   import Callout from '$lib/components/Callout.svelte'
+
+  // Lets a link like /tools/gdpr_analyzer/faq#is-my-data-private land on an already-expanded
+  // answer instead of just a collapsed <summary> - plain #id navigation alone can't open a
+  // <details> element, so this opens whichever one matches the current hash (if any) and
+  // scrolls it into view once the page has mounted.
+  onMount(() => {
+    const hash = window.location.hash.slice(1)
+    if (!hash) return
+    const target = document.getElementById(hash)
+    if (target?.tagName === 'DETAILS') {
+      target.open = true
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  })
 
   // Built from parts (rather than a single hardcoded mailto: string) so the button and the
   // copyable fields below it can't drift out of sync with each other.
@@ -118,7 +133,7 @@ Thank you in advance.`
 
   <h2>FAQ</h2>
 
-  <details class="faq-item">
+  <details class="faq-item" id="is-my-data-private">
     <summary>Is my data actually kept private?</summary>
     <p>
       Yes, all the processing of the files happens entirely on your device. No data is ever sent back to us or any third party.
@@ -133,9 +148,13 @@ Thank you in advance.`
   <details class="faq-item">
     <summary>Which files can this tool analyze right now?</summary>
     <p>
-      [Placeholder] List/describe the file types currently supported (e.g. location history
-      files, store_purchases.tsv) and note that more are being added over time.
-    </p>
+      Currently, the following files have been integrated into the tool in some capacity:</p>
+      <ul>
+        <li><b>game_log.tsv</b> | Game Log - The master event log (captures, hacks, links, comms, purchases, and more), listed one action at a time.</li>
+        <li><b>GameplayLocationHistory.tsv</b> | Location History - GPS locations reported by the game over time.</li>
+        <li><b>portal_history.tsv</b> | Portal History - Locations of Portals visited, captured, or scout-controlled.</li>
+        <li><b>store_purchases.tsv</b> | In-app purchases - Date and time of buying CMU or purchasing items in the in-app store, as well as details about each article and when the awarded items were used.</li>
+      </ul>
   </details>
 
   <details class="faq-item">
@@ -156,6 +175,15 @@ Thank you in advance.`
     <p>
       Some data has not been tracked by Niantic since the beginning. As an example, the amount of MU Destroyed by you only started to be tracked
       at around August 2023. As such, the export is not a perfect replica of your activities and might miss some information.
+    </p>
+  </details>
+
+    <details class="faq-item">
+    <summary>I have an older GDPR export / older files which is not recognized by the tool. What can I do?</summary>
+    <p>
+      This tool was built primarily upon a GDPR export obtained in February 2026. Older exports may have different formatting, naming conventions
+      and the like that cause the tool to have problems parsing them. Please try to request a new export in that case to make sure you have your latest
+      data and the latest formatting used by Niantic Spatial.
     </p>
   </details>
 </div>

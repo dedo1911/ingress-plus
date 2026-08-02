@@ -10,9 +10,21 @@
   let menuOpen = $state(false)
   let showSubTools = $state(false)
   let pathname = $state('/')
+  let toolsMenuEl = $state(null)
 
   const toggleMenu = () => { menuOpen = !menuOpen }
   const toggleSubTools = () => { showSubTools = !showSubTools }
+
+  // Closes the Tools submenu on an outside click or Escape, instead of leaving it open until
+  // the same toggle is clicked again - the previous behavior with no way to dismiss it otherwise.
+  const onWindowClick = e => {
+    if (showSubTools && toolsMenuEl && !toolsMenuEl.contains(e.target)) {
+      showSubTools = false
+    }
+  }
+  const onWindowKeydown = e => {
+    if (e.key === 'Escape' && showSubTools) showSubTools = false
+  }
 
   const login = async () => {
     menuOpen = false
@@ -63,6 +75,9 @@
   afterNavigate(() => {
     pathname = window.location.pathname
     menuOpen = false
+    // Previously left unset here, so the submenu could still be expanded the next time the
+    // mobile menu was reopened, even though navigation had already happened.
+    showSubTools = false
   })
 </script>
 
@@ -99,14 +114,14 @@
       </li>
     </a>
     -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-    <li class="tools {pathname.startsWith('/tools') ? 'active' : ''}"
-        onclick={toggleSubTools}>
-      <img src="/images/tools.svg" alt="Tools" /> Tools &triangledown;
+    <li class="tools {pathname.startsWith('/tools') ? 'active' : ''}" bind:this={toolsMenuEl}>
+      <button type="button" class="tools-toggle" onclick={toggleSubTools} aria-haspopup="true" aria-expanded={showSubTools}>
+        <img src="/images/tools.svg" alt="Tools" /> Tools &triangledown;
+      </button>
       <ul class="submenu" class:visible={showSubTools}>
         <li><img src="/images/cmu.png" alt="CMU icon" /><a href={resolve('/tools/cmu_calc')}>CMU Calculator</a></li>
         <li><img src="/images/resources.svg" alt="Tools" /><a href={resolve('/tools/resources')}>Resources</a></li>
+        <li><img src="/images/private.svg" alt="GDPR Analyzer icon" /><a href={resolve('/tools/gdpr_analyzer')}>GDPR Analyzer</a></li>
       </ul>
     </li>
     <a href={resolve('/stats')}>
@@ -132,6 +147,8 @@
     {/if}
   </ul>
 {/snippet}
+
+<svelte:window onclick={onWindowClick} onkeydown={onWindowKeydown} />
 
 <header>
   <div>
@@ -265,9 +282,29 @@
     h1 {
       font-size: 1.5em;
     }
+    .submenu {
+      /* On the mobile menu the submenu should push the rest of the list down when it opens,
+         not overlay on top of it like the absolutely-positioned desktop dropdown does. */
+      position: static;
+      box-shadow: none;
+      min-width: auto;
+    }
   }
   .tools {
     position: relative;
+  }
+  .tools-toggle {
+    background: none;
+    border: none;
+    color: inherit;
+    font: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 100%;
+    padding: 0;
+    margin: 0;
   }
 
   .submenu {
