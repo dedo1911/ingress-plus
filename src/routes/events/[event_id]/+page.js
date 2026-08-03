@@ -4,6 +4,7 @@ import { pb } from '$lib/pocketbase'
 export async function load ({ fetch, params }) {
   try {
     const event = await pb.collection('game_events').getFirstListItem(`id="${params.event_id}"`, {
+      expand: 'linked_badge',
       fetch
     })
     return {

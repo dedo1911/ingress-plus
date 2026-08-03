@@ -3,6 +3,7 @@
   import { resolve } from '$app/paths'
   import { pb, serverAddress } from '$lib/pocketbase'
   import AddToCalendarButton from '$lib/components/AddToCalendarButton.svelte'
+  import EventBadges from '$lib/components/EventBadges.svelte'
   import Time, { dayjs } from 'svelte-time'
   import utc from 'dayjs/plugin/utc'
   import timezone from 'dayjs/plugin/timezone'
@@ -34,7 +35,7 @@
   const loadData = async () => {
     const userTZ = dayjs.tz.guess() || 'UTC'
     const r = await pb.collection('game_events_list').getFullList({
-
+      expand: 'linked_badge'
     })
     totalPages = Math.ceil(r.length / itemsPerPage)
     totalItems = r.length
@@ -42,6 +43,7 @@
       const isLocal = e.time_type === 'local'
       e = {
         ...e,
+        badges: e.expand?.linked_badge ?? [],
         start_time: isLocal
           ? dayjs(e.start_time.substring(0, 19)).tz(userTZ)
           : dayjs(e.start_time),
@@ -169,6 +171,11 @@
             <img style="height:1em" src="images/location.svg" alt="Location" />
           </span>
         </div>
+        {#if e.badges.length > 0}
+          <div class="event-badges-row">
+            <EventBadges badges={e.badges} size="2em" />
+          </div>
+        {/if}
       </div>
     </div>
   </div>
@@ -286,6 +293,9 @@
   div.event-meta, div.event-time {
     display: flex;
     justify-content: space-between;
+    margin-top: .5em;
+  }
+  div.event-badges-row {
     margin-top: .5em;
   }
   div.event-description {
