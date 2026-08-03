@@ -37,6 +37,14 @@
   </p>
 
   <p>
+    The Site offers optional tools to import your game statistics from independent, third-party
+    stat-tracking services (currently Agent Stats and The Grid). These services are not operated,
+    affiliated with, or vetted by Ingress Plus. If you choose to connect one by providing your API
+    key, you do so at your own discretion and are responsible for reviewing their own terms and
+    privacy practices.
+  </p>
+
+  <p>
     We provide the Site and its features "as is" without any warranty of any kind.
     We are not responsible for any damages, direct or indirect, that may result from the use or inability to use the Site.
     We reserve the right to modify, suspend, or discontinue any part of the Site at any time without prior notice.
