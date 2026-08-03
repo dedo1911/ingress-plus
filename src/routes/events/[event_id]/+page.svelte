@@ -96,7 +96,7 @@
     {/if}</p>
   {#if event.badges.length > 0}
     <div class="badges-row">
-      <EventBadges badges={event.badges} size="4em" showTitles />
+      <EventBadges badges={event.badges} size="4em" showTitles expandTiers />
     </div>
   {/if}
   <p class="center">

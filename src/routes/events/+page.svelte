@@ -115,7 +115,7 @@
     <div class="event-row">
       <div class="event-icon">
         <a href={resolve(`/events/${e.id}`)} aria-label="Event details">
-          <span class="event-icon-image" style="background-image: url('{e.image !== '' ? `${serverAddress}/api/files/ncmy64l5pb3p039/${e.id}/${e.image}` : `images/events/${e.category}.png`}');" ></span>
+          <img class="event-icon-image" src={e.image !== '' ? `${serverAddress}/api/files/ncmy64l5pb3p039/${e.id}/${e.image}` : `images/events/${e.category}.png`} alt={e.title} />
         </a>
       </div>
       <div class="event-description">
@@ -242,6 +242,7 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
+    align-items: center;
     position: relative;
     z-index: 3;
   }
@@ -278,15 +279,30 @@
   }
   div.event-icon {
     margin-right: 1em;
-    width: 100px;
-    text-align: center;
-  }
-  span.event-icon-image {
-    width: 6em;
+    width: 8em;
     height: 6em;
-    display: inline-block;
-    background-position: center;
-    background-size: cover;
+    flex-shrink: 0;
+  }
+  div.event-icon a {
+    /* The <a> is inline by default; giving it a definite size (rather than
+       leaving it to shrink-wrap an auto-sized img) is what makes the img's
+       own 100%/100% below resolve consistently instead of being ambiguous
+       against an auto-sized containing block - the actual cause of images
+       coming out squished (verified: happened identically in both Chromium
+       and Firefox, not a browser quirk) when height and max-width were set
+       independently without an explicit box to reconcile them against. */
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  img.event-icon-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* Fits the whole image inside the fixed box above without cropping or
+       stretching it - any leftover space (for images that aren't 8:6)
+       letterboxes instead of distorting the picture. */
+    object-fit: contain;
     border-radius: 0.5em;
     box-shadow: black 0 0 0.25em;
   }
@@ -333,12 +349,9 @@
       gap: 0.35em;
     }
     div.event-icon {
-      width: 72px;
-      margin-right: 0.75em;
-    }
-    span.event-icon-image {
-      width: 4.5em;
+      width: 6em;
       height: 4.5em;
+      margin-right: 0.75em;
     }
     div.event-description h2 {
       font-size: 1.2em;

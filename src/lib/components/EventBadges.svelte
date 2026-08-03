@@ -1,22 +1,49 @@
 <script>
   import { serverAddress } from '$lib/pocketbase'
 
-  const { badges = [], size = '2.5em', showTitles = false } = $props()
+  // expandTiers: when a badge has multiple tiers, show every tier icon (grouped
+  // under that badge's own single title) instead of just its highest one. Always
+  // on when it's the only linked badge (e.g. Second Sunday's bronze-through-black) -
+  // otherwise opt-in per usage, since showing every tier of every badge in a
+  // compact list row would be too much clutter.
+  const { badges = [], size = '2.5em', showTitles = false, expandTiers = false } = $props()
+
+  const groups = $derived(
+    badges.map(badge => {
+      const showAllTiers = (badges.length === 1 || expandTiers) && badge.image.length > 1
+      const images = showAllTiers
+        ? badge.image.map((image, tier) => ({
+          key: `${badge.id}-${tier}`,
+          image,
+          title: `${badge.title} - Tier ${tier + 1}`
+        }))
+        : [{
+            key: badge.id,
+            image: badge.image[badge.image.length - 1],
+            title: badge.title
+          }]
+      return { key: badge.id, badge, images }
+    })
+  )
 </script>
 
-{#if badges.length > 0}
-  <div class="event-badges" style="--badge-size: {size}">
-    {#each badges as badge (badge.id)}
-      <span class="event-badge">
-        <img
-          src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[0]}?thumb=96x96"
-          alt={badge.title}
-          title={badge.title}
-        />
+{#if groups.length > 0}
+  <div class="event-badges">
+    {#each groups as group (group.key)}
+      <div class="event-badge-group" style="--badge-size: {size}">
+        <div class="event-badge-icons">
+          {#each group.images as icon (icon.key)}
+            <img
+              src="{serverAddress}/api/files/{group.badge.collectionId}/{group.badge.id}/{icon.image}?thumb=96x96"
+              alt={icon.title}
+              title={icon.title}
+            />
+          {/each}
+        </div>
         {#if showTitles}
-          <small>{badge.title}</small>
+          <small>{group.badge.title}</small>
         {/if}
-      </span>
+      </div>
     {/each}
   </div>
 {/if}
@@ -25,16 +52,19 @@
   div.event-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.6em;
+    gap: 0.8em;
   }
-  span.event-badge {
+  div.event-badge-group {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.25em;
-    max-width: 5em;
+    gap: 0.3em;
   }
-  span.event-badge img {
+  div.event-badge-icons {
+    display: flex;
+    gap: 0.25em;
+  }
+  div.event-badge-icons img {
     height: var(--badge-size);
     width: var(--badge-size);
     object-fit: contain;
@@ -43,7 +73,7 @@
     box-shadow: black 0 0 0.2em;
     flex-shrink: 0;
   }
-  span.event-badge small {
+  div.event-badge-group small {
     color: rgba(255, 255, 255, 0.7);
     text-align: center;
     line-height: 1.15em;
