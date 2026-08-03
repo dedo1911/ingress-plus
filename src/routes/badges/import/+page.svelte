@@ -9,10 +9,11 @@
   import { parseTextExport } from '$lib/statImport/textExport.js'
   import { matchBadgesToStats } from '$lib/statImport/matchBadges.js'
   import { fetchAgentStats } from '$lib/statImport/agentStats.js'
+  import { fetchTheGridStats } from '$lib/statImport/theGrid.js'
   import Callout from '$lib/components/Callout.svelte'
 
   const { data } = $props()
-  const { badges } = data
+  const { badges, theGridStatMatches } = data
 
   // TEMPORARY: auth gate disabled for mobile testing - restore before shipping.
   const SKIP_AUTH_GATE_FOR_TESTING = true
@@ -24,7 +25,8 @@
   // Each entry is a distinct way of getting stat data into the parser below.
   const methods = [
     { id: 'text', label: 'Import from Scanner Export' },
-    { id: 'agent-stats', label: 'Import from Agent Stats' }
+    { id: 'agent-stats', label: 'Import from Agent Stats' },
+    { id: 'the-grid', label: 'The Grid (RES)' }
   ]
   let activeMethod = $state('text')
   const switchMethod = (id) => {
@@ -42,19 +44,20 @@
     result = parsed.error ? parsed : { ...parsed, stats: matchBadgesToStats(parsed.stats, badges) }
   }
 
-  // Agent Stats API key handling. The key can be saved to the user's own
-  // profile (agentStatsApiKey field on the users collection) so it doesn't
-  // need to be re-pasted on every visit. Letters/numbers only, max 20 chars,
-  // mirroring the pattern + max length enforced server-side on that field.
+  // API key handling shared by the Agent Stats and The Grid tabs below.
+  // Each key can be saved to the user's own profile so it doesn't need to
+  // be re-pasted on every visit. Letters/numbers only, mirroring the
+  // pattern + max length enforced server-side on those fields.
   //
   // Once a key is saved it's never loaded back into the visible/editable
   // input - the box just shows disabled with a placeholder, and "Remove
   // Saved Key" is the only way to type a new one. This avoids both the
-  // custom masking bugs (misaligned overlay, text still selectable) and
-  // ever re-displaying a previously-saved key on screen.
-  const API_KEY_MAX_LENGTH = 20
-  const sanitizeApiKey = (value) => value.replace(/[^a-zA-Z0-9]/g, '').slice(0, API_KEY_MAX_LENGTH)
+  // custom masking bugs a plain password field would have (misaligned
+  // overlay, text still selectable) and ever re-displaying a previously-
+  // saved key on screen.
+  const sanitizeKey = (value, maxLength) => value.replace(/[^a-zA-Z0-9]/g, '').slice(0, maxLength)
 
+  const AGENT_STATS_KEY_MAX_LENGTH = 20
   let apiKey = $state('')
   let showApiKeyHint = $state(false)
   let savingKey = $state(false)
@@ -111,6 +114,68 @@
       result = { error: err.message || 'Could not fetch your Agent Stats data.' }
     } finally {
       fetchingStats = false
+    }
+  }
+
+  // The Grid API key handling - same pattern as Agent Stats above, saved
+  // to a separate theGridApiKey field on the user's profile.
+  const THE_GRID_KEY_MAX_LENGTH = 64
+  let theGridApiKey = $state('')
+  let showTheGridApiKeyHint = $state(false)
+  let savingGridKey = $state(false)
+  let removingGridKey = $state(false)
+  let fetchingGridStats = $state(false)
+
+  const savedTheGridApiKey = $derived($authData?.baseModel?.theGridApiKey || '')
+
+  const saveTheGridApiKey = async () => {
+    if (!$authData.isValid || !theGridApiKey.trim()) return
+    savingGridKey = true
+    showTheGridApiKeyHint = false
+    try {
+      $authData.baseModel.theGridApiKey = theGridApiKey.trim()
+      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+      authData.set($authData)
+      theGridApiKey = ''
+      toast.push('API key saved to your profile.', { classes: ['successToast'] })
+    } catch (err) {
+      console.error(err)
+      toast.push('Could not save your API key.', { classes: ['errorToast'] })
+    } finally {
+      savingGridKey = false
+    }
+  }
+
+  const removeTheGridApiKey = async () => {
+    if (!$authData.isValid) return
+    removingGridKey = true
+    try {
+      $authData.baseModel.theGridApiKey = ''
+      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+      authData.set($authData)
+      toast.push('Removed your saved API key.', { classes: ['successToast'] })
+    } catch (err) {
+      console.error(err)
+      toast.push('Could not remove your saved API key.', { classes: ['errorToast'] })
+    } finally {
+      removingGridKey = false
+    }
+  }
+
+  const handleFetchTheGrid = async () => {
+    const keyToUse = savedTheGridApiKey || theGridApiKey.trim()
+    if (!keyToUse) return
+    fetchingGridStats = true
+    showTheGridApiKeyHint = false
+    result = null
+    try {
+      const parsed = await fetchTheGridStats(keyToUse, theGridStatMatches)
+      result = { ...parsed, stats: matchBadgesToStats(parsed.stats, badges) }
+    } catch (err) {
+      console.error(err)
+      result = { error: err.message || 'Could not fetch your Grid stats.' }
+    } finally {
+      fetchingGridStats = false
     }
   }
 
@@ -318,7 +383,8 @@
       <p>
         If you use Agent Stats you can generate an API key to automatically import your latest Agent Stat upload.
         You can find or generate an API Key for your account settings from the
-        <a href="https://www.agent-stats.com/preferences.php" target="_blank" rel="noopener noreferrer">Agent Stats Preferences page</a>.
+        <a href="https://www.agent-stats.com/preferences.php" target="_blank" rel="noopener noreferrer">Agent Stats Preferences page</a>.<br>
+        <br>
         Once copied, paste your Agent Stats API key below. You can optionally save your API key for future use of this tool.
       </p>
 
@@ -330,7 +396,7 @@
           disabled={!!savedApiKey}
           oninput={(e) => {
             const raw = e.currentTarget.value
-            const sanitized = sanitizeApiKey(raw)
+            const sanitized = sanitizeKey(raw, AGENT_STATS_KEY_MAX_LENGTH)
             if (sanitized !== raw) showApiKeyHint = true
             e.currentTarget.value = sanitized
             apiKey = sanitized
@@ -340,13 +406,13 @@
           autocapitalize="off"
           autocorrect="off"
           spellcheck="false"
-          maxlength={API_KEY_MAX_LENGTH}
+          maxlength={AGENT_STATS_KEY_MAX_LENGTH}
           pattern="[a-zA-Z0-9]*"
         />
       </div>
       {#if showApiKeyHint}
         <p class="api-key-hint" transition:slide={{ duration: 150 }}>
-          Only letters (A-Z) and numbers are allowed, up to 20 characters.
+          Only letters (A-Z) and numbers are allowed, up to {AGENT_STATS_KEY_MAX_LENGTH} characters.
         </p>
       {/if}
 
@@ -375,6 +441,70 @@
           onclick={handleFetchAgentStats}
         >
           {fetchingStats ? 'Fetching…' : 'Fetch Stats'}
+        </button>
+      </div>
+    {:else if activeMethod === 'the-grid'}
+      <p>
+        Resistance Agents can use The Grid to import their stats. Depending on how long and how regularly you have uploaded to The Grid
+        this import may include more stats than other import methods.<br>
+        <br>
+        Paste your "Personal API key" from <a href="https://the-grid.org/settings" target="_blank" rel="noopener noreferrer">The Grid</a> below.
+        You can optionally save your API key for future use of this tool.
+      </p>
+
+      <div class="api-key-input">
+        <input
+          type="text"
+          name="theGridApiKey"
+          value={theGridApiKey}
+          disabled={!!savedTheGridApiKey}
+          oninput={(e) => {
+            const raw = e.currentTarget.value
+            const sanitized = sanitizeKey(raw, THE_GRID_KEY_MAX_LENGTH)
+            if (sanitized !== raw) showTheGridApiKeyHint = true
+            e.currentTarget.value = sanitized
+            theGridApiKey = sanitized
+          }}
+          placeholder={savedTheGridApiKey ? 'Using API key saved to your profile. Remove to enter new API key' : 'Paste your Grid API key'}
+          autocomplete="off"
+          autocapitalize="off"
+          autocorrect="off"
+          spellcheck="false"
+          maxlength={THE_GRID_KEY_MAX_LENGTH}
+          pattern="[a-zA-Z0-9]*"
+        />
+      </div>
+      {#if showTheGridApiKeyHint}
+        <p class="api-key-hint" transition:slide={{ duration: 150 }}>
+          Only letters (A-Z) and numbers are allowed, up to {THE_GRID_KEY_MAX_LENGTH} characters.
+        </p>
+      {/if}
+
+      {#if $authData.isValid}
+        <div class="key-persistence-actions">
+          {#if savedTheGridApiKey}
+            <button type="button" onclick={removeTheGridApiKey} disabled={removingGridKey}>
+              {removingGridKey ? 'Removing…' : 'Remove Saved Key'}
+            </button>
+          {:else}
+            <button type="button" onclick={saveTheGridApiKey} disabled={savingGridKey || !theGridApiKey.trim()}>
+              {savingGridKey ? 'Saving…' : 'Save API Key to My Profile'}
+            </button>
+          {/if}
+        </div>
+        {#if savedTheGridApiKey}
+          <p class="saved-key-note">Using the API key saved to your profile.</p>
+        {/if}
+      {/if}
+
+      <div class="actions">
+        <button
+          type="button"
+          class="cta"
+          disabled={(!savedTheGridApiKey && !theGridApiKey.trim()) || fetchingGridStats}
+          onclick={handleFetchTheGrid}
+        >
+          {fetchingGridStats ? 'Fetching…' : 'Fetch Stats'}
         </button>
       </div>
     {/if}

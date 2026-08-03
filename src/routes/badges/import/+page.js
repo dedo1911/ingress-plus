@@ -20,7 +20,21 @@ export async function load ({ fetch }) {
       ].join(','),
       fetch
     })
-    return { badges }
+
+    // Maps The Grid's stat keys to our stat_line labels - kept in
+    // PocketBase rather than hardcoded so a new key (Niantic adds stat
+    // lines periodically) can be mapped without a code deployment. Not
+    // essential to the rest of the page, so a missing/misconfigured
+    // record shouldn't take down the whole import tool.
+    let theGridStatMatches = {}
+    try {
+      const theGridMatching = await pb.collection('statMatching').getFirstListItem('serviceName = "the-grid"', { fetch })
+      theGridStatMatches = theGridMatching.statMatches ?? {}
+    } catch (err) {
+      console.error(err)
+    }
+
+    return { badges, theGridStatMatches }
   } catch (err) {
     console.error(err)
   }
