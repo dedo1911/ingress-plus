@@ -15,8 +15,10 @@ function isBadgeAvailable (badge) {
 // tier, tier 0's image is still returned so the caller can show it dimmed
 // to indicate a match exists but hasn't been earned yet. Recursion wings are
 // earned once the value reaches double the highest tier's requirement, same
-// as on the main badges page.
-function resolveTier (badge, value) {
+// as on the main badges page - but only if the agent has actually recursed
+// at least once, since that's the only way to earn wings in the game at
+// all; doubling a stat alone doesn't imply that.
+function resolveTier (badge, value, recursions) {
   if (!isBadgeAvailable(badge)) return { tierIndex: 0, reached: false, wingsEarned: false }
 
   const thresholds = (badge.tier_values || '')
@@ -34,7 +36,7 @@ function resolveTier (badge, value) {
   if (tierIndex === -1) return { tierIndex: 0, reached: false, wingsEarned: false }
 
   const highestTierValue = thresholds[thresholds.length - 1]
-  let wingsEarned = badge.wings_possible === true && value >= highestTierValue * 2
+  let wingsEarned = badge.wings_possible === true && recursions >= 1 && value >= highestTierValue * 2
 
   // Cap at the highest tier the game has actually unlocked for this badge -
   // mirrors the disabled-checkbox restriction on the main badges page, so
@@ -52,7 +54,9 @@ function resolveTier (badge, value) {
 
 // Matches parsed stat-line entries to the badges that track them, by exact
 // name against each badge's stat_line field, and resolves which tier each
-// matched badge's value reaches.
+// matched badge's value reaches. All three import sources (text export,
+// Agent Stats, The Grid) report a "Recursions" stat alongside the rest, so
+// it's read once here rather than passed in separately.
 export function matchBadgesToStats (stats, badges) {
   const badgesByStatLine = new Map()
   for (const badge of badges) {
@@ -61,12 +65,14 @@ export function matchBadgesToStats (stats, badges) {
     badgesByStatLine.get(badge.stat_line).push(badge)
   }
 
+  const recursions = Number(stats.find(s => s.stat === 'Recursions')?.value)
+
   return stats.map(entry => {
     const matchedBadges = badgesByStatLine.get(entry.stat) ?? []
     const value = Number(entry.value)
     return {
       ...entry,
-      badges: matchedBadges.map(badge => ({ badge, ...resolveTier(badge, value) }))
+      badges: matchedBadges.map(badge => ({ badge, ...resolveTier(badge, value, recursions) }))
     }
   })
 }

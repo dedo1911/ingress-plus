@@ -139,6 +139,7 @@
     border: none;
     cursor: pointer;
     color: #FFF;
+    font-size: 1em;
     margin: 1em 0 1em 1em;
     padding-bottom: 0.5em;
     display: flex;
