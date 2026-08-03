@@ -1,6 +1,7 @@
 <script>
   import { fly, slide } from 'svelte/transition'
   import { tick } from 'svelte'
+  import { resolve } from '$app/paths'
   import { categories, badgeSize, siteSettings, authData } from '$lib/stores'
   import Category from '$lib/components/Category.svelte'
   import { onMount } from 'svelte'
@@ -87,6 +88,10 @@
             <img src="/images/shuffle.svg" height="24" alt="Invert highlights" />
             Highlight {$siteSettings.opaqueOwned ? 'obtained' : 'unobtained'}
           </button>
+          <a href={resolve('/badges/import')} transition:fly={{ x: 50, duration: 500 }}>
+            <img src="/images/upload.svg" height="24" alt="Import stats" />
+            Import stats
+          </a>
         {/if}
       </div>
       {#if showSearch}
@@ -128,7 +133,8 @@
     justify-content: flex-end;
     flex-wrap: wrap;
   }
-  div.buttons button {
+  div.buttons button,
+  div.buttons a {
     background: none;
     border: none;
     cursor: pointer;
@@ -141,11 +147,13 @@
     transition: border 0.3s ease-in-out;
     white-space: nowrap;
   }
-  div.buttons button img {
+  div.buttons button img,
+  div.buttons a img {
     margin-right: 0.5em;
   }
   div.buttons button:hover,
-  div.buttons button.active {
+  div.buttons button.active,
+  div.buttons a:hover {
     border-bottom: 1px solid rgba(255, 255, 255, 1);
   }
   div.search-bar {
