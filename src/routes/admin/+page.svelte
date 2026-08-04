@@ -5,6 +5,7 @@
   import { pb } from '$lib/pocketbase/index.js'
   import { authData } from '$lib/stores'
   import { resolve } from '$app/paths'
+  import { toast } from '@zerodevx/svelte-toast'
   import Callout from '$lib/components/Callout.svelte'
 
   // pbAdmin.authStore is PocketBase's own store, not a Svelte one - it has
@@ -40,6 +41,41 @@
 
   const handleLogout = () => {
     pbAdmin.authStore.clear()
+  }
+
+  // Feature flags: toggles existing feature_flags records only. Creating a
+  // new flag name here wouldn't do anything - $lib/featureFlags.js and
+  // +layout.js only react to the specific names the app code already
+  // checks for, so authoring a new flag is a code change, not an admin
+  // panel job.
+  let featureFlags = $state([])
+  let loadingFlags = $state(false)
+
+  const loadFeatureFlags = async () => {
+    loadingFlags = true
+    try {
+      featureFlags = await pbAdmin.collection('feature_flags').getFullList({ sort: 'name' })
+    } catch (err) {
+      console.error(err)
+    } finally {
+      loadingFlags = false
+    }
+  }
+
+  const toggleFlag = async (flag) => {
+    const next = !flag.enabled
+    flag.enabled = next
+    flag.busy = true
+    try {
+      await pbAdmin.collection('feature_flags').update(flag.id, { enabled: next })
+      toast.push(`"${flag.name}" is now ${next ? 'enabled' : 'disabled'}.`, { classes: ['successToast'] })
+    } catch (err) {
+      console.error(err)
+      flag.enabled = !next
+      toast.push(`Could not update "${flag.name}".`, { classes: ['errorToast'] })
+    } finally {
+      flag.busy = false
+    }
   }
 
   // Impersonation PoC: PocketBase's impersonate endpoint (superuser-only)
@@ -342,7 +378,10 @@
   }
 
   $effect(() => {
-    if (isAuthenticated) loadCampaigns()
+    if (isAuthenticated) {
+      loadCampaigns()
+      loadFeatureFlags()
+    }
   })
 
   // Set while the composer holds a draft loaded from history, so Save
@@ -533,6 +572,22 @@
     <div class="card">
       <p>Logged in as <strong>{adminEmail}</strong>.</p>
       <button type="button" class="cta" onclick={handleLogout}>Log Out</button>
+    </div>
+
+    <div class="card">
+      <h2>Feature Flags</h2>
+      {#if loadingFlags}
+        <p>Loading…</p>
+      {:else if featureFlags.length === 0}
+        <p>No feature flags found.</p>
+      {:else}
+        {#each featureFlags as flag (flag.id)}
+          <label class="checkbox-label">
+            <input type="checkbox" checked={flag.enabled} disabled={flag.busy} onchange={() => toggleFlag(flag)} />
+            {flag.name}
+          </label>
+        {/each}
+      {/if}
     </div>
 
     {#if impersonation}
