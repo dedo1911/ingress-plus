@@ -21,24 +21,6 @@
     reloadKey += 1 // Force AgentName to reload
   }
 
-  const handleSaveUsername = async () => {
-    if (verified) {
-      toast.push('You must un-verify your account to change your username.', { classes: ['errorToast'] })
-      return
-    }
-    await saveUsername()
-    reloadKey += 1 // Force AgentName to reload
-  }
-
-  const handleSaveFaction = async () => {
-    if (verified) {
-      toast.push('You must un-verify your account to change your faction.', { classes: ['errorToast'] })
-      return
-    }
-    await saveFaction()
-    reloadKey += 1 // Force AgentName to reload
-  }
-
   const togglePublic = async () => {
     $authData.baseModel.public = !$authData.baseModel.public
     await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
@@ -84,35 +66,30 @@
   }
 
   let selectedFaction = $state($authData?.baseModel?.faction || 'unaligned')
-
-  const saveFaction = async () => {
-    if ($authData.baseModel.faction === selectedFaction) {
-      console.log('Faction same as before, skipping')
-      return
-    }
-    $authData.baseModel.faction = selectedFaction
-    await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-    toast.push('Faction has been changed to ' + selectedFaction.charAt(0).toUpperCase() + selectedFaction.slice(1) + '!', {
-      classes: ['successToast']
-    })
-  }
-
   let newUsername = $derived(username)
 
-  const saveUsername = async () => {
+  const saveIdentity = async () => {
+    if (verified) {
+      toast.push('You must un-verify your account to change your Username or Faction.', { classes: ['errorToast'] })
+      return
+    }
     const oldUsername = $authData.baseModel.username
-    if (oldUsername === newUsername) {
-      console.log('Username same as before, skipping')
+    const oldFaction = $authData.baseModel.faction
+    if (oldUsername === newUsername && oldFaction === selectedFaction) {
+      console.log('Username and Faction unchanged, skipping')
       return
     }
     try {
       $authData.baseModel.username = newUsername
+      $authData.baseModel.faction = selectedFaction
       await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      toast.push('Username has been changed to ' + $authData.baseModel.username, { classes: ['successToast'] })
+      toast.push('Your Username and Faction have been updated!', { classes: ['successToast'] })
+      reloadKey += 1 // Force AgentName to reload
     } catch (err) {
       $authData.baseModel.username = oldUsername
+      $authData.baseModel.faction = oldFaction
       const errorCode = err.response?.data?.username?.code
-      console.error('Username Error:', errorCode, err)
+      console.error('Save Identity Error:', errorCode, err)
 
       const errorMessages = {
         validation_not_unique: 'The username is already taken. Please choose a different username.',
@@ -190,20 +167,15 @@
 
         <div class="field">
           <label for="settings-username">Username</label>
-          <div class="input-row">
-            <input
-              id="settings-username"
-              type="text"
-              maxlength="15"
-              bind:value={newUsername}
-              disabled={verified}
-              class:locked={verified}
-              style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})"
-            />
-            <button type="button" class="icon-button" onclick={handleSaveUsername} disabled={verified} class:locked={verified}>
-              <img src="/images/accept.svg" height="32" alt="Save username" />
-            </button>
-          </div>
+          <input
+            id="settings-username"
+            type="text"
+            maxlength="15"
+            bind:value={newUsername}
+            disabled={verified}
+            class:locked={verified}
+            style="color: var(--color-faction-{selectedFaction || 'unaligned'})"
+          />
           <p class="explanation">
             Your public Agent name, shown across Ingress Plus. 3-15 characters, letters and numbers only.
           </p>
@@ -211,24 +183,19 @@
 
         <div class="field">
           <label for="settings-faction">Faction</label>
-          <div class="input-row">
-            <select
-              id="settings-faction"
-              bind:value={selectedFaction}
-              disabled={verified}
-              class:locked={verified}
-              style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'})"
-            >
-              <option value="enlightened">Enlightened</option>
-              <option value="resistance">Resistance</option>
-              {#if supporter === true}
-                <option value="machina">Machina</option>
-              {/if}
-            </select>
-            <button type="button" class="icon-button" onclick={handleSaveFaction} disabled={verified} class:locked={verified}>
-              <img src="/images/accept.svg" height="24" alt="Save faction" />
-            </button>
-          </div>
+          <select
+            id="settings-faction"
+            bind:value={selectedFaction}
+            disabled={verified}
+            class:locked={verified}
+            style="color: var(--color-faction-{selectedFaction || 'unaligned'})"
+          >
+            <option value="enlightened">Enlightened</option>
+            <option value="resistance">Resistance</option>
+            {#if supporter === true}
+              <option value="machina">Machina</option>
+            {/if}
+          </select>
           <p class="explanation">
             Colors your Agent name and some site theming to match your Faction.
             {#if supporter === true}
@@ -238,6 +205,10 @@
             {/if}
           </p>
         </div>
+
+        <button type="button" class="cta identity-save" disabled={verified} class:locked={verified} onclick={saveIdentity}>
+          Save Username &amp; Faction
+        </button>
 
         <div class="field">
           <p><b>User ID:</b> <code>ING+{userId}</code></p>
@@ -280,35 +251,35 @@
         })}
       </div>
 
-      <div class="card verification">
-        <h3>Verification</h3>
-        {#if verified}
-          {#if $featureFlags.VERIFICATION_ENABLED}
-            <p>You are currently verified. You need to un-verify to change your Username or Faction.</p>
-          {:else}
-            <p>Verification is currently disabled. You must un-verify to edit your Username or Faction.</p>
-          {/if}
-          <div class="unverify-controls">
-            {#if showUnverifyConfirm}
-              {#if !$featureFlags.VERIFICATION_ENABLED}
-                <p class="unverify-warning">Verification is disabled and you will not be able to re-verify yourself.</p>
-              {/if}
-              <button
-                class="danger-button"
-                disabled={disableConfirmButton}
-                onclick={handleUnverify}
-                title={disableConfirmButton ? 'Please wait...' : 'Click to Confirm Un-Verify'}>Click to Confirm Un-Verify</button>
-              <button class="secondary-button" onclick={() => { showUnverifyConfirm = false }}>Cancel</button>
+      {#if verified || $featureFlags.VERIFICATION_ENABLED}
+        <div class="card verification">
+          <h3>Verification</h3>
+          {#if verified}
+            {#if $featureFlags.VERIFICATION_ENABLED}
+              <p>You are currently verified. You need to un-verify to change your Username or Faction.</p>
             {:else}
-              <button class="secondary-button" onclick={showConfirmationPrompt}>Un-Verify Account</button>
+              <p>Verification is currently disabled. You must un-verify to edit your Username or Faction.</p>
             {/if}
-          </div>
-        {:else if $featureFlags.VERIFICATION_ENABLED}
-          <p>You are not verified. You may change your Username or Faction.</p>
-        {:else}
-          <p>Verification is currently disabled.</p>
-        {/if}
-      </div>
+            <div class="unverify-controls">
+              {#if showUnverifyConfirm}
+                {#if !$featureFlags.VERIFICATION_ENABLED}
+                  <p class="unverify-warning">Verification is disabled and you will not be able to re-verify yourself.</p>
+                {/if}
+                <button
+                  class="danger-button"
+                  disabled={disableConfirmButton}
+                  onclick={handleUnverify}
+                  title={disableConfirmButton ? 'Please wait...' : 'Click to Confirm Un-Verify'}>Click to Confirm Un-Verify</button>
+                <button class="secondary-button" onclick={() => { showUnverifyConfirm = false }}>Cancel</button>
+              {:else}
+                <button class="secondary-button" onclick={showConfirmationPrompt}>Un-Verify Account</button>
+              {/if}
+            </div>
+          {:else}
+            <p>You are not verified. You may change your Username or Faction.</p>
+          {/if}
+        </div>
+      {/if}
 
       {#if supporter === true}
         <div class="card">
@@ -442,23 +413,21 @@
     gap: 0.5em;
     cursor: pointer;
   }
-  div.input-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
+  div.field input[type=text],
+  div.field select {
+    width: 100%;
+    box-sizing: border-box;
   }
-  div.input-row input,
-  div.input-row select {
-    flex: 1;
-    min-width: 0;
-  }
-  button.checkbox-toggle,
-  button.icon-button {
+  button.checkbox-toggle {
     background: none;
     border: none;
     cursor: pointer;
     padding: 0;
     line-height: 0;
+  }
+  button.identity-save {
+    max-width: none;
+    width: 100%;
   }
   p.explanation {
     margin: 0;
