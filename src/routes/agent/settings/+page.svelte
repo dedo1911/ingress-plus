@@ -41,16 +41,6 @@
     }
   }
 
-  const copyProfileLink = async () => {
-    try {
-      await navigator.clipboard.writeText(`https://ingress.plus/agent/${newUsername}`)
-      toast.push('Copied to clipboard!', { classes: ['successToast'] })
-    } catch (err) {
-      console.error(err)
-      toast.push('An error has occurred.', { classes: ['errorToast'] })
-    }
-  }
-
   $effect(() => {
     if (browser && $authData.isValid === false) goto(resolve('/'))
   })
@@ -153,12 +143,12 @@
         <AgentName user={{ username }} linkable={false} factionLogo={true} />
       {/key}
     </h2>
-    <p class="subtitle">Manage your Agent identity, privacy, and account.</p>
+    <p class="subtitle">Manage your Agent details, privacy, and account.</p>
     <p class="back-link"><a href={resolve('/agent')}>&larr; Back to Profile</a></p>
 
     <div class="settings-grid">
       <div class="card identity">
-        <h3>Identity</h3>
+        <h3>Agent details</h3>
         <img class="profilePicture" src={$authData?.baseModel?.avatar.slice(0, -6)} alt={username} />
 
         {#if verified}
@@ -193,15 +183,13 @@
             <option value="enlightened">Enlightened</option>
             <option value="resistance">Resistance</option>
             {#if supporter === true}
-              <option value="machina">Machina</option>
+              <option value="machina">MACHINA</option>
             {/if}
           </select>
           <p class="explanation">
             Colors your Agent name and some site theming to match your Faction.
             {#if supporter === true}
               As a Supporter, Machina is available to you too!
-            {:else}
-              Supporters can also select Machina.
             {/if}
           </p>
         </div>
@@ -212,7 +200,7 @@
 
         <div class="field">
           <p><b>User ID:</b> <code>ING+{userId}</code></p>
-          <p class="explanation">Your internal Ingress Plus identifier. Include this if you contact support about your account.</p>
+          <p class="explanation">Your internal Ingress Plus identifier.</p>
         </div>
         <div class="field">
           <p><b>E-mail:</b> <code>{email}</code></p>
@@ -231,14 +219,6 @@
           onStatus: 'Public',
           offStatus: 'Private'
         })}
-        {#if $authData.baseModel.public}
-          <p class="publicNotice">
-            Your profile is public and will be visible at:<br />
-            <span onclick={copyProfileLink}>
-              https://ingress.plus/agent/{newUsername}
-            </span>
-          </p>
-        {/if}
         {@render toggleRow({
           checked: $authData.baseModel.newsletterOptIn,
           onToggle: toggleNewsletter,
@@ -446,14 +426,6 @@
     opacity: 0.5;
   }
 
-  p.publicNotice span {
-    border: 3px double #5e5a75;
-    border-radius: 8px;
-    display: inline-block;
-    padding: 1rem;
-    margin-top: 1rem;
-    cursor: pointer;
-  }
   p.preview {
     display: flex;
     align-items: center;
