@@ -1,5 +1,8 @@
 <script>
-  let { showModal = $bindable(), children } = $props()
+  // dismissible controls whether the backdrop click and Escape/cancel both
+  // close the dialog - off for flows that must be dismissed through their
+  // own explicit buttons only (e.g. the onboarding modal).
+  let { showModal = $bindable(), dismissible = true, children } = $props()
 
   let dialog = $state()
 
@@ -10,15 +13,22 @@
   })
 
   const handleBackdropClick = (event) => {
+    if (!dismissible) return
     if (event.target === dialog) {
       dialog.close()
       showModal = false
     }
   }
+
+  // <dialog> fires "cancel" (then "close") on Escape by default - block it
+  // the same way the backdrop click is blocked when not dismissible.
+  const handleCancel = (event) => {
+    if (!dismissible) event.preventDefault()
+  }
 </script>
 
 {#if showModal}
-  <dialog bind:this={dialog} onclick={handleBackdropClick}>
+  <dialog bind:this={dialog} onclick={handleBackdropClick} oncancel={handleCancel}>
     <div role="button" tabindex="0">
       {@render children?.()}
     </div>

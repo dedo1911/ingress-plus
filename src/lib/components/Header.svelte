@@ -5,7 +5,7 @@
   import { afterNavigate } from '$app/navigation'
   import { resolve } from '$app/paths'
   import { pb } from '$lib/pocketbase'
-  import { authData, ownedBadges } from '$lib/stores'
+  import { authData, freshLogin, ownedBadges } from '$lib/stores'
 
   let menuOpen = $state(false)
   let showSubTools = $state(false)
@@ -31,6 +31,7 @@
       pb.collection('users').update(user.record.id, user.record)
     }
 
+    freshLogin.set(true)
     authData.set(pb.authStore)
     await refreshOwnedBadges()
   }

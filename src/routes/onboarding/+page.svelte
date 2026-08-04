@@ -44,13 +44,6 @@
 
   const resetOnboarding = () => setOnboardingState('notStarted')
 
-  // TODO: placeholder only - replace with the real last step of the guided
-  // setup (name/faction/privacy/etc.) once that flow is built.
-  const finishPlaceholder = async () => {
-    await setOnboardingState('completed')
-    goto(resolve('/'))
-  }
-
   // Dev-only shortcuts to jump directly to any state while the real guided
   // steps aren't built yet - not meant to ship long-term.
   const TEST_STATES = [
@@ -63,7 +56,7 @@
 </script>
 
 <svelte:head>
-  <title>Ingress Plus &middot; Get Started</title>
+  <title>Ingress Plus &middot; Onboarding</title>
 </svelte:head>
 
 <div>
@@ -75,15 +68,12 @@
         {savingState === 'notStarted' ? 'Resetting…' : 'Reset Onboarding'}
       </button>
     {:else}
-      <h1>Welcome, Agent.</h1>
+      <h1>Welcome to Ingress Plus, Agent..</h1>
       <p>
-        This is where we'll walk you through setting up your Agent name, choosing a Faction, deciding who can
-        see your profile, and a quick rundown of how Ingress Plus works. That guided setup isn't built yet -
-        for now this page is just a placeholder.
+        This is where we'll walk you through setting up your Agent name, choosing a Faction as well as a few
+        other things. Once completed you will be awarded a special "Onboarded!" medal for your Ingress Plus
+        profile!
       </p>
-      <button type="button" class="cta" disabled={savingState !== null} onclick={finishPlaceholder}>
-        {savingState === 'completed' ? 'Finishing…' : 'Mark Onboarding as Complete (placeholder)'}
-      </button>
     {/if}
 
     <hr />

@@ -1,8 +1,9 @@
 <script>
   import { onMount } from 'svelte'
+  import { get } from 'svelte/store'
   import { page } from '$app/stores'
   import { SvelteToast } from '@zerodevx/svelte-toast'
-  import { authData, siteSettings } from '$lib/stores'
+  import { authData, freshLogin, siteSettings } from '$lib/stores'
   import Header from '$lib/components/Header.svelte'
   import Footer from '$lib/components/Footer.svelte'
   import LoadingBar from '$lib/components/LoadingBar.svelte'
@@ -29,21 +30,38 @@
     }
   })
 
-  // Checked once per real login/page load (not on every client-side route
-  // change, since $authData only emits a fresh value from Header's login()/
-  // onMount() calls) - "Not now" leaves the state as-is so it comes back
-  // next time this fires, per the onboarding spec.
+  // Runs once each time $authData actually transitions to valid (a real
+  // login, or a page load that restores an existing session) rather than
+  // once per component lifetime, so logging out and back in within the
+  // same tab is still checked - tracked via previousAuthValid rather than
+  // a one-shot flag.
+  //
+  // An empty onboardingState (never even seen the prompt) keeps the
+  // original behavior of reappearing on every page load. Once it's been
+  // set to something else non-terminal (currently just "notStarted" -
+  // dismissed via "Not now"), that would get naggy if repeated on every
+  // reload of an already-open session, so from then on it's only shown
+  // again on an actual fresh login (freshLogin, set by Header's login()).
   const ONBOARDING_DONE_STATES = ['completed', 'skipped']
-  let onboardingChecked = $state(false)
+  let previousAuthValid = $state(false)
   let showOnboardingModal = $state(false)
 
   $effect(() => {
-    if (!$authData.isValid || onboardingChecked) return
-    onboardingChecked = true
+    const isValid = $authData.isValid
+    const wasValid = previousAuthValid
+    previousAuthValid = !!isValid
+    if (!isValid || wasValid) return
+
+    const wasFreshLogin = get(freshLogin)
+    freshLogin.set(false)
+
     if ($page.url.pathname === '/onboarding') return
-    if (!ONBOARDING_DONE_STATES.includes($authData.baseModel?.onboardingState)) {
-      showOnboardingModal = true
-    }
+
+    const state = $authData.baseModel?.onboardingState
+    if (ONBOARDING_DONE_STATES.includes(state)) return
+    if (state && !wasFreshLogin) return
+
+    showOnboardingModal = true
   })
 </script>
 

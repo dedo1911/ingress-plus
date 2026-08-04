@@ -12,6 +12,12 @@ export const categories = writable([])
 
 export const authData = writable({ isValid: null })
 
+// Set by Header's login() right before it updates authData, so the
+// onboarding-modal check in +layout.svelte can tell "just completed OAuth"
+// apart from "page load restored an existing session" - both make authData
+// valid, but only the former should count as "logging in fresh".
+export const freshLogin = writable(false)
+
 export const ownedBadges = writable([])
 
 export const siteSettings = writable({

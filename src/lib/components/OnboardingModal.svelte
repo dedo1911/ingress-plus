@@ -7,6 +7,8 @@
 
   let { showModal = $bindable() } = $props()
 
+  const isInProgress = $derived($authData?.baseModel?.onboardingState === 'inProgress')
+
   let saving = $state(false)
 
   const setOnboardingState = async (value) => {
@@ -40,18 +42,32 @@
   }
 </script>
 
-<Modal bind:showModal>
+<Modal bind:showModal dismissible={false}>
   <div class="onboarding-card">
-    <h2>Welcome, Agent!</h2>
-    <p>
-      Let's get your Ingress Plus profile set up. We'll walk you through picking your Agent name, choosing
-      a Faction, deciding who can see your profile, and a quick rundown of how the site works.
-    </p>
+    {#if isInProgress}
+      <h2>Welcome back, Agent!</h2>
+      <p>
+        You haven't completed the Onboarding yet. If you want to continue and set up your profile,
+        just click on "Continue" below. Otherwise, you can click on "Skip Onboarding" to skip the Onboarding.<br>
+        <br>
+        You can always restart the Onboarding from your Profile if you do change your mind!
+      </p>
+    {:else}
+      <h2>Welcome, Agent!</h2>
+      <p>
+        Let's get your Ingress Plus profile set up. We'll walk you through a short Onboarding by picking your Agent name, choosing
+        a Faction and more, as well a quick rundown of what you can do on this site.<br>
+        <br>
+        You can skip this Onboarding by clicking on "Skip Onboarding" below. You can always restart the Onboarding from your Profile if you do change your mind!
+      </p>
+    {/if}
     <div class="actions">
-      <button type="button" class="cta" disabled={saving} onclick={startOnboarding}>Let's Go</button>
+      <button type="button" class="cta" disabled={saving} onclick={startOnboarding}>
+        {isInProgress ? 'Continue' : "Let's Go"}
+      </button>
       <div class="skip-actions">
         <button type="button" class="skip-link" disabled={saving} onclick={notNow}>Not now</button>
-        <button type="button" class="skip-link" disabled={saving} onclick={never}>Never</button>
+        <button type="button" class="skip-link" disabled={saving} onclick={never}>Skip Onboarding</button>
       </div>
     </div>
   </div>
