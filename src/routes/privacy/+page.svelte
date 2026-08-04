@@ -4,7 +4,7 @@
 
 <div>
   <h1>Privacy Policy for Ingress Plus</h1>
-    <p><em>Effective date: July 8th, 2025</em></p>
+    <p><em>Effective date: July 8th, 2025 (last updated: August 4th, 2026)</em></p>
 
     <p>Welcome, Agent, to Ingress Plus! This project was created to support the Ingress community and enhance your experience in the field.
     We take your privacy seriously. This Privacy Policy explains what information we collect, how we use it,
@@ -70,6 +70,30 @@
         <li>List of uploaded Media (plugin)</li>
     </ul>
 
+    <h3>1.5 Third-Party Resources Loaded By Your Browser</h3>
+    <p>Regardless of whether you are registered, our website loads the "Exo" and "Kode Mono" fonts directly from
+      <a href="https://policies.google.com/?hl=en" target="_blank" rel="noopener noreferrer">Google</a>'s Google Fonts
+      servers rather than hosting them ourselves. As a result, your browser sends your IP address and standard
+      request data (as described in section 1.1) directly to Google when a page loads.</p>
+
+    <h3>1.6 Optional Third-Party Stat Import</h3>
+    <p>The Badges page offers optional tools to import your game statistics from third-party stat-tracking
+      services (currently <a href="https://www.agent-stats.com" target="_blank" rel="noopener noreferrer">Agent Stats</a>
+      and <a href="https://the-grid.org" target="_blank" rel="noopener noreferrer">The Grid</a>). If you choose to use
+      one, you provide an API key for that service, which we use to retrieve your statistics and match them against
+      Ingress Plus badges. If you choose to save an API key to your profile for future use, it is stored alongside
+      your other account data. These services are independent projects, not affiliated with or vetted by Ingress
+      Plus - please review their own privacy practices before connecting an account.</p>
+
+    <h3>1.7 Email Delivery Service</h3>
+    <p>Any email we send you - including account-related emails as well as newsletters or update notices you
+      receive - is delivered through
+      <a href="https://www.mailjet.com/" target="_blank" rel="noopener noreferrer">Mailjet</a>, a third-party email
+      delivery service. Mailjet receives your email address, and any Agent name or Faction we include in the message
+      content, in order to deliver it to your inbox. Mailjet is an independent company, not affiliated with or vetted
+      beyond our use of their service to send email - please review their own privacy practices for details on how
+      they handle this data.</p>
+
     <h2>2. Purposes of Data Usage</h2>
     <p>We use your data for the following purposes:</p>
     <ul>
@@ -79,6 +103,7 @@
         <li>Contacting you via email for important site updates, such as changes to Terms of Service or security alerts</li>
         <li>Contacting you via email for other purposes, if you have opted in</li>
         <li>Displaying your Agent name, Faction, and badges publicly if your profile is set to public</li>
+        <li>Retrieving your statistics from a third-party service you've connected, if you choose to use the optional stat import tool, to help identify which badges you've earned</li>
     </ul>
 
     <h2>3. User Rights</h2>
