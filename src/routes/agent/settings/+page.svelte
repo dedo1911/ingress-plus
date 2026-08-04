@@ -49,6 +49,16 @@
     }
   }
 
+  const toggleNewsletter = async () => {
+    $authData.baseModel.newsletterOptIn = !$authData.baseModel.newsletterOptIn
+    await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+    if ($authData.baseModel.newsletterOptIn) {
+      toast.push('You have been subscribed to newsletters and update emails!', { classes: ['successToast'] })
+    } else {
+      toast.push('You have been unsubscribed from newsletters and update emails.', { classes: ['successToast'] })
+    }
+  }
+
   const copyProfileLink = async () => {
     try {
       await navigator.clipboard.writeText(`https://ingress.plus/agent/${newUsername}`)
@@ -192,6 +202,15 @@
               </span>
             </p>
             {/if}
+          <p><b>Newsletter emails</b>:
+            <button onclick={toggleNewsletter} title={$authData.baseModel.newsletterOptIn ? 'Unsubscribe from newsletters' : 'Subscribe to newsletters'}>
+              <img
+                class="checkbox"
+                src="../images/{$authData.baseModel.newsletterOptIn ? 'checkbox_on' : 'checkbox_off'}.png"
+                alt="Checkbox"
+              />
+            </button>
+            - {$authData.baseModel.newsletterOptIn ? 'Subscribed' : 'Not subscribed'}</p>
             <br>
           <p><b>User ID:</b> <code>ING+{userId}</code></p>
           <p><b>E-mail:</b> <code>{email}</code></p>
@@ -236,6 +255,10 @@
                - {$authData.baseModel.hasUsernameGlow ? 'Enabled' : 'Disabled'}!
             </p>
           {/if}
+          <br>
+          <p>
+            <button class="unverify-button" onclick={() => goto(resolve('/onboarding'))}>Return to Onboarding</button>
+          </p>
       </div>
   {:else}
       <p style="margin-top:2em;">
