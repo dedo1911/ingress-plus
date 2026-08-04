@@ -177,7 +177,7 @@
 
   let campaignSubject = $state('')
   let campaignBody = $state('')
-  let requireOptIn = $state(false)
+  let requireOptIn = $state(true)
   let targetRules = $state([])
   let addRuleType = $state('all')
 
@@ -214,9 +214,16 @@
     }
   }
 
+  // Local {#each} keys for target rules. Deliberately not crypto.randomUUID():
+  // that API only exists in secure contexts (https / localhost), so it throws
+  // when the dev server is opened from a phone over plain http - which made
+  // Add Target and draft restoring silently do nothing on mobile.
+  let ruleIdCounter = 0
+  const nextRuleId = () => `rule-${++ruleIdCounter}`
+
   const addRule = () => {
     targetRules = [...targetRules, {
-      id: crypto.randomUUID(),
+      id: nextRuleId(),
       type: addRuleType,
       factions: [],
       users: [],
@@ -347,7 +354,7 @@
   const clearComposer = () => {
     campaignSubject = ''
     campaignBody = ''
-    requireOptIn = false
+    requireOptIn = true
     targetRules = []
     editingCampaignId = null
     recipientCount = null
@@ -377,11 +384,11 @@
         } catch (err) {
           console.error(err)
         }
-        rules.push({ id: crypto.randomUUID(), type: 'user', factions: [], users, searchQuery: '', searchResults: [], searching: false })
+        rules.push({ id: nextRuleId(), type: 'user', factions: [], users, searchQuery: '', searchResults: [], searching: false })
       } else if (rule.type === 'faction') {
-        rules.push({ id: crypto.randomUUID(), type: 'faction', factions: rule.factions || [], users: [], searchQuery: '', searchResults: [], searching: false })
+        rules.push({ id: nextRuleId(), type: 'faction', factions: rule.factions || [], users: [], searchQuery: '', searchResults: [], searching: false })
       } else {
-        rules.push({ id: crypto.randomUUID(), type: rule.type, factions: [], users: [], searchQuery: '', searchResults: [], searching: false })
+        rules.push({ id: nextRuleId(), type: rule.type, factions: [], users: [], searchQuery: '', searchResults: [], searching: false })
       }
     }
     targetRules = rules
@@ -887,14 +894,21 @@
   }
   div.composer-header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 1em;
-    position: relative;
+    gap: 0.5em 1em;
+  }
+  div.composer-header h2 {
+    flex: 1;
+    min-width: 0;
   }
   button.new-campaign-link {
-    position: absolute;
-    right: 0;
+    /* A normal flex item, not position:absolute - on narrow screens the
+       h2 next to it can wrap onto two lines, and an absolutely positioned
+       button doesn't reliably follow that height change, so it could end
+       up rendered outside the visible card. */
+    flex: 0 0 auto;
     background: none;
     border: none;
     color: rgba(255, 255, 255, 0.75);
@@ -1013,11 +1027,21 @@
   }
   div.add-rule-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.75em;
   }
   div.add-rule-row select {
     flex: 1;
     width: auto;
+    min-width: 8em;
+  }
+  div.add-rule-row button.cta {
+    /* button.cta defaults to width:100%, which flexbox reads as a huge
+       flex-basis - without this it gets crushed down toward its 20px
+       min-width by the select's flex:1 on narrow viewports. */
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 8em;
   }
   div.campaign-actions {
     display: flex;
