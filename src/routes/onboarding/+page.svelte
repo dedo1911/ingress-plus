@@ -44,53 +44,75 @@
 
   const resetOnboarding = () => setOnboardingState('notStarted')
 
-  // Machina is supporter-only and set from the Profile page, not offered
-  // here - a fresh account can't already be Machina, but if one somehow is
-  // (e.g. restarting onboarding after becoming a supporter), keep it
-  // selectable so submitting this form can't silently wipe it back to blank.
-  const FACTION_OPTIONS = [
-    { value: '', label: 'Not set yet' },
-    { value: 'enlightened', label: 'Enlightened' },
-    { value: 'resistance', label: 'Resistance' }
-  ]
-  const initialFaction = $authData?.baseModel?.faction || ''
-  const factionOptions = initialFaction === 'machina'
-    ? [...FACTION_OPTIONS, { value: 'machina', label: 'Machina (already set)' }]
-    : FACTION_OPTIONS
+  // Same faction options as /agent/settings: Enlightened/Resistance always
+  // offered, Machina only for supporters (set from the Profile page
+  // otherwise) - see saveFaction()/the faction <select> there.
+  const supporter = $derived($authData?.baseModel?.supporter)
 
-  // Local, decoupled from $authData.baseModel until submit - unlike the
-  // Profile settings page (which saves each field the moment it's toggled),
-  // a half-filled onboarding form shouldn't leak partial edits into global
-  // auth state before the Agent actually finishes it.
+  // Local, decoupled from $authData.baseModel until a save actually
+  // succeeds - unlike the Profile settings page (which saves each field the
+  // moment it's toggled), a half-filled onboarding form shouldn't leak
+  // partial edits into global auth state before they're confirmed saved.
   let username = $state($authData?.baseModel?.username || '')
-  let faction = $state(initialFaction)
+  // Left blank (not defaulted to Enlightened) when unset, so the dropdown
+  // doesn't visually favor one faction before the Agent has actually chosen
+  // one - see the disabled placeholder <option> below.
+  let faction = $state($authData?.baseModel?.faction || '')
   let isPublic = $state(!!$authData?.baseModel?.public)
   let newsletterOptIn = $state(!!$authData?.baseModel?.newsletterOptIn)
+
+  // 'profile' (this page's form), then 'tour' (a quick feature rundown),
+  // then 'done' (the completion page) - all three render on /onboarding
+  // itself, no navigation between them.
+  let step = $state('profile')
 
   let submitting = $state(false)
   let formError = $state('')
 
+  // Same wording as saveUsername()'s errorMessages on /agent/settings.
   const USERNAME_ERRORS = {
-    validation_not_unique: 'This username is already taken.',
+    validation_not_unique: 'The username is already taken. Please choose a different username.',
     validation_required: 'Username cannot be blank.',
-    validation_min_text_constraint: 'Username needs to be at least 3 characters.',
-    validation_max_text_constraint: 'Username needs to be 15 characters or less.',
-    validation_invalid_format: 'Username can only contain letters and numbers.'
+    validation_min_text_constraint: 'The username is too short. It needs to be at least 3 characters long.',
+    validation_max_text_constraint: 'The username is too long. It needs to be 15 characters or less.',
+    validation_invalid_format: 'The username contains characters that are not allowed. You can only use letters or numbers.'
   }
 
-  const completeOnboarding = async () => {
+  // The users collection's updateRule checks @request.body.supporter (and
+  // other fields) against the record's own current value, e.g.
+  // "@request.body.supporter = false || (@request.body.supporter = true &&
+  // supporter = true)" - PocketBase resolves a field missing from the
+  // submitted body as empty, not as "unchanged", so a partial payload with
+  // only the fields we intend to change fails that comparison and PocketBase
+  // 404s the whole request (its standard response for an API-rule mismatch,
+  // same as a genuinely missing record). Sending the full current record
+  // with just our fields overridden - the same thing /agent/settings does -
+  // satisfies the rule.
+  //
+  // baseModel itself is only mutated from the server's confirmed response,
+  // after success: mutating it optimistically before the request resolves
+  // (an earlier version of this) meant a rejected save still flipped
+  // onboardingState locally, which made alreadyDone true and silently
+  // jumped the page to the "completed" view out from under the still-set
+  // form error.
+  const saveProfile = async () => {
     formError = ''
     submitting = true
     try {
-      $authData.baseModel.username = username
-      $authData.baseModel.faction = faction
-      $authData.baseModel.public = isPublic
-      $authData.baseModel.newsletterOptIn = newsletterOptIn
-      $authData.baseModel.onboardingState = 'completed'
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      goto(resolve('/'))
+      const updated = await pb.collection('users').update($authData.baseModel.id, {
+        ...$authData.baseModel,
+        username,
+        faction,
+        public: isPublic,
+        newsletterOptIn
+      })
+      $authData.baseModel.username = updated.username
+      $authData.baseModel.faction = updated.faction
+      $authData.baseModel.public = updated.public
+      $authData.baseModel.newsletterOptIn = updated.newsletterOptIn
+      step = 'tour'
     } catch (err) {
-      console.error('Failed to complete onboarding:', err)
+      console.error('Failed to save profile during onboarding:', err)
       const errorCode = err.response?.data?.username?.code
       formError = USERNAME_ERRORS[errorCode] || 'Something went wrong saving your profile. Please try again.'
     } finally {
@@ -98,8 +120,20 @@
     }
   }
 
-  // Dev-only shortcuts to jump directly to any state while the real guided
-  // steps aren't built yet - not meant to ship long-term.
+  // Reaching the completion step is itself "finishing" onboarding - claimed
+  // once, same pattern as the inProgress effect above, so navigating away
+  // and back to this step (e.g. via the browser back button) doesn't
+  // re-fire the write.
+  let completedClaimed = $state(false)
+
+  $effect(() => {
+    if (step !== 'done' || completedClaimed) return
+    completedClaimed = true
+    setOnboardingState('completed')
+  })
+
+  // Dev-only shortcuts to jump directly to any onboardingState value,
+  // bypassing the guided steps above - not meant to ship long-term.
   const TEST_STATES = [
     { value: '', label: 'Empty' },
     { value: 'notStarted', label: 'Not Started' },
@@ -115,24 +149,39 @@
 
 <div>
   {#if $authData.isValid}
-    {#if alreadyDone}
+    {#if step === 'done'}
+      <h1>Onboarding Completed!</h1>
+      <p>
+        Great work, {username || 'Agent'} - your profile is all set up, and you've earned the "Onboarded!"
+        medal. Feel free to explore the site now.
+      </p>
+      <button type="button" class="cta" disabled={savingState === 'completed'} onclick={() => goto(resolve('/'))}>
+        {savingState === 'completed' ? 'Finishing…' : 'Head to the Homepage'}
+      </button>
+    {:else if alreadyDone}
       <h1>You're all set, Agent.</h1>
       <p>You've already been through onboarding. Head back to the <a href={resolve('/')}>homepage</a> to keep exploring.</p>
       <button type="button" class="cta" disabled={savingState !== null} onclick={resetOnboarding}>
         {savingState === 'notStarted' ? 'Resetting…' : 'Reset Onboarding'}
       </button>
-    {:else}
-      <h1>Welcome to Ingress Plus, Agent..</h1>
+    {:else if step === 'profile'}
+      <h1>Welcome to Ingress Plus, Agent.</h1>
       <p>
         This is where we'll walk you through setting up your Agent name, choosing a Faction as well as a few
         other things. Once completed you will be awarded a special "Onboarded!" medal for your Ingress Plus
         profile!
       </p>
 
-      <form class="onboarding-form" onsubmit={(e) => { e.preventDefault(); completeOnboarding() }}>
+      <form class="onboarding-form" onsubmit={(e) => { e.preventDefault(); saveProfile() }}>
         <div class="field">
           <label for="onboarding-username">Agent Name</label>
-          <input id="onboarding-username" type="text" maxlength="15" bind:value={username} />
+          <input
+            id="onboarding-username"
+            type="text"
+            maxlength="15"
+            bind:value={username}
+            style="color: var(--color-faction-{faction || 'unaligned'})"
+          />
           <p class="explanation">
             Your public Agent name, shown across Ingress Plus. We suggest matching your in-game Agent name
             so other Agents recognize you. 3-15 characters, letters and numbers only.
@@ -146,13 +195,21 @@
             bind:value={faction}
             style="color: var(--color-faction-{faction || 'unaligned'})"
           >
-            {#each factionOptions as opt (opt.value)}
-              <option value={opt.value}>{opt.label}</option>
-            {/each}
+            <option value="" disabled>Select a Faction</option>
+            <option value="enlightened">Enlightened</option>
+            <option value="resistance">Resistance</option>
+            {#if supporter === true}
+              <option value="machina">Machina</option>
+            {/if}
           </select>
           <p class="explanation">
-            Colors your Agent name and some site theming to match your side. Only Enlightened and Resistance
-            are offered here - Supporters can switch to Machina later from their Profile page.
+            Colors your Agent name and some site theming to match your faction. You can leave this unset
+            if you want.
+            {#if supporter === true}
+              As a Supporter, Machina is available to you too!
+            {:else}
+              People that support the site via Ko-Fi can also pick Machina from their Profile page after onboarding!
+            {/if}
           </p>
         </div>
 
@@ -164,7 +221,7 @@
             Make my profile public
           </label>
           <p class="explanation">
-            When public, anyone can view your earned badges at ingress.plus/agent/{username || '...'}. When
+            When public, anyone can view your earned badges at ingress.plus/agent/{username || 'YOUR_USERNAME_HERE'}. When
             private, only you can see it. You can change this anytime from your Profile page.
           </p>
         </div>
@@ -177,8 +234,8 @@
             Send me newsletters and update emails
           </label>
           <p class="explanation">
-            Occasional emails from the Ingress Plus team - new features, event announcements, and important
-            updates. You can change this anytime from your Profile page.
+            Occasional emails from the Ingress Plus team such as new features and announcements.
+            You can change this anytime from your Profile page. Note that you will still recieve emails for important updates.
           </p>
         </div>
 
@@ -187,9 +244,50 @@
         {/if}
 
         <button type="submit" class="cta" disabled={submitting}>
-          {submitting ? 'Saving…' : 'Complete Onboarding'}
+          {submitting ? 'Saving…' : 'Continue'}
         </button>
       </form>
+    {:else if step === 'tour'}
+      <h1>Just a couple more things, {username || 'Agent'}.</h1>
+      <p>This is a quick rundown of what you'll find around Ingress Plus:</p>
+
+      <div class="tour">
+        <div class="tour-item">
+          <h3><img src="/images/medal.svg" alt="" /> Badges</h3>
+          <p>
+            You can mark off your Badges that you have obtained in Ingress and keep track of which Badges
+            you are still missing. We recommend importing your stats from the Scanner to automatically mark off your
+            first Badges.
+          </p>
+        </div>
+        <div class="tour-item">
+          <h3><img src="/images/mediagress.png" alt="" /> Mediagress</h3>
+          <p>
+            Mediagress is a public archive of Media items that have been discovered and submitted by other Agents.
+            If you have any Media in your inventory that you want to upload, head over to Mediagress and follow the
+            instructions to install our IITC plugin. Note that you will need a C.O.R.E. Subscription to upload!
+          </p>
+        </div>
+        <div class="tour-item">
+          <h3><img src="/images/event.svg" alt="" /> Events</h3>
+          <p>
+            Check which Events are currently scheduled, what Badges and/or items they reward and easily add them
+            to your personal calendar with a simple click.
+          </p>
+        </div>
+        <div class="tour-item">
+          <h3><img src="/images/tools.svg" alt="" /> Tools</h3>
+          <p>
+            Ingress Plus containes various tools, such as an CMU Calculator that you can use to infer the real price
+            of in-game store items or the GDPR Explorer to which you can upload your GDPR Export to analyze it and reveal
+            stats that the Scanner doesn't show.
+          </p>
+        </div>
+      </div>
+
+      <button type="button" class="cta" onclick={() => (step = 'done')}>
+        Finish
+      </button>
     {/if}
 
     <hr />
@@ -325,5 +423,52 @@
     color: #e07b54;
     text-align: center;
     margin: 0;
+  }
+  div.tour {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    gap: 1em;
+    width: 100%;
+    max-width: 700px;
+    margin-top: 0;
+  }
+  div.tour-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: stretch;
+    height: 100%;
+    gap: 0.35em;
+    text-align: center;
+    padding: 1em;
+    margin-top: 0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    box-sizing: border-box;
+  }
+  @media (max-width: 550px) {
+    div.tour {
+      grid-template-columns: 1fr;
+    }
+  }
+  div.tour-item h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    text-shadow: 0 0 10px black;
+  }
+  div.tour-item h3 img {
+    height: 1.5em;
+    width: 1.5em;
+    border-radius: 6px;
+  }
+  div.tour-item p {
+    margin: 0;
+    text-align: center;
+    max-width: none;
   }
 </style>
