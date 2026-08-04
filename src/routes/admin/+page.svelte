@@ -7,6 +7,7 @@
   import { resolve } from '$app/paths'
   import { toast } from '@zerodevx/svelte-toast'
   import Callout from '$lib/components/Callout.svelte'
+  import Modal from '$lib/components/Modal.svelte'
 
   // pbAdmin.authStore is PocketBase's own store, not a Svelte one - it has
   // to be mirrored into local state via onChange to react to it here.
@@ -393,6 +394,49 @@
       loadFeatureFlags()
     }
   })
+
+  // Draft/failed campaigns never went out (or fully failed to), so they're
+  // safe to remove; anything queued/sending/sent is left alone - deleting
+  // those would just hide history of an email that was actually sent.
+  const isDeletable = (c) => c.status === 'draft' || c.status === 'failed'
+
+  const promptDeleteCampaign = (c) => {
+    c.confirmingDelete = true
+    c.deleteConfirmLocked = true
+    setTimeout(() => {
+      c.deleteConfirmLocked = false
+    }, 1000) // Delay to avoid misclick, matching the un-verify confirm on agent/settings
+  }
+
+  const cancelDeleteCampaign = (c) => {
+    c.confirmingDelete = false
+  }
+
+  const deleteCampaign = async (c) => {
+    c.deleting = true
+    try {
+      await pbAdmin.collection('email_campaigns').delete(c.id)
+      if (editingCampaignId === c.id) editingCampaignId = null
+      toast.push('Campaign deleted.', { classes: ['successToast'] })
+      await loadCampaigns()
+    } catch (err) {
+      console.error(err)
+      c.deleting = false
+      c.confirmingDelete = false
+      toast.push('Could not delete the campaign.', { classes: ['errorToast'] })
+    }
+  }
+
+  // Viewing a failed campaign's saved error - an admin can then use the
+  // existing "load into composer" flow (clicking the row) to adjust and
+  // resend it as a new draft.
+  let viewingErrorCampaign = $state(null)
+  let showErrorModal = $state(false)
+
+  const viewCampaignError = (c) => {
+    viewingErrorCampaign = c
+    showErrorModal = true
+  }
 
   // Set while the composer holds a draft loaded from history, so Save
   // Draft/Send update that same record instead of creating a duplicate.
@@ -807,12 +851,43 @@
                     </span>
                   </div>
                 </button>
-                <span class="status-badge status-{c.status}">{c.status}</span>
+                <div class="campaign-row-actions">
+                  <span class="status-badge status-{c.status}">{c.status}</span>
+                  {#if c.status === 'failed'}
+                    <button type="button" class="row-action" onclick={() => viewCampaignError(c)}>View Error</button>
+                  {/if}
+                  {#if isDeletable(c)}
+                    {#if c.confirmingDelete}
+                      <button
+                        type="button"
+                        class="row-action danger"
+                        disabled={c.deleteConfirmLocked || c.deleting}
+                        onclick={() => deleteCampaign(c)}
+                      >
+                        {c.deleting ? 'Deleting…' : 'Confirm Delete'}
+                      </button>
+                      <button type="button" class="row-action" disabled={c.deleting} onclick={() => cancelDeleteCampaign(c)}>
+                        Cancel
+                      </button>
+                    {:else}
+                      <button type="button" class="row-action danger" onclick={() => promptDeleteCampaign(c)}>Delete</button>
+                    {/if}
+                  {/if}
+                </div>
               </li>
             {/each}
           </ul>
         {/if}
       </div>
+
+      <Modal bind:showModal={showErrorModal}>
+        <div class="card error-modal">
+          <h2>Campaign Error</h2>
+          <p><strong>{viewingErrorCampaign?.subject || '(no subject)'}</strong></p>
+          <p class="error-text">{viewingErrorCampaign?.error || 'No error message was recorded.'}</p>
+          <button type="button" class="cta" onclick={() => (showErrorModal = false)}>Close</button>
+        </div>
+      </Modal>
     {:else if activeTab === 'flags'}
       <div class="card">
         <h2>Feature Flags</h2>
@@ -981,13 +1056,14 @@
   li.campaign-row {
     padding: 0;
     overflow: hidden;
+    flex-wrap: wrap;
   }
   li.campaign-row.editing {
     border-color: #9593c3;
     box-shadow: #9593c3 0px 0px 5px 1px;
   }
   button.campaign-row-button {
-    flex: 1;
+    flex: 1 1 12em;
     display: flex;
     align-items: center;
     text-align: left;
@@ -999,8 +1075,54 @@
   button.campaign-row-button:hover {
     background: rgba(255, 255, 255, 0.05);
   }
-  li.campaign-row span.status-badge {
+  div.campaign-row-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5em;
     margin-right: 0.75em;
+    flex-shrink: 0;
+  }
+  button.row-action {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    padding: 0.3em 0.7em;
+    font-size: 0.8em;
+    white-space: nowrap;
+  }
+  button.row-action:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+  }
+  button.row-action.danger {
+    border-color: rgba(255, 60, 60, 0.4);
+    color: #ff8a8a;
+  }
+  button.row-action.danger:hover {
+    background: rgba(255, 60, 60, 0.15);
+    color: #ffb3b3;
+  }
+  button.row-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  div.error-modal {
+    margin: 0;
+  }
+  p.error-text {
+    text-align: left;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: monospace;
+    font-size: 0.9em;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    padding: 0.75em;
+    max-height: 50vh;
+    overflow: auto;
   }
   div.composer-header {
     display: flex;
