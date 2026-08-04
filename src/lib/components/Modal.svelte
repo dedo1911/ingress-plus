@@ -27,6 +27,10 @@
 
 <style>
   dialog {
+    /* Browsers apply a UA stylesheet default of color: CanvasText directly
+       on <dialog> (usually black), which breaks inheriting the page's text
+       color for any content that doesn't set its own - inherit it back. */
+    color: inherit;
     background: none;
     border: none;
     padding: 0;
