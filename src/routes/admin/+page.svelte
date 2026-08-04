@@ -313,6 +313,10 @@
   let savingCampaign = $state(false)
   let sendingCampaign = $state(false)
   let sendingTest = $state(false)
+  // All three campaign actions share one lock: letting e.g. Save Draft and
+  // Send Campaign run at the same time could create two separate records
+  // for the same composed email.
+  const campaignBusy = $derived(savingCampaign || sendingCampaign || sendingTest)
   let campaignError = $state('')
   let campaignSuccess = $state('')
 
@@ -416,7 +420,17 @@
       await loadCampaigns()
     } catch (err) {
       console.error(err)
-      campaignError = 'Could not save the campaign.'
+      if (err?.status === 409) {
+        // The backend refused because this record already left the
+        // draft/queued stage (e.g. it was sent from another tab).
+        // Detach so the next save creates a fresh record instead of
+        // trying to rewrite a sent campaign's history.
+        campaignError = 'This campaign was already sent, so it can\'t be edited - saving again will store your text as a new draft.'
+        editingCampaignId = null
+        await loadCampaigns()
+      } else {
+        campaignError = 'Could not save the campaign.'
+      }
     } finally {
       savingCampaign = false
     }
@@ -442,9 +456,17 @@
       })
 
       const payload = { subject: campaignSubject, body: campaignBody, targeting, status: 'queued' }
-      const record = editingCampaignId
-        ? await pbAdmin.collection('email_campaigns').update(editingCampaignId, payload)
-        : await pbAdmin.collection('email_campaigns').create(payload)
+      if (!editingCampaignId) {
+        // Create as an inert draft first, remember its id, and only then
+        // flip it to "queued" below. If any of these calls fail (even with
+        // the work done server-side but the response lost), a retry
+        // re-targets this same record instead of creating a second queued
+        // campaign - the worst possible orphan is a draft, which never
+        // sends. A duplicate "queued" record would email everyone twice.
+        const draft = await pbAdmin.collection('email_campaigns').create({ ...payload, status: 'draft' })
+        editingCampaignId = draft.id
+      }
+      const record = await pbAdmin.collection('email_campaigns').update(editingCampaignId, payload)
 
       if (count <= INSTANT_SEND_THRESHOLD) {
         const result = await pbAdmin.send(`/api/admin/campaigns/${record.id}/dispatch`, { method: 'POST' })
@@ -458,7 +480,17 @@
       await loadCampaigns()
     } catch (err) {
       console.error(err)
-      campaignError = 'Could not send the campaign.'
+      if (err?.status === 409) {
+        // Not a failure: either the cron claimed the campaign in the moment
+        // between queueing it and the dispatch call, or a retried send found
+        // it already sent. Either way it's handled - retrying would only
+        // risk sending it twice.
+        campaignSuccess = 'This campaign was already picked up and is being (or has been) sent - see the history below.'
+        editingCampaignId = null
+        await loadCampaigns()
+      } else {
+        campaignError = 'Could not send the campaign. Retrying is safe - it will not send duplicate emails.'
+      }
     } finally {
       sendingCampaign = false
     }
@@ -675,13 +707,13 @@
       {/if}
 
       <div class="campaign-actions">
-        <button type="button" class="cta" disabled={sendingTest || !campaignSubject.trim()} onclick={sendTest}>
+        <button type="button" class="cta" disabled={campaignBusy || !campaignSubject.trim()} onclick={sendTest}>
           {sendingTest ? 'Sending…' : 'Send Test Email to Me'}
         </button>
-        <button type="button" class="cta" disabled={savingCampaign || !campaignSubject.trim()} onclick={saveDraft}>
+        <button type="button" class="cta" disabled={campaignBusy || !campaignSubject.trim()} onclick={saveDraft}>
           {savingCampaign ? 'Saving…' : 'Save Draft'}
         </button>
-        <button type="button" class="cta" disabled={sendingCampaign || !campaignSubject.trim() || targetRules.length === 0} onclick={sendCampaign}>
+        <button type="button" class="cta" disabled={campaignBusy || !campaignSubject.trim() || targetRules.length === 0} onclick={sendCampaign}>
           {sendingCampaign ? 'Sending…' : 'Send Campaign'}
         </button>
       </div>
