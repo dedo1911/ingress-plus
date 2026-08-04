@@ -6,6 +6,7 @@
   import { pb } from '$lib/pocketbase'
 
   const ONBOARDING_DONE_STATES = ['completed', 'skipped']
+  const ONBOARDING_BADGE_ID = 'onl0wktktek3bn8'
 
   const alreadyDone = $derived(ONBOARDING_DONE_STATES.includes($authData?.baseModel?.onboardingState))
 
@@ -123,13 +124,28 @@
   // Reaching the completion step is itself "finishing" onboarding - claimed
   // once, same pattern as the inProgress effect above, so navigating away
   // and back to this step (e.g. via the browser back button) doesn't
-  // re-fire the write.
+  // re-fire the writes below.
   let completedClaimed = $state(false)
+
+  // The Onboarded! badge is flagged unobtainable, so user_badges' createRule
+  // special-cases its id and additionally requires @request.auth.onboardingState
+  // to already be "completed" - the award can only go through once the
+  // server has actually recorded onboarding as done, which is why this
+  // waits on setOnboardingState('completed') rather than firing alongside
+  // it. Best-effort: a failure here (e.g. the badge was already awarded in
+  // an earlier session) shouldn't block the completion screen.
+  const awardOnboardedBadge = async () => {
+    try {
+      await pb.collection('user_badges').create({ user: $authData.baseModel.id, badge: ONBOARDING_BADGE_ID })
+    } catch (err) {
+      console.error('Failed to award the Onboarded! badge:', err)
+    }
+  }
 
   $effect(() => {
     if (step !== 'done' || completedClaimed) return
     completedClaimed = true
-    setOnboardingState('completed')
+    setOnboardingState('completed').then(awardOnboardedBadge)
   })
 
   // Dev-only shortcuts to jump directly to any onboardingState value,
@@ -152,15 +168,18 @@
     {#if step === 'done'}
       <h1>Onboarding Completed!</h1>
       <p>
-        Great work, {username || 'Agent'} - your profile is all set up, and you've earned the "Onboarded!"
-        medal. Feel free to explore the site now.
+        Awesome, {username || 'Agent'} - your profile is now all set up, and you've earned the "Onboarded!"
+        badge for your Ingress Plus profile. You can view it on your profile anytime. Feel free to explore
+        the site now.
       </p>
-      <button type="button" class="cta" disabled={savingState === 'completed'} onclick={() => goto(resolve('/'))}>
-        {savingState === 'completed' ? 'Finishing…' : 'Head to the Homepage'}
+      <img class="earned-badge" src="/images/onboarding/ingressplus_onboarded.png" alt="Onboarded! badge" />
+      <button type="button" class="cta" disabled={savingState === 'completed'} onclick={() => goto(resolve('/agent'))}>
+        {savingState === 'completed' ? 'Finishing…' : 'View Your Profile'}
       </button>
     {:else if alreadyDone}
-      <h1>You're all set, Agent.</h1>
-      <p>You've already been through onboarding. Head back to the <a href={resolve('/')}>homepage</a> to keep exploring.</p>
+      <h1>You're all set, {username || 'Agent'}.</h1>
+      <p>You've already been through the Onboarding. Head back to the <a href={resolve('/')}>homepage</a> to keep exploring or
+        reset the Onboarding below to restart the Onboarding.</p>
       <button type="button" class="cta" disabled={savingState !== null} onclick={resetOnboarding}>
         {savingState === 'notStarted' ? 'Resetting…' : 'Reset Onboarding'}
       </button>
@@ -470,5 +489,21 @@
     margin: 0;
     text-align: center;
     max-width: none;
+  }
+  img.earned-badge {
+    width: 160px;
+    height: 160px;
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.25));
+    animation: badge-fade-spin-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes badge-fade-spin-in {
+    from {
+      opacity: 0;
+      transform: scale(0.4) rotate(-180deg);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
   }
 </style>
