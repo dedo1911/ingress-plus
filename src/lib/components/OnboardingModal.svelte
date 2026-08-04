@@ -1,0 +1,110 @@
+<script>
+  import { goto } from '$app/navigation'
+  import { resolve } from '$app/paths'
+  import { authData } from '$lib/stores'
+  import { pb } from '$lib/pocketbase'
+  import Modal from '$lib/components/Modal.svelte'
+
+  let { showModal = $bindable() } = $props()
+
+  let saving = $state(false)
+
+  const setOnboardingState = async (value) => {
+    saving = true
+    try {
+      $authData.baseModel.onboardingState = value
+      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+    } catch (err) {
+      console.error('Failed to update onboarding state:', err)
+    } finally {
+      saving = false
+    }
+  }
+
+  // Doesn't write anything itself - /onboarding claims "inProgress" once the
+  // Agent actually lands there, so a closed tab or a browser back-button
+  // before that point doesn't falsely mark onboarding as started.
+  const startOnboarding = () => {
+    showModal = false
+    goto(resolve('/onboarding'))
+  }
+
+  const notNow = async () => {
+    showModal = false
+    await setOnboardingState('notStarted')
+  }
+
+  const never = async () => {
+    showModal = false
+    await setOnboardingState('skipped')
+  }
+</script>
+
+<Modal bind:showModal>
+  <div class="onboarding-card">
+    <h2>Welcome, Agent!</h2>
+    <p>
+      Let's get your Ingress Plus profile set up. We'll walk you through picking your Agent name, choosing
+      a Faction, deciding who can see your profile, and a quick rundown of how the site works.
+    </p>
+    <div class="actions">
+      <button type="button" class="cta" disabled={saving} onclick={startOnboarding}>Let's Go</button>
+      <div class="skip-actions">
+        <button type="button" class="skip-link" disabled={saving} onclick={notNow}>Not now</button>
+        <button type="button" class="skip-link" disabled={saving} onclick={never}>Never</button>
+      </div>
+    </div>
+  </div>
+</Modal>
+
+<style>
+  .onboarding-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    background: rgba(14, 11, 28, 0.9);
+    border: 3px double #5e5a75;
+    border-radius: 8px;
+    padding: 1.5em;
+    text-align: center;
+  }
+  h2 {
+    margin: 0;
+    text-shadow: 0 0 10px black;
+  }
+  p {
+    margin: 0;
+    text-align: center;
+  }
+  .actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75em;
+    margin-top: 0.5em;
+  }
+  button.cta {
+    max-width: none;
+    width: 100%;
+  }
+  .skip-actions {
+    display: flex;
+    gap: 1.5em;
+  }
+  button.skip-link {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.9em;
+  }
+  button.skip-link:hover {
+    color: #fff;
+  }
+  button.skip-link:disabled,
+  button.cta:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+</style>
