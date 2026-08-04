@@ -43,6 +43,16 @@
     pbAdmin.authStore.clear()
   }
 
+  // Each admin feature lives in its own tab, mirroring the method-tabs
+  // pattern on /badges/import.
+  const tabs = [
+    { id: 'impersonation', label: 'Impersonation' },
+    { id: 'emails', label: 'Emails' },
+    { id: 'flags', label: 'Feature Flags' }
+  ]
+  let activeTab = $state('impersonation')
+  const switchTab = (id) => { activeTab = id }
+
   // Feature flags: toggles existing feature_flags records only. Creating a
   // new flag name here wouldn't do anything - $lib/featureFlags.js and
   // +layout.js only react to the specific names the app code already
@@ -574,22 +584,6 @@
       <button type="button" class="cta" onclick={handleLogout}>Log Out</button>
     </div>
 
-    <div class="card">
-      <h2>Feature Flags</h2>
-      {#if loadingFlags}
-        <p>Loading…</p>
-      {:else if featureFlags.length === 0}
-        <p>No feature flags found.</p>
-      {:else}
-        {#each featureFlags as flag (flag.id)}
-          <label class="checkbox-label">
-            <input type="checkbox" checked={flag.enabled} disabled={flag.busy} onchange={() => toggleFlag(flag)} />
-            {flag.name}
-          </label>
-        {/each}
-      {/if}
-    </div>
-
     {#if impersonation}
       <div class="card impersonation-banner">
         <p>
@@ -600,212 +594,242 @@
       </div>
     {/if}
 
-    <div class="card">
-      <h2>Impersonate a User</h2>
-      <form class="search-row" onsubmit={(e) => { e.preventDefault(); searchUsers() }}>
-        <input type="text" bind:value={searchQuery} placeholder="Search by username or email…" />
-        <button type="submit" class="cta" disabled={searching || !searchQuery.trim()}>
-          {searching ? 'Searching…' : 'Search'}
+    <div class="admin-tabs">
+      {#each tabs as tab (tab.id)}
+        <button
+          type="button"
+          class:active={activeTab === tab.id}
+          onclick={() => switchTab(tab.id)}
+        >
+          {tab.label}
         </button>
-      </form>
-
-      {#if searchError}
-        <Callout variant="error">{searchError}</Callout>
-      {/if}
-      {#if impersonateError}
-        <Callout variant="error">{impersonateError}</Callout>
-      {/if}
-
-      {#if searchResults.length > 0}
-        <ul class="results">
-          {#each searchResults as user (user.id)}
-            <li>
-              <img src="{user.avatar}" alt="" onerror={(e) => (e.currentTarget.style.visibility = 'hidden')} />
-              <div class="user-info">
-                <strong>{user.username}</strong>
-                <span>{user.email}</span>
-              </div>
-              <button
-                type="button"
-                class="cta"
-                disabled={impersonatingId === user.id}
-                onclick={() => impersonate(user)}
-              >
-                {impersonatingId === user.id ? 'Impersonating…' : 'Impersonate'}
-              </button>
-            </li>
-          {/each}
-        </ul>
-      {/if}
+      {/each}
     </div>
 
-    <div class="card">
-      <div class="composer-header">
-        <h2>Send an Email Campaign</h2>
-        {#if editingCampaignId}
-          <button type="button" class="new-campaign-link" onclick={clearComposer}>+ New Campaign</button>
+    {#if activeTab === 'impersonation'}
+      <div class="card">
+        <h2>Impersonate a User</h2>
+        <form class="search-row" onsubmit={(e) => { e.preventDefault(); searchUsers() }}>
+          <input type="text" bind:value={searchQuery} placeholder="Search by username or email…" />
+          <button type="submit" class="cta" disabled={searching || !searchQuery.trim()}>
+            {searching ? 'Searching…' : 'Search'}
+          </button>
+        </form>
+
+        {#if searchError}
+          <Callout variant="error">{searchError}</Callout>
+        {/if}
+        {#if impersonateError}
+          <Callout variant="error">{impersonateError}</Callout>
+        {/if}
+
+        {#if searchResults.length > 0}
+          <ul class="results">
+            {#each searchResults as user (user.id)}
+              <li>
+                <img src="{user.avatar}" alt="" onerror={(e) => (e.currentTarget.style.visibility = 'hidden')} />
+                <div class="user-info">
+                  <strong>{user.username}</strong>
+                  <span>{user.email}</span>
+                </div>
+                <button
+                  type="button"
+                  class="cta"
+                  disabled={impersonatingId === user.id}
+                  onclick={() => impersonate(user)}
+                >
+                  {impersonatingId === user.id ? 'Impersonating…' : 'Impersonate'}
+                </button>
+              </li>
+            {/each}
+          </ul>
         {/if}
       </div>
-      {#if editingCampaignId}
-        <p class="editing-note">Editing a saved draft - Save Draft will update it instead of creating a new one.</p>
-      {/if}
-
-      <label>
-        Subject
-        <input
-          type="text"
-          bind:value={campaignSubject}
-          bind:this={subjectInputEl}
-          onfocus={() => (lastFocusedField = 'subject')}
-          placeholder="Subject line…"
-        />
-      </label>
-      <label>
-        Body (HTML)
-        <textarea
-          bind:value={campaignBody}
-          bind:this={bodyInputEl}
-          onfocus={() => (lastFocusedField = 'body')}
-          rows="8"
-          placeholder="<p>Hello Agent...</p>"
-        ></textarea>
-      </label>
-
-      <div class="placeholder-row">
-        <span>Insert placeholder:</span>
-        {#each PLACEHOLDERS as token (token)}
-          <button type="button" class="placeholder-button" onclick={() => insertPlaceholder(token)}>{token}</button>
-        {/each}
-      </div>
-
-      <div class="targeting">
-        <h3>Send To</h3>
-
-        {#each targetRules as rule (rule.id)}
-          <div class="rule-card">
-            <div class="rule-card-header">
-              <strong>{RULE_TYPE_OPTIONS.find(o => o.value === rule.type)?.label}</strong>
-              <button type="button" class="remove-rule" onclick={() => removeRule(rule.id)}>Remove</button>
-            </div>
-
-            {#if rule.type === 'faction'}
-              <div class="faction-options">
-                {#each FACTION_OPTIONS as opt (opt.value)}
-                  <label class="checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={rule.factions.includes(opt.value)}
-                      onchange={() => toggleRuleFaction(rule, opt.value)}
-                    />
-                    {opt.label}
-                  </label>
-                {/each}
-              </div>
-            {:else if rule.type === 'user'}
-              {#if rule.users.length > 0}
-                <div class="chips">
-                  {#each rule.users as u (u.id)}
-                    <span class="chip">
-                      {u.username}
-                      <button type="button" onclick={() => removeUserFromRule(rule, u.id)}>&times;</button>
-                    </span>
-                  {/each}
-                </div>
-              {/if}
-              <form class="search-row" onsubmit={(e) => { e.preventDefault(); searchUsersForRule(rule) }}>
-                <input type="text" bind:value={rule.searchQuery} placeholder="Search by username or email…" />
-                <button type="submit" class="cta" disabled={rule.searching || !rule.searchQuery.trim()}>
-                  {rule.searching ? 'Searching…' : 'Search'}
-                </button>
-              </form>
-              {#if rule.searchResults.length > 0}
-                <ul class="results">
-                  {#each rule.searchResults as u (u.id)}
-                    <li>
-                      <div class="user-info">
-                        <strong>{u.username}</strong>
-                        <span>{u.email}</span>
-                      </div>
-                      <button type="button" class="cta" onclick={() => addUserToRule(rule, u)}>Add</button>
-                    </li>
-                  {/each}
-                </ul>
-              {/if}
-            {/if}
-          </div>
-        {/each}
-
-        <div class="add-rule-row">
-          <select bind:value={addRuleType}>
-            {#each RULE_TYPE_OPTIONS as opt (opt.value)}
-              <option value={opt.value}>{opt.label}</option>
-            {/each}
-          </select>
-          <button type="button" class="cta" onclick={addRule}>+ Add Target</button>
+    {:else if activeTab === 'emails'}
+      <div class="card">
+        <div class="composer-header">
+          <h2>Send an Email Campaign</h2>
+          {#if editingCampaignId}
+            <button type="button" class="new-campaign-link" onclick={clearComposer}>+ New Campaign</button>
+          {/if}
         </div>
+        {#if editingCampaignId}
+          <p class="editing-note">Editing a saved draft - Save Draft will update it instead of creating a new one.</p>
+        {/if}
 
-        <label class="checkbox-label">
-          <input type="checkbox" bind:checked={requireOptIn} onchange={schedulePreviewCount} />
-          Only send to users who opted in to newsletters
+        <label>
+          Subject
+          <input
+            type="text"
+            bind:value={campaignSubject}
+            bind:this={subjectInputEl}
+            onfocus={() => (lastFocusedField = 'subject')}
+            placeholder="Subject line…"
+          />
+        </label>
+        <label>
+          Body (HTML)
+          <textarea
+            bind:value={campaignBody}
+            bind:this={bodyInputEl}
+            onfocus={() => (lastFocusedField = 'body')}
+            rows="8"
+            placeholder="<p>Hello Agent...</p>"
+          ></textarea>
         </label>
 
-        {#if targetRules.length > 0}
-          <p class="recipient-count">
-            {#if previewingCount}
-              Calculating recipients…
-            {:else if recipientCount !== null}
-              This will reach <strong>{recipientCount}</strong> recipient{recipientCount === 1 ? '' : 's'}
-              &middot; {recipientCount <= INSTANT_SEND_THRESHOLD ? 'sent instantly' : 'will be queued'}
-            {/if}
-          </p>
+        <div class="placeholder-row">
+          <span>Insert placeholder:</span>
+          {#each PLACEHOLDERS as token (token)}
+            <button type="button" class="placeholder-button" onclick={() => insertPlaceholder(token)}>{token}</button>
+          {/each}
+        </div>
+
+        <div class="targeting">
+          <h3>Send To</h3>
+
+          {#each targetRules as rule (rule.id)}
+            <div class="rule-card">
+              <div class="rule-card-header">
+                <strong>{RULE_TYPE_OPTIONS.find(o => o.value === rule.type)?.label}</strong>
+                <button type="button" class="remove-rule" onclick={() => removeRule(rule.id)}>Remove</button>
+              </div>
+
+              {#if rule.type === 'faction'}
+                <div class="faction-options">
+                  {#each FACTION_OPTIONS as opt (opt.value)}
+                    <label class="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={rule.factions.includes(opt.value)}
+                        onchange={() => toggleRuleFaction(rule, opt.value)}
+                      />
+                      {opt.label}
+                    </label>
+                  {/each}
+                </div>
+              {:else if rule.type === 'user'}
+                {#if rule.users.length > 0}
+                  <div class="chips">
+                    {#each rule.users as u (u.id)}
+                      <span class="chip">
+                        {u.username}
+                        <button type="button" onclick={() => removeUserFromRule(rule, u.id)}>&times;</button>
+                      </span>
+                    {/each}
+                  </div>
+                {/if}
+                <form class="search-row" onsubmit={(e) => { e.preventDefault(); searchUsersForRule(rule) }}>
+                  <input type="text" bind:value={rule.searchQuery} placeholder="Search by username or email…" />
+                  <button type="submit" class="cta" disabled={rule.searching || !rule.searchQuery.trim()}>
+                    {rule.searching ? 'Searching…' : 'Search'}
+                  </button>
+                </form>
+                {#if rule.searchResults.length > 0}
+                  <ul class="results">
+                    {#each rule.searchResults as u (u.id)}
+                      <li>
+                        <div class="user-info">
+                          <strong>{u.username}</strong>
+                          <span>{u.email}</span>
+                        </div>
+                        <button type="button" class="cta" onclick={() => addUserToRule(rule, u)}>Add</button>
+                      </li>
+                    {/each}
+                  </ul>
+                {/if}
+              {/if}
+            </div>
+          {/each}
+
+          <div class="add-rule-row">
+            <select bind:value={addRuleType}>
+              {#each RULE_TYPE_OPTIONS as opt (opt.value)}
+                <option value={opt.value}>{opt.label}</option>
+              {/each}
+            </select>
+            <button type="button" class="cta" onclick={addRule}>+ Add Target</button>
+          </div>
+
+          <label class="checkbox-label">
+            <input type="checkbox" bind:checked={requireOptIn} onchange={schedulePreviewCount} />
+            Only send to users who opted in to newsletters
+          </label>
+
+          {#if targetRules.length > 0}
+            <p class="recipient-count">
+              {#if previewingCount}
+                Calculating recipients…
+              {:else if recipientCount !== null}
+                This will reach <strong>{recipientCount}</strong> recipient{recipientCount === 1 ? '' : 's'}
+                &middot; {recipientCount <= INSTANT_SEND_THRESHOLD ? 'sent instantly' : 'will be queued'}
+              {/if}
+            </p>
+          {/if}
+        </div>
+
+        {#if campaignError}
+          <Callout variant="error">{campaignError}</Callout>
+        {/if}
+        {#if campaignSuccess}
+          <Callout variant="warning">{campaignSuccess}</Callout>
+        {/if}
+
+        <div class="campaign-actions">
+          <button type="button" class="cta" disabled={campaignBusy || !campaignSubject.trim()} onclick={sendTest}>
+            {sendingTest ? 'Sending…' : 'Send Test Email to Me'}
+          </button>
+          <button type="button" class="cta" disabled={campaignBusy || !campaignSubject.trim()} onclick={saveDraft}>
+            {savingCampaign ? 'Saving…' : 'Save Draft'}
+          </button>
+          <button type="button" class="cta" disabled={campaignBusy || !campaignSubject.trim() || targetRules.length === 0} onclick={sendCampaign}>
+            {sendingCampaign ? 'Sending…' : 'Send Campaign'}
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Campaign History</h2>
+        {#if loadingCampaigns}
+          <p>Loading…</p>
+        {:else if campaigns.length === 0}
+          <p>No campaigns yet.</p>
+        {:else}
+          <ul class="results">
+            {#each campaigns as c (c.id)}
+              <li class="campaign-row" class:editing={editingCampaignId === c.id}>
+                <button type="button" class="campaign-row-button" onclick={() => loadCampaignIntoComposer(c)}>
+                  <div class="user-info">
+                    <strong>{c.subject || '(no subject)'}</strong>
+                    <span>
+                      {c.status}
+                      {#if c.recipientCount}&middot; {c.recipientCount} recipients{/if}
+                    </span>
+                  </div>
+                </button>
+                <span class="status-badge status-{c.status}">{c.status}</span>
+              </li>
+            {/each}
+          </ul>
         {/if}
       </div>
-
-      {#if campaignError}
-        <Callout variant="error">{campaignError}</Callout>
-      {/if}
-      {#if campaignSuccess}
-        <Callout variant="warning">{campaignSuccess}</Callout>
-      {/if}
-
-      <div class="campaign-actions">
-        <button type="button" class="cta" disabled={campaignBusy || !campaignSubject.trim()} onclick={sendTest}>
-          {sendingTest ? 'Sending…' : 'Send Test Email to Me'}
-        </button>
-        <button type="button" class="cta" disabled={campaignBusy || !campaignSubject.trim()} onclick={saveDraft}>
-          {savingCampaign ? 'Saving…' : 'Save Draft'}
-        </button>
-        <button type="button" class="cta" disabled={campaignBusy || !campaignSubject.trim() || targetRules.length === 0} onclick={sendCampaign}>
-          {sendingCampaign ? 'Sending…' : 'Send Campaign'}
-        </button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Campaign History</h2>
-      {#if loadingCampaigns}
-        <p>Loading…</p>
-      {:else if campaigns.length === 0}
-        <p>No campaigns yet.</p>
-      {:else}
-        <ul class="results">
-          {#each campaigns as c (c.id)}
-            <li class="campaign-row" class:editing={editingCampaignId === c.id}>
-              <button type="button" class="campaign-row-button" onclick={() => loadCampaignIntoComposer(c)}>
-                <div class="user-info">
-                  <strong>{c.subject || '(no subject)'}</strong>
-                  <span>
-                    {c.status}
-                    {#if c.recipientCount}&middot; {c.recipientCount} recipients{/if}
-                  </span>
-                </div>
-              </button>
-              <span class="status-badge status-{c.status}">{c.status}</span>
-            </li>
+    {:else if activeTab === 'flags'}
+      <div class="card">
+        <h2>Feature Flags</h2>
+        {#if loadingFlags}
+          <p>Loading…</p>
+        {:else if featureFlags.length === 0}
+          <p>No feature flags found.</p>
+        {:else}
+          {#each featureFlags as flag (flag.id)}
+            <label class="checkbox-label">
+              <input type="checkbox" checked={flag.enabled} disabled={flag.busy} onchange={() => toggleFlag(flag)} />
+              {flag.name}
+            </label>
           {/each}
-        </ul>
-      {/if}
-    </div>
+        {/if}
+      </div>
+    {/if}
   {:else}
     <form class="card" onsubmit={(e) => { e.preventDefault(); handleLogin() }}>
       <label>
@@ -843,6 +867,37 @@
     margin: 0;
     text-align: center;
     text-shadow: 0 0 10px black;
+  }
+  div.admin-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: fit-content;
+    max-width: 100%;
+    margin: 1.5em auto 0;
+    border: 3px double #5e5a75;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  div.admin-tabs button {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
+  }
+  div.admin-tabs button:not(:last-child) {
+    border-right: 1px solid #5e5a75;
+  }
+  div.admin-tabs button.active {
+    background: rgba(94, 90, 117, 0.4);
+    color: #fff;
+  }
+  div.admin-tabs button:not(.active):hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
   }
   .card {
     display: flex;
