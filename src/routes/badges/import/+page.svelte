@@ -26,7 +26,7 @@
   const methods = [
     { id: 'text', label: 'Import from Scanner Export' },
     { id: 'agent-stats', label: 'Import from Agent Stats' },
-    { id: 'the-grid', label: 'The Grid (RES)' }
+    { id: 'the-grid', label: 'Import from The Grid (RES)' }
   ]
   let activeMethod = $state('text')
   const switchMethod = (id) => {
