@@ -10,10 +10,11 @@
   import { matchBadgesToStats } from '$lib/statImport/matchBadges.js'
   import { fetchAgentStats } from '$lib/statImport/agentStats.js'
   import { fetchTheGridStats } from '$lib/statImport/theGrid.js'
+  import { fetchStatsTrackerProStats } from '$lib/statImport/statsTrackerPro.js'
   import Callout from '$lib/components/Callout.svelte'
 
   const { data } = $props()
-  const { badges, theGridStatMatches } = data
+  const { badges, theGridStatMatches, statsTrackerProStatMatches } = data
 
   // TEMPORARY: auth gate disabled for mobile testing - restore before shipping.
   const SKIP_AUTH_GATE_FOR_TESTING = true
@@ -26,7 +27,8 @@
   const methods = [
     { id: 'text', label: 'Import from Scanner Export' },
     { id: 'agent-stats', label: 'Import from Agent Stats' },
-    { id: 'the-grid', label: 'Import from The Grid (RES)' }
+    { id: 'the-grid', label: 'Import from The Grid (RES)' },
+    { id: 'stats-tracker-pro', label: 'Import from Stats Tracker Pro (RES)' }
   ]
   let activeMethod = $state('text')
   const switchMethod = (id) => {
@@ -176,6 +178,68 @@
       result = { error: err.message || 'Could not fetch your Grid stats.' }
     } finally {
       fetchingGridStats = false
+    }
+  }
+
+  // Stats Tracker Pro API key handling - same pattern as Agent Stats/The
+  // Grid above, saved to a separate statsTrackerProApiKey field.
+  const STATS_TRACKER_PRO_KEY_MAX_LENGTH = 32
+  let statsTrackerProApiKey = $state('')
+  let showStatsTrackerProApiKeyHint = $state(false)
+  let savingStatsTrackerProKey = $state(false)
+  let removingStatsTrackerProKey = $state(false)
+  let fetchingStatsTrackerProStats = $state(false)
+
+  const savedStatsTrackerProApiKey = $derived($authData?.baseModel?.statsTrackerProApiKey || '')
+
+  const saveStatsTrackerProApiKey = async () => {
+    if (!$authData.isValid || !statsTrackerProApiKey.trim()) return
+    savingStatsTrackerProKey = true
+    showStatsTrackerProApiKeyHint = false
+    try {
+      $authData.baseModel.statsTrackerProApiKey = statsTrackerProApiKey.trim()
+      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+      authData.set($authData)
+      statsTrackerProApiKey = ''
+      toast.push('API key saved to your profile.', { classes: ['successToast'] })
+    } catch (err) {
+      console.error(err)
+      toast.push('Could not save your API key.', { classes: ['errorToast'] })
+    } finally {
+      savingStatsTrackerProKey = false
+    }
+  }
+
+  const removeStatsTrackerProApiKey = async () => {
+    if (!$authData.isValid) return
+    removingStatsTrackerProKey = true
+    try {
+      $authData.baseModel.statsTrackerProApiKey = ''
+      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+      authData.set($authData)
+      toast.push('Removed your saved API key.', { classes: ['successToast'] })
+    } catch (err) {
+      console.error(err)
+      toast.push('Could not remove your saved API key.', { classes: ['errorToast'] })
+    } finally {
+      removingStatsTrackerProKey = false
+    }
+  }
+
+  const handleFetchStatsTrackerPro = async () => {
+    const keyToUse = savedStatsTrackerProApiKey || statsTrackerProApiKey.trim()
+    if (!keyToUse) return
+    fetchingStatsTrackerProStats = true
+    showStatsTrackerProApiKeyHint = false
+    result = null
+    try {
+      const parsed = await fetchStatsTrackerProStats(keyToUse, statsTrackerProStatMatches)
+      result = { ...parsed, stats: matchBadgesToStats(parsed.stats, badges) }
+    } catch (err) {
+      console.error(err)
+      result = { error: err.message || 'Could not fetch your Stats Tracker Pro data.' }
+    } finally {
+      fetchingStatsTrackerProStats = false
     }
   }
 
@@ -505,6 +569,68 @@
           onclick={handleFetchTheGrid}
         >
           {fetchingGridStats ? 'Fetching…' : 'Fetch Stats'}
+        </button>
+      </div>
+    {:else if activeMethod === 'stats-tracker-pro'}
+      <p>
+        Resistance Agents can use Stats Tracker Pro to import their stats.
+        Generate a User API key from your Account Settings on <a href="https://the-grid.blue" target="_blank" rel="noopener noreferrer">Stats Tracker Pro</a> below.
+        You can optionally save your API key for future use of this tool.
+      </p>
+
+      <div class="api-key-input">
+        <input
+          type="text"
+          name="statsTrackerProApiKey"
+          value={statsTrackerProApiKey}
+          disabled={!!savedStatsTrackerProApiKey}
+          oninput={(e) => {
+            const raw = e.currentTarget.value
+            const sanitized = sanitizeKey(raw, STATS_TRACKER_PRO_KEY_MAX_LENGTH)
+            if (sanitized !== raw) showStatsTrackerProApiKeyHint = true
+            e.currentTarget.value = sanitized
+            statsTrackerProApiKey = sanitized
+          }}
+          placeholder={savedStatsTrackerProApiKey ? 'Using API key saved to your profile. Remove to enter new API key' : 'Paste your Stats Tracker Pro API key'}
+          autocomplete="off"
+          autocapitalize="off"
+          autocorrect="off"
+          spellcheck="false"
+          maxlength={STATS_TRACKER_PRO_KEY_MAX_LENGTH}
+          pattern="[a-zA-Z0-9]*"
+        />
+      </div>
+      {#if showStatsTrackerProApiKeyHint}
+        <p class="api-key-hint" transition:slide={{ duration: 150 }}>
+          Only letters (A-Z) and numbers are allowed, up to {STATS_TRACKER_PRO_KEY_MAX_LENGTH} characters.
+        </p>
+      {/if}
+
+      {#if $authData.isValid}
+        <div class="key-persistence-actions">
+          {#if savedStatsTrackerProApiKey}
+            <button type="button" onclick={removeStatsTrackerProApiKey} disabled={removingStatsTrackerProKey}>
+              {removingStatsTrackerProKey ? 'Removing…' : 'Remove Saved Key'}
+            </button>
+          {:else}
+            <button type="button" onclick={saveStatsTrackerProApiKey} disabled={savingStatsTrackerProKey || !statsTrackerProApiKey.trim()}>
+              {savingStatsTrackerProKey ? 'Saving…' : 'Save API Key to My Profile'}
+            </button>
+          {/if}
+        </div>
+        {#if savedStatsTrackerProApiKey}
+          <p class="saved-key-note">Using the API key saved to your profile.</p>
+        {/if}
+      {/if}
+
+      <div class="actions">
+        <button
+          type="button"
+          class="cta"
+          disabled={(!savedStatsTrackerProApiKey && !statsTrackerProApiKey.trim()) || fetchingStatsTrackerProStats}
+          onclick={handleFetchStatsTrackerPro}
+        >
+          {fetchingStatsTrackerProStats ? 'Fetching…' : 'Fetch Stats'}
         </button>
       </div>
     {/if}

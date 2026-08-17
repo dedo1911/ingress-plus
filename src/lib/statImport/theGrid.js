@@ -35,8 +35,10 @@ export function buildTheGridResult (record, statKeyLabels) {
 
 // The Grid sends proper CORS headers, so this can be called directly from
 // the browser, unlike Agent Stats. It has its own error quirks though: an
-// invalid key returns the literal JSON value `null` (HTTP 200), and no key
-// at all returns an empty body (HTTP 200) - neither is a real error status.
+// invalid key returns the literal JSON value `null` (HTTP 200), no key at
+// all returns an empty body (HTTP 200), and an account with no uploads at
+// all returns `[]` instead of the usual single record object - none of
+// these are a real error status.
 export async function fetchTheGridStats (apiKey, statKeyLabels) {
   const response = await fetch(`https://the-grid.org/r/export/?key=${encodeURIComponent(apiKey)}`)
   const text = await response.text()
@@ -51,6 +53,7 @@ export async function fetchTheGridStats (apiKey, statKeyLabels) {
   }
 
   if (!record) throw new Error('Invalid Grid API key.')
+  if (Array.isArray(record)) throw new Error('No stat upload found for this account on The Grid. Upload your stats there first, then try again.')
 
   return buildTheGridResult(record, statKeyLabels)
 }

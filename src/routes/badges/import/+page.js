@@ -34,7 +34,15 @@ export async function load ({ fetch }) {
       console.error(err)
     }
 
-    return { badges, theGridStatMatches }
+    let statsTrackerProStatMatches = {}
+    try {
+      const statsTrackerProMatching = await pb.collection('statMatching').getFirstListItem('serviceName = "stats-tracker-pro"', { fetch })
+      statsTrackerProStatMatches = statsTrackerProMatching.statMatches ?? {}
+    } catch (err) {
+      console.error(err)
+    }
+
+    return { badges, theGridStatMatches, statsTrackerProStatMatches }
   } catch (err) {
     console.error(err)
   }

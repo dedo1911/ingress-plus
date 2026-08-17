@@ -19,12 +19,20 @@ function deriveLevel (apMedal) {
 // the import pipeline (matching, tier resolution, preview, import) stays
 // identical regardless of which source the stats came from.
 export function buildAgentStatsResult (medals, progress) {
+  // An account that has never uploaded still returns the full medal
+  // structure with every value zeroed out rather than an empty/error
+  // response - last_submit is the actual signal that nothing has been
+  // uploaded yet.
+  if (!progress.last_submit) {
+    throw new Error('No stat upload found for this account on Agent Stats. Upload your stats there first, then try again.')
+  }
+
   const playerInfo = [
     { stat: 'Level', value: String(deriveLevel(progress.mymedals.ap)) },
     { stat: 'Current AP', value: String(progress.mymedals.ap?.progression?.total ?? 0) },
-    { stat: 'Lifetime AP', value: String(progress.mymedals.lifetime_ap?.progression?.total ?? 0) }
+    { stat: 'Lifetime AP', value: String(progress.mymedals.lifetime_ap?.progression?.total ?? 0) },
+    { stat: 'Last Synced', value: progress.last_submit }
   ]
-  if (progress.last_submit) playerInfo.push({ stat: 'Last Synced', value: progress.last_submit })
 
   const stats = Object.entries(medals)
     .filter(([key, medal]) => !PLAYER_INFO_MEDAL_KEYS.has(key) && medal.hide !== 1 && progress.mymedals[key])
