@@ -24,17 +24,37 @@
   })
 
   // Each entry is a distinct way of getting stat data into the parser below.
+  // An untagged method is shown to everyone; a faction-tagged one only to
+  // users on that faction, or every faction once they're Machina.
+  const FACTION_TAGS = { enl: 'enlightened', res: 'resistance' }
   const methods = [
     { id: 'text', label: 'Import from Scanner Export' },
     { id: 'agent-stats', label: 'Import from Agent Stats' },
-    { id: 'the-grid', label: 'Import from The Grid (RES)' },
-    { id: 'stats-tracker-pro', label: 'Import from Stats Tracker Pro (RES)' }
+    { id: 'the-grid', label: 'Import from The Grid (RES)', faction: 'res' },
+    { id: 'stats-tracker-pro', label: 'Import from Stats Tracker Pro (RES)', faction: 'res' }
   ]
+
+  const userFaction = $derived($authData?.baseModel?.faction || '')
+  const visibleMethods = $derived(
+    userFaction === 'machina'
+      ? methods
+      : methods.filter((method) => !method.faction || FACTION_TAGS[method.faction] === userFaction)
+  )
+
   let activeMethod = $state('text')
   const switchMethod = (id) => {
     activeMethod = id
     result = null
   }
+
+  // If the active tab is (or becomes, e.g. once auth data loads client-side)
+  // hidden for the current faction, fall back to the first visible one.
+  $effect(() => {
+    if (!visibleMethods.some((method) => method.id === activeMethod)) {
+      activeMethod = visibleMethods[0]?.id ?? 'text'
+      result = null
+    }
+  })
 
   let pasteText = $state('')
   let result = $state(null)
@@ -408,12 +428,12 @@
 
   <p>
     Here you can provide an existing Stat Export, review the badges it matches, and confirm to mark them
-    as owned. This will not catch Character Badges or other Badges that are awarded without a dedicated
+    as owned. This will sadly not catch Character Badges or other Badges that are awarded without a dedicated
     stat line.
   </p>
 
   <div class="method-tabs">
-    {#each methods as method (method.id)}
+    {#each visibleMethods as method (method.id)}
       <button
         type="button"
         class:active={activeMethod === method.id}
@@ -574,8 +594,10 @@
     {:else if activeMethod === 'stats-tracker-pro'}
       <p>
         Resistance Agents can use Stats Tracker Pro to import their stats.
-        Generate a User API key from your Account Settings on <a href="https://the-grid.blue" target="_blank" rel="noopener noreferrer">Stats Tracker Pro</a> below.
-        You can optionally save your API key for future use of this tool.
+        Depending on how long and how regularly you have uploaded to Stats Tracker Pro this import may include more stats than other import methods.<br>
+        <br>
+        Copy your API key from your Account Settings on <a href="https://the-grid.blue/edit_profile.php" target="_blank" rel="noopener noreferrer">Stats Tracker Pro</a> below.
+        You can optionally save your API key for future use of this tool so you don't have to copy and paste it the next time.
       </p>
 
       <div class="api-key-input">
