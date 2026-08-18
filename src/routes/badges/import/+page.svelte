@@ -77,6 +77,13 @@
   // custom masking bugs a plain password field would have (misaligned
   // overlay, text still selectable) and ever re-displaying a previously-
   // saved key on screen.
+  //
+  // Length is capped here rather than via the input's native maxlength
+  // attribute - some copied keys (Agent Stats in particular) carry a
+  // trailing invisible whitespace character, and a native maxlength would
+  // truncate the pasted string to that length before this handler ever
+  // sees it, cutting off a real trailing character instead of the
+  // whitespace once it's stripped below.
   const sanitizeKey = (value, maxLength) => value.replace(/[^a-zA-Z0-9]/g, '').slice(0, maxLength)
 
   const AGENT_STATS_KEY_MAX_LENGTH = 20
@@ -503,7 +510,6 @@
           autocapitalize="off"
           autocorrect="off"
           spellcheck="false"
-          maxlength={AGENT_STATS_KEY_MAX_LENGTH}
           pattern="[a-zA-Z0-9]*"
         />
       </div>
@@ -567,7 +573,6 @@
           autocapitalize="off"
           autocorrect="off"
           spellcheck="false"
-          maxlength={THE_GRID_KEY_MAX_LENGTH}
           pattern="[a-zA-Z0-9]*"
         />
       </div>
@@ -631,7 +636,6 @@
           autocapitalize="off"
           autocorrect="off"
           spellcheck="false"
-          maxlength={STATS_TRACKER_PRO_KEY_MAX_LENGTH}
           pattern="[a-zA-Z0-9]*"
         />
       </div>
