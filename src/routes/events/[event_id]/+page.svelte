@@ -1,6 +1,7 @@
 <script>
   import { serverAddress } from '$lib/pocketbase'
   import AddToCalendarButton from '$lib/components/AddToCalendarButton.svelte'
+  import EventBadges from '$lib/components/EventBadges.svelte'
   import Time, { dayjs } from 'svelte-time'
   import utc from 'dayjs/plugin/utc'
   import timezone from 'dayjs/plugin/timezone'
@@ -14,6 +15,7 @@
   const isLocal = data.event.time_type === 'local'
   const event = {
     ...data.event,
+    badges: data.event.expand?.linked_badge ?? [],
     image: `${serverAddress}/api/files/${data.event.collectionId}/${data.event.id}/${data.event.image}`,
     start_time: isLocal
       ? dayjs(data.event.start_time.substring(0, 19)).tz(userTZ)
@@ -92,6 +94,11 @@
         alt="CMU Cost"
       /> {Intl.NumberFormat().format(event.cmu_cost)} CMU
     {/if}</p>
+  {#if event.badges.length > 0}
+    <div class="badges-row">
+      <EventBadges badges={event.badges} size="4em" showTitles expandTiers />
+    </div>
+  {/if}
   <p class="center">
     {@html event.description}
   </p>
@@ -130,5 +137,10 @@
   }
   div.time-row p.center {
     margin: 0;
+  }
+  div.badges-row {
+    display: flex;
+    justify-content: center;
+    margin: 1em 0;
   }
 </style>
