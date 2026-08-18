@@ -1,6 +1,4 @@
 <script>
-  import { onMount } from 'svelte'
-
   import { resolve } from '$app/paths'
   import { pb } from '$lib/pocketbase'
   import zalgo from '$lib/zalgo'
@@ -19,11 +17,20 @@
     ? 'machina.png'
     : `${user?.faction || 'unaligned'}.svg`)
 
-  onMount(async () => {
-    if (id || !user) user = await pb.collection('public_users').getFirstListItem(`id="${id}"`, { requestKey: null })
-    if (!!user.username && user.supporter === undefined) {
-      const lateUser = await pb.collection('public_users').getFirstListItem(`username="${user.username}"`, { requestKey: null })
-      user = lateUser
+  // An $effect (not onMount) so this re-runs if id/user.username only
+  // become available after this component's first render - e.g. a parent
+  // passing user={{ username }} sourced from authData, which resolves
+  // asynchronously after a full page reload. onMount only fires once, so
+  // if that data wasn't ready yet at the initial mount, the fetch below
+  // would never happen and the component would stay permanently hidden
+  // until the page was fully remounted (navigating away and back).
+  $effect(() => {
+    if (id) {
+      pb.collection('public_users').getFirstListItem(`id="${id}"`, { requestKey: null }).then(record => { user = record })
+      return
+    }
+    if (user?.username && user.supporter === undefined) {
+      pb.collection('public_users').getFirstListItem(`username="${user.username}"`, { requestKey: null }).then(record => { user = record })
     }
   })
 </script>

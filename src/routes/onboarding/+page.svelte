@@ -4,6 +4,7 @@
   import { resolve } from '$app/paths'
   import { authData } from '$lib/stores'
   import { pb } from '$lib/pocketbase'
+  import { refreshOwnedBadges } from '$lib/badges'
 
   const ONBOARDING_DONE_STATES = ['completed', 'skipped']
   const ONBOARDING_BADGE_ID = 'onl0wktktek3bn8'
@@ -137,6 +138,10 @@
   const awardOnboardedBadge = async () => {
     try {
       await pb.collection('user_badges').create({ user: $authData.baseModel.id, badge: ONBOARDING_BADGE_ID })
+      // Without this, ownedBadges (populated at login/mount) stays stale
+      // until a full reload, so /agent wouldn't show the new badge right
+      // after navigating there from the completion step.
+      await refreshOwnedBadges()
     } catch (err) {
       console.error('Failed to award the Onboarded! badge:', err)
     }
