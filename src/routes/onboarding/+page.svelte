@@ -173,16 +173,6 @@
         step = 'tour'
       })
   })
-
-  // Dev-only shortcuts to jump directly to any onboardingState value,
-  // bypassing the guided steps above - not meant to ship long-term.
-  const TEST_STATES = [
-    { value: '', label: 'Empty' },
-    { value: 'notStarted', label: 'Not Started' },
-    { value: 'inProgress', label: 'In Progress' },
-    { value: 'completed', label: 'Completed' },
-    { value: 'skipped', label: 'Skipped' }
-  ]
 </script>
 
 <svelte:head>
@@ -345,26 +335,6 @@
         Finish
       </button>
     {/if}
-
-    <hr />
-    <div class="testing-controls">
-      <p>
-        <strong>Testing controls</strong> - jump directly to any <code>onboardingState</code> value.
-        Current value: <code>{$authData.baseModel?.onboardingState || '(empty)'}</code>
-      </p>
-      <div class="test-buttons">
-        {#each TEST_STATES as state (state.value)}
-          <button
-            type="button"
-            class="test-button"
-            disabled={savingState !== null}
-            onclick={() => setOnboardingState(state.value)}
-          >
-            {savingState === state.value ? 'Setting…' : state.label}
-          </button>
-        {/each}
-      </div>
-    </div>
   {:else}
     <p>You are currently not logged in. Please log in first.</p>
   {/if}
@@ -387,38 +357,6 @@
     text-align: center;
     max-width: 700px;
   }
-  hr {
-    width: 100%;
-  }
-  div.testing-controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75em;
-    padding: 1em;
-    border: 2px dashed rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-  }
-  div.test-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5em;
-  }
-  button.test-button {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    color: rgba(255, 255, 255, 0.85);
-    cursor: pointer;
-    padding: 0.4em 0.8em;
-    font-size: 0.85em;
-  }
-  button.test-button:hover {
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
-  }
-  button.test-button:disabled,
   button.cta:disabled {
     opacity: 0.5;
     cursor: not-allowed;
