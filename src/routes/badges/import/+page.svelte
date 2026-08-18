@@ -16,11 +16,8 @@
   const { data } = $props()
   const { badges, theGridStatMatches, statsTrackerProStatMatches } = data
 
-  // TEMPORARY: auth gate disabled for mobile testing - restore before shipping.
-  const SKIP_AUTH_GATE_FOR_TESTING = true
-
   $effect(() => {
-    if (!SKIP_AUTH_GATE_FOR_TESTING && browser && $authData.isValid === false) goto(resolve('/badges'))
+    if (browser && $authData.isValid === false) goto(resolve('/badges'))
   })
 
   // Each entry is a distinct way of getting stat data into the parser below.
@@ -464,7 +461,7 @@
     {/each}
   </div>
 
-  {#if !SKIP_AUTH_GATE_FOR_TESTING && $authData.isValid !== true}
+  {#if $authData.isValid !== true}
     <Callout variant="warning">You need to be logged in to import stats.</Callout>
   {:else}
     {#if activeMethod === 'text'}
