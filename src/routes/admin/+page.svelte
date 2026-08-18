@@ -339,6 +339,16 @@
   // the cursor position of whichever of subject/body was last focused.
   const PLACEHOLDERS = ['%username%', '%faction%', '%userEmail%']
 
+  // Ready-made disclosure sentences for the two kinds of campaigns this tool
+  // sends - optional newsletters agents can opt out of, versus mandatory
+  // service notices. These are static text, not server-substituted tokens
+  // like PLACEHOLDERS above, so they're inserted as-is and can be edited
+  // afterward like any other body text.
+  const TEXT_SNIPPETS = [
+    { label: 'Opt-Out Notice', text: 'Not interested in updates like this one? You can unsubscribe from non-essential emails at any time from your <a href="https://ingress.plus/agent/settings">profile settings</a>.' },
+    { label: 'Mandatory Notice', text: 'This is an essential service notice sent to all agents, so it cannot be opted out of.' }
+  ]
+
   let subjectInputEl = $state(null)
   let bodyInputEl = $state(null)
   let lastFocusedField = $state('body')
@@ -721,11 +731,23 @@
             placeholder="<p>Hello Agent...</p>"
           ></textarea>
         </label>
+        <p class="visual-editor-hint">
+          Prefer not to write HTML by hand? Build the email in
+          <a href="https://html5-editor.net/" target="_blank" rel="noopener noreferrer">HTML5 Editor</a>'s
+          visual editor, then paste the generated HTML into the field above.
+        </p>
 
         <div class="placeholder-row">
           <span>Insert placeholder:</span>
           {#each PLACEHOLDERS as token (token)}
             <button type="button" class="placeholder-button" onclick={() => insertPlaceholder(token)}>{token}</button>
+          {/each}
+        </div>
+
+        <div class="placeholder-row">
+          <span>Insert disclosure text:</span>
+          {#each TEXT_SNIPPETS as snippet (snippet.label)}
+            <button type="button" class="placeholder-button" onclick={() => insertPlaceholder(snippet.text)}>{snippet.label}</button>
           {/each}
         </div>
 
@@ -1157,6 +1179,11 @@
     text-align: center;
     font-size: 0.85em;
     color: #ffb84d;
+  }
+  p.visual-editor-hint {
+    margin: -0.5em 0 0;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.6);
   }
   div.user-info {
     display: flex;
