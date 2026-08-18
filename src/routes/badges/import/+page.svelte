@@ -66,6 +66,12 @@
     result = parsed.error ? parsed : { ...parsed, stats: matchBadgesToStats(parsed.stats, badges) }
   }
 
+  // The Guardian badge is deliberately excluded from matching in
+  // matchBadges.js (see the comment there) - this just detects whether the
+  // underlying stat line showed up in this particular import so the notice
+  // below only appears for agents it's actually relevant to.
+  const hasRetiredGuardianStat = $derived(result?.stats?.some((entry) => entry.stat === 'Max Time Portal Held') ?? false)
+
   // API key handling shared by the Agent Stats and The Grid tabs below.
   // Each key can be saved to the user's own profile so it doesn't need to
   // be re-pasted on every visit. Letters/numbers only, mirroring the
@@ -469,7 +475,7 @@
         You can find or generate an API Key for your account settings from the
         <a href="https://www.agent-stats.com/preferences.php" target="_blank" rel="noopener noreferrer">Agent Stats Preferences page</a>.<br>
         <br>
-        Once copied, paste your Agent Stats API key below. You can optionally save your API key for future use of this tool.
+        Once copied, paste your Agent Stats API key below.  You can optionally save your API key for future use of this tool so you don't have to copy and paste it the next time..
       </p>
 
       <div class="api-key-input">
@@ -533,7 +539,7 @@
         this import may include more stats than other import methods.<br>
         <br>
         Paste your "Personal API key" from <a href="https://the-grid.org/settings" target="_blank" rel="noopener noreferrer">The Grid</a> below.
-        You can optionally save your API key for future use of this tool.
+         You can optionally save your API key for future use of this tool so you don't have to copy and paste it the next time..
       </p>
 
       <div class="api-key-input">
@@ -663,6 +669,15 @@
       {:else}
         <h2>Agent Information</h2>
         {@render statsTable(result.playerInfo, false)}
+
+        {#if hasRetiredGuardianStat}
+          <Callout variant="warning">
+            The Guardian badge (tracked by "Max Time Portal Held") was retired and can no longer be
+            earned, so it's deliberately left out of this import. If you already own it from before
+            the retirement, this won't change that - if you believe you're still missing it, mark it
+            manually on your Badges page.
+          </Callout>
+        {/if}
 
         {#if importCandidates.length > 0}
           <h2>Badges Ready to Import</h2>
