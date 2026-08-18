@@ -1,5 +1,6 @@
 <script>
   import { serverAddress } from '$lib/pocketbase'
+  import AddToCalendarButton from '$lib/components/AddToCalendarButton.svelte'
   import Time, { dayjs } from 'svelte-time'
   import utc from 'dayjs/plugin/utc'
   import timezone from 'dayjs/plugin/timezone'
@@ -50,7 +51,8 @@
   <p class="center">
     <img src="{event.image}" alt={event.title} />
   </p>
-  <p class="center">
+  <div class="time-row">
+    <p class="center">
       {#if event.start_time.isAfter(dayjs())}
              <strong>Starts <Time timestamp={event.start_time} relative live /></strong>
              <small>(
@@ -71,6 +73,10 @@
              )</small>
          {/if}
     </p>
+    {#if event.end_time.isAfter(dayjs())}
+      <AddToCalendarButton {event} />
+    {/if}
+  </div>
     <p class="center"><b><img style="height:1em;" src="../images/location.svg" alt="Location" /> {event.location}</b>
     {#if event.category === 'paid_campaign' && event.cmu_cost} |
       <img
@@ -114,5 +120,15 @@
   }
   p.center {
     text-align: center;
+  }
+  div.time-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5em;
+  }
+  div.time-row p.center {
+    margin: 0;
   }
 </style>

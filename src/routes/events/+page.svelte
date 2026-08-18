@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { resolve } from '$app/paths'
   import { pb, serverAddress } from '$lib/pocketbase'
-  import { addToCalendar } from '$lib/utils.js'
+  import AddToCalendarButton from '$lib/components/AddToCalendarButton.svelte'
   import Time, { dayjs } from 'svelte-time'
   import utc from 'dayjs/plugin/utc'
   import timezone from 'dayjs/plugin/timezone'
@@ -143,21 +143,7 @@
           </span>
           {#if e.end_time.isAfter(dayjs())}
             <span>
-              <a href={`#event${e.id}`}
-                onclick={addToCalendar({
-                  title: e.title,
-                  description: e.description,
-                  startTime: e.start_time,
-                  endTime: e.end_time,
-                  location: e.location,
-                })} >
-                Add to Calendar
-                <img
-                  style="height:1em"
-                  src="images/add_to_calendar.svg"
-                  alt="Add to Calendar"
-                />
-              </a>
+              <AddToCalendarButton event={e} />
             </span>
           {/if}
         </div>
@@ -231,10 +217,19 @@
     box-shadow: black 0 0 0.25em;
     transition: all ease-in-out 0.2s;
     position: relative;
+    z-index: 1;
   }
   div.event-container:hover {
     background: rgba(0, 0, 0, 0.5);
     box-shadow: black 0 0 1em;
+  }
+  /* Without its own stacking context, this container's z-index:3 event-row (below)
+     would be compared against every other event-row in the list rather than just its
+     own siblings, so later events (later in DOM order, same z-index) would always paint
+     over an earlier event's open Add to Calendar dropdown. :focus-within raises the
+     open one above the rest for as long as the dropdown holds focus. */
+  div.event-container:focus-within {
+    z-index: 5;
   }
   div.event-row {
     display: flex;
@@ -313,6 +308,30 @@
       vertical-align: sub;
       height: 1.5em;
       width: 1.5em;
+    }
+  }
+
+  @media (max-width: 700px) {
+    /* event-meta and event-time each hold two independent pieces of info
+       (category/add-to-calendar, date-range/location). Side by side with
+       justify-content: space-between they get squeezed into two narrow
+       columns and wrap heavily - stacking them gives each line the full
+       width to breathe. */
+    div.event-meta, div.event-time {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.35em;
+    }
+    div.event-icon {
+      width: 72px;
+      margin-right: 0.75em;
+    }
+    span.event-icon-image {
+      width: 4.5em;
+      height: 4.5em;
+    }
+    div.event-description h2 {
+      font-size: 1.2em;
     }
   }
 </style>
