@@ -52,13 +52,8 @@ function resolveTier (badge, value, recursions) {
   return { tierIndex, reached: true, wingsEarned }
 }
 
-// The Guardian badge ("Max Time Portal Held") was retired by the
-// developers - it can no longer be earned, but the stat line itself is
-// still reported and still updates for agents who already have it from
-// before the retirement. Since most agents importing stats won't have it,
-// it's deliberately left out of matching entirely rather than shown
-// dimmed like a normal unearned badge; the import page shows a callout
-// telling agents with the stat to mark it manually instead.
+// Lists retired badges that were awarded based on Stat lines that are still
+// in use and updated today, even if they don't award the badge anymore
 const RETIRED_BADGE_TITLES = new Set(['Guardian'])
 
 // Matches parsed stat-line entries to the badges that track them, by exact
@@ -69,7 +64,7 @@ const RETIRED_BADGE_TITLES = new Set(['Guardian'])
 export function matchBadgesToStats (stats, badges) {
   const badgesByStatLine = new Map()
   for (const badge of badges) {
-    if (!badge.stat_line || RETIRED_BADGE_TITLES.has(badge.title)) continue
+    if (!badge.stat_line) continue
     if (!badgesByStatLine.has(badge.stat_line)) badgesByStatLine.set(badge.stat_line, [])
     badgesByStatLine.get(badge.stat_line).push(badge)
   }
@@ -81,7 +76,10 @@ export function matchBadgesToStats (stats, badges) {
     const value = Number(entry.value)
     return {
       ...entry,
-      badges: matchedBadges.map(badge => ({ badge, ...resolveTier(badge, value, recursions) }))
+      // Still matched and shown like any other badge - retired is only
+      // consulted by the page to keep it out of importCandidates and to
+      // show the retirement notice next to it.
+      badges: matchedBadges.map(badge => ({ badge, retired: RETIRED_BADGE_TITLES.has(badge.title), ...resolveTier(badge, value, recursions) }))
     }
   })
 }

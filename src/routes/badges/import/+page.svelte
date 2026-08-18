@@ -66,12 +66,6 @@
     result = parsed.error ? parsed : { ...parsed, stats: matchBadgesToStats(parsed.stats, badges) }
   }
 
-  // The Guardian badge is deliberately excluded from matching in
-  // matchBadges.js (see the comment there) - this just detects whether the
-  // underlying stat line showed up in this particular import so the notice
-  // below only appears for agents it's actually relevant to.
-  const hasRetiredGuardianStat = $derived(result?.stats?.some((entry) => entry.stat === 'Max Time Portal Held') ?? false)
-
   // API key handling shared by the Agent Stats and The Grid tabs below.
   // Each key can be saved to the user's own profile so it doesn't need to
   // be re-pasted on every visit. Letters/numbers only, mirroring the
@@ -275,11 +269,13 @@
   // "what will change" preview and the actual import can iterate over one
   // flat list of badges to mark. alreadyOwned is recalculated whenever
   // ownedBadges changes, so it also updates live as the import runs.
+  // Retired badges (see matchBadges.js) are still shown in the stats table
+  // but are never import candidates - they can't be granted automatically.
   const importCandidates = $derived(
     result && !result.error
       ? result.stats.flatMap(entry =>
         entry.badges
-          .filter(({ reached }) => reached)
+          .filter(({ reached, retired }) => reached && !retired)
           .map(({ badge, tierIndex, wingsEarned }) => {
             const existing = $ownedBadges.find(b => b.badge === badge.id)
             const alreadyOwned = !!existing && existing.tier >= tierIndex && (existing.hasWings || !wingsEarned)
@@ -379,6 +375,17 @@
           <td>{stat}</td>
           <td>{value}</td>
         </tr>
+        {#if showBadge && matchedBadges?.[0]?.retired}
+          <tr class="retired-badge-note">
+            <td colspan="3">
+              <Callout variant="warning">
+                The {matchedBadges[0].badge.title} badge has been retired and can no longer be earned if
+                you do not already own it. This tool therefore will not automatically mark it for you. If
+                you did earn it before it was retired, please manually mark it from the Badge list later!
+              </Callout>
+            </td>
+          </tr>
+        {/if}
       {/each}
     </tbody>
   </table>
@@ -670,15 +677,6 @@
         <h2>Agent Information</h2>
         {@render statsTable(result.playerInfo, false)}
 
-        {#if hasRetiredGuardianStat}
-          <Callout variant="warning">
-            The Guardian badge (tracked by "Max Time Portal Held") was retired and can no longer be
-            earned, so it's deliberately left out of this import. If you already own it from before
-            the retirement, this won't change that - if you believe you're still missing it, mark it
-            manually on your Badges page.
-          </Callout>
-        {/if}
-
         {#if importCandidates.length > 0}
           <h2>Badges Ready to Import</h2>
           <p>
@@ -771,6 +769,12 @@
   }
   tr.already-owned {
     opacity: 0.55;
+  }
+  tr.retired-badge-note td {
+    padding: 0 1em 0.6em;
+  }
+  tr.retired-badge-note :global(.callout) {
+    margin: 0;
   }
   span.already-owned-tag {
     font-size: 0.85em;
