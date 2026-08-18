@@ -325,8 +325,7 @@
           <h3><img src="/images/tools.svg" alt="" /> Tools</h3>
           <p>
             Ingress Plus containes various tools, such as an CMU Calculator that you can use to infer the real price
-            of in-game store items or the GDPR Explorer to which you can upload your GDPR Export to analyze it and reveal
-            stats that the Scanner doesn't show.
+            of in-game store items.
           </p>
         </div>
       </div>
