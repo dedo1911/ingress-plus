@@ -20,6 +20,10 @@ export const freshLogin = writable(false)
 
 export const ownedBadges = writable([])
 
+// Terminal onboardingState values - shared so +layout.svelte's modal-trigger
+// logic and /onboarding's own alreadyDone gate can't drift out of sync.
+export const ONBOARDING_DONE_STATES = ['completed', 'skipped']
+
 export const siteSettings = writable({
   opaqueOwned: true,
   showUnobtainable: true

@@ -55,7 +55,12 @@
     }
   }
 
-  let selectedFaction = $state($authData?.baseModel?.faction || 'unaligned')
+  // $derived (not $state) so this re-syncs once $authData actually resolves
+  // on a hard reload - a one-time $state snapshot taken before authData.set()
+  // fires would freeze on 'unaligned' and saveIdentity() would then overwrite
+  // the Agent's real faction with it even on a username-only edit. Matches
+  // newUsername below, which already relies on this same pattern.
+  let selectedFaction = $derived($authData?.baseModel?.faction || 'unaligned')
   let newUsername = $derived(username)
 
   const saveIdentity = async () => {

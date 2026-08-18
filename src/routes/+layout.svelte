@@ -3,7 +3,7 @@
   import { get } from 'svelte/store'
   import { page } from '$app/stores'
   import { SvelteToast } from '@zerodevx/svelte-toast'
-  import { authData, freshLogin, siteSettings } from '$lib/stores'
+  import { authData, freshLogin, siteSettings, ONBOARDING_DONE_STATES } from '$lib/stores'
   import Header from '$lib/components/Header.svelte'
   import Footer from '$lib/components/Footer.svelte'
   import LoadingBar from '$lib/components/LoadingBar.svelte'
@@ -42,7 +42,6 @@
   // dismissed via "Not now"), that would get naggy if repeated on every
   // reload of an already-open session, so from then on it's only shown
   // again on an actual fresh login (freshLogin, set by Header's login()).
-  const ONBOARDING_DONE_STATES = ['completed', 'skipped']
   let previousAuthValid = $state(false)
   let showOnboardingModal = $state(false)
 

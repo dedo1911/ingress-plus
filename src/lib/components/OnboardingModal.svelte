@@ -1,6 +1,7 @@
 <script>
   import { goto } from '$app/navigation'
   import { resolve } from '$app/paths'
+  import { toast } from '@zerodevx/svelte-toast'
   import { authData } from '$lib/stores'
   import { pb } from '$lib/pocketbase'
   import Modal from '$lib/components/Modal.svelte'
@@ -13,11 +14,19 @@
 
   const setOnboardingState = async (value) => {
     saving = true
+    const previousState = $authData.baseModel.onboardingState
     try {
       $authData.baseModel.onboardingState = value
       await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
     } catch (err) {
+      // The modal is already closed by the time notNow()/never() call this,
+      // so revert the optimistic mutation rather than leaving local state
+      // claiming a state the server never actually recorded - otherwise a
+      // same-session navigation to /onboarding would read the wrong value
+      // straight off this same object until the next full reload.
+      $authData.baseModel.onboardingState = previousState
       console.error('Failed to update onboarding state:', err)
+      toast.push('Something went wrong. Please try again.', { classes: ['errorToast'] })
     } finally {
       saving = false
     }

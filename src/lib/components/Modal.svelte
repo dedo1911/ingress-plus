@@ -25,10 +25,18 @@
   const handleCancel = (event) => {
     if (!dismissible) event.preventDefault()
   }
+
+  // "close" fires for every way the dialog actually closes (Escape when
+  // dismissible, backdrop click, or our own dialog.close() calls above) -
+  // syncing showModal here (rather than only inside handleBackdropClick)
+  // means Escape doesn't leave showModal stuck true with the dialog already
+  // gone, which previously made showModal = true a no-op until something
+  // else flipped it false first.
+  const handleClose = () => { showModal = false }
 </script>
 
 {#if showModal}
-  <dialog bind:this={dialog} onclick={handleBackdropClick} oncancel={handleCancel}>
+  <dialog bind:this={dialog} onclick={handleBackdropClick} oncancel={handleCancel} onclose={handleClose}>
     <div role="button" tabindex="0">
       {@render children?.()}
     </div>

@@ -2,11 +2,11 @@
   import { browser } from '$app/environment'
   import { goto } from '$app/navigation'
   import { resolve } from '$app/paths'
-  import { authData } from '$lib/stores'
+  import { authData, ONBOARDING_DONE_STATES } from '$lib/stores'
   import { pb } from '$lib/pocketbase'
   import { refreshOwnedBadges } from '$lib/badges'
+  import { toast } from '@zerodevx/svelte-toast'
 
-  const ONBOARDING_DONE_STATES = ['completed', 'skipped']
   const ONBOARDING_BADGE_ID = 'onl0wktktek3bn8'
 
   const alreadyDone = $derived(ONBOARDING_DONE_STATES.includes($authData?.baseModel?.onboardingState))
@@ -50,18 +50,27 @@
   // offered, Machina only for supporters (set from the Profile page
   // otherwise) - see saveFaction()/the faction <select> there.
   const supporter = $derived($authData?.baseModel?.supporter)
+  // /agent/settings locks Username/Faction editing while verified - the
+  // users collection's updateRule enforces this server-side regardless, but
+  // check here too so a verified Agent gets the same clear explanation
+  // instead of the generic "something went wrong" fallback below.
+  const verified = $derived($authData?.baseModel?.verification)
 
-  // Local, decoupled from $authData.baseModel until a save actually
-  // succeeds - unlike the Profile settings page (which saves each field the
-  // moment it's toggled), a half-filled onboarding form shouldn't leak
-  // partial edits into global auth state before they're confirmed saved.
-  let username = $state($authData?.baseModel?.username || '')
+  // $derived (with the form controls freely overriding it via bind:value/
+  // onclick), not a one-time $state snapshot - decoupled from $authData
+  // .baseModel in the sense that typing here doesn't write back to global
+  // auth state until a save actually succeeds (unlike /agent/settings,
+  // which saves each field the moment it's toggled), but it still needs to
+  // pick up the real saved values once $authData actually resolves on a
+  // hard reload, otherwise these render blank/false and saving would
+  // silently overwrite real values with them.
+  let username = $derived($authData?.baseModel?.username || '')
   // Left blank (not defaulted to Enlightened) when unset, so the dropdown
   // doesn't visually favor one faction before the Agent has actually chosen
   // one - see the disabled placeholder <option> below.
-  let faction = $state($authData?.baseModel?.faction || '')
-  let isPublic = $state(!!$authData?.baseModel?.public)
-  let newsletterOptIn = $state(!!$authData?.baseModel?.newsletterOptIn)
+  let faction = $derived($authData?.baseModel?.faction || '')
+  let isPublic = $derived(!!$authData?.baseModel?.public)
+  let newsletterOptIn = $derived(!!$authData?.baseModel?.newsletterOptIn)
 
   // 'profile' (this page's form), then 'tour' (a quick feature rundown),
   // then 'done' (the completion page) - all three render on /onboarding
@@ -150,7 +159,19 @@
   $effect(() => {
     if (step !== 'done' || completedClaimed) return
     completedClaimed = true
-    setOnboardingState('completed').then(awardOnboardedBadge)
+    setOnboardingState('completed')
+      .then(awardOnboardedBadge)
+      .catch((err) => {
+        // setOnboardingState's own PATCH failed (the badge award already
+        // handles its own errors) - step is already 'done' at this point,
+        // so without this the completion screen would keep claiming success
+        // even though onboardingState was never actually persisted. Send
+        // the Agent back to the tour step so "Finish" can be retried.
+        console.error('Failed to mark onboarding as completed:', err)
+        toast.push('Something went wrong finishing onboarding. Please try again.', { classes: ['errorToast'] })
+        completedClaimed = false
+        step = 'tour'
+      })
   })
 
   // Dev-only shortcuts to jump directly to any onboardingState value,
@@ -197,6 +218,13 @@
       </p>
 
       <form class="onboarding-form" onsubmit={(e) => { e.preventDefault(); saveProfile() }}>
+        {#if verified}
+          <p class="locked-note">
+            Your Username and Faction are locked while your account is verified - un-verify from the
+            <a href={resolve('/agent/settings')}>Profile Settings</a> page to change them.
+          </p>
+        {/if}
+
         <div class="field">
           <label for="onboarding-username">Agent Name</label>
           <input
@@ -204,6 +232,8 @@
             type="text"
             maxlength="15"
             bind:value={username}
+            disabled={verified}
+            class:locked={verified}
             style="color: var(--color-faction-{faction || 'unaligned'})"
           />
           <p class="explanation">
@@ -217,6 +247,8 @@
           <select
             id="onboarding-faction"
             bind:value={faction}
+            disabled={verified}
+            class:locked={verified}
             style="color: var(--color-faction-{faction || 'unaligned'})"
           >
             <option value="" disabled>Select a Faction</option>
@@ -447,6 +479,16 @@
     color: #e07b54;
     text-align: center;
     margin: 0;
+  }
+  p.locked-note {
+    color: #e07b54;
+    font-size: 0.9em;
+    margin: 0;
+  }
+  input.locked,
+  select.locked {
+    cursor: not-allowed;
+    opacity: 0.5;
   }
   div.tour {
     display: grid;
