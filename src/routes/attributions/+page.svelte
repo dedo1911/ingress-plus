@@ -63,6 +63,30 @@
 
       <div class="card">
         <div class="card-header">
+          <img class="card-icon" src="/images/agent-stats-icon.png" alt="" />
+          <h3><a href="https://www.agent-stats.com" target="_blank" rel="noopener noreferrer">Agent Stats</a></h3>
+        </div>
+        <p>Powers the optional Agent Stats import on the Badges page, letting agents pull in their stats to automatically mark badges as owned.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <img class="card-icon" src="/images/the-grid-icon.png" alt="" />
+          <h3><a href="https://the-grid.org" target="_blank" rel="noopener noreferrer">The Grid</a></h3>
+        </div>
+        <p>Powers the optional Grid import on the Badges page for Resistance agents, letting them pull in their stats to automatically mark badges as owned.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <img class="card-icon" src="/images/stat_tracker_pro_icon.png" alt="" />
+          <h3><a href="https://the-grid.blue" target="_blank" rel="noopener noreferrer">Stats Tracker Pro</a></h3>
+        </div>
+        <p>Powers the optional Stats Tracker Pro import on the Badges page for Resistance agents, letting them pull in their stats to automatically mark badges as owned.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
           <span class="icon-chip">
             <img class="card-icon" src="/images/green-web-foundation-logo.svg" alt="" />
           </span>

@@ -4,7 +4,7 @@
 
 <div>
   <h1>Privacy Policy for Ingress Plus</h1>
-    <p><em>Effective date: July 8th, 2025 (last updated: August 2nd, 2026)</em></p>
+    <p><em>Effective date: August 18th, 2026 (last updated: August 18th, 2026)</em></p>
 
     <p>Welcome, Agent, to Ingress Plus! This project was created to support the Ingress community and enhance your experience in the field.
     We take your privacy seriously. This Privacy Policy explains what information we collect, how we use it,
@@ -76,6 +76,16 @@
       servers rather than hosting them ourselves. As a result, your browser sends your IP address and standard
       request data (as described in section 1.1) directly to Google when a page loads.</p>
 
+    <h3>1.6 Optional Third-Party Stat Import</h3>
+    <p>The Badges page offers optional tools to import your game statistics from third-party stat-tracking
+      services (currently <a href="https://www.agent-stats.com" target="_blank" rel="noopener noreferrer">Agent Stats</a>,
+      <a href="https://the-grid.org" target="_blank" rel="noopener noreferrer">The Grid</a>, and
+      <a href="https://the-grid.blue" target="_blank" rel="noopener noreferrer">Stats Tracker Pro</a>). If you choose to use
+      one, you provide an API key for that service, which we use to retrieve your statistics and match them against
+      Ingress Plus badges. If you choose to save an API key to your profile for future use, it is stored alongside
+      your other account data. These services are independent projects, not affiliated with or vetted by Ingress
+      Plus - please review their own privacy practices before connecting an account.</p>
+
     <h2>2. Purposes of Data Usage</h2>
     <p>We use your data for the following purposes:</p>
     <ul>
@@ -85,6 +95,7 @@
         <li>Contacting you via email for important site updates, such as changes to Terms of Service or security alerts</li>
         <li>Contacting you via email for other purposes, if you have opted in</li>
         <li>Displaying your Agent name, Faction, and badges publicly if your profile is set to public</li>
+        <li>Retrieving your statistics from a third-party service you've connected, if you choose to use the optional stat import tool, to help identify which badges you've earned</li>
     </ul>
 
     <h2>3. User Rights</h2>
