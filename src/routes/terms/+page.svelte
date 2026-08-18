@@ -38,7 +38,7 @@
 
   <p>
     The Site offers optional tools to import your game statistics from independent, third-party
-    stat-tracking services (currently Agent Stats and The Grid). These services are not operated,
+    stat-tracking services (currently Agent Stats, The Grid, and Stats Tracker Pro). These services are not operated,
     affiliated with, or vetted by Ingress Plus. If you choose to connect one by providing your API
     key, you do so at your own discretion and are responsible for reviewing their own terms and
     privacy practices.

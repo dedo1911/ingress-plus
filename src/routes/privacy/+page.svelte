@@ -78,8 +78,9 @@
 
     <h3>1.6 Optional Third-Party Stat Import</h3>
     <p>The Badges page offers optional tools to import your game statistics from third-party stat-tracking
-      services (currently <a href="https://www.agent-stats.com" target="_blank" rel="noopener noreferrer">Agent Stats</a>
-      and <a href="https://the-grid.org" target="_blank" rel="noopener noreferrer">The Grid</a>). If you choose to use
+      services (currently <a href="https://www.agent-stats.com" target="_blank" rel="noopener noreferrer">Agent Stats</a>,
+      <a href="https://the-grid.org" target="_blank" rel="noopener noreferrer">The Grid</a>, and
+      <a href="https://the-grid.blue" target="_blank" rel="noopener noreferrer">Stats Tracker Pro</a>). If you choose to use
       one, you provide an API key for that service, which we use to retrieve your statistics and match them against
       Ingress Plus badges. If you choose to save an API key to your profile for future use, it is stored alongside
       your other account data. These services are independent projects, not affiliated with or vetted by Ingress

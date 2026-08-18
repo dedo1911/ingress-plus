@@ -79,6 +79,14 @@
 
       <div class="card">
         <div class="card-header">
+          <img class="card-icon" src="/images/stat_tracker_pro_icon.png" alt="" />
+          <h3><a href="https://the-grid.blue" target="_blank" rel="noopener noreferrer">Stats Tracker Pro</a></h3>
+        </div>
+        <p>Powers the optional Stats Tracker Pro import on the Badges page for Resistance agents, letting them pull in their stats to automatically mark badges as owned.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
           <span class="icon-chip">
             <img class="card-icon" src="/images/green-web-foundation-logo.svg" alt="" />
           </span>
