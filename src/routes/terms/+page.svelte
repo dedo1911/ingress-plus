@@ -4,7 +4,7 @@
 
 <div>
   <h1>TERMS OF SERVICE</h1>
-  <p><em>Effective date: July 8th, 2025</em></p>
+  <p><em>Effective date: August 18th, 2026</em></p>
 
   <p>
     Welcome, Agent! By accessing and using Ingress Plus, you’re joining a community of fellow Ingress players and explorers.
@@ -34,6 +34,14 @@
     in relation to Ingress. Ingress itself is a mobile application
     created by Niantic Spatial, Inc. and is not connected to Ingress Plus in any
     way, be it technically or legally. Ingress Plus does not share any data with Niantic Spatial, Inc.
+  </p>
+
+  <p>
+    The Site offers optional tools to import your game statistics from independent, third-party
+    stat-tracking services (currently Agent Stats, The Grid, and Stats Tracker Pro). These services are not operated,
+    affiliated with, or vetted by Ingress Plus. If you choose to connect one by providing your API
+    key, you do so at your own discretion and are responsible for reviewing their own terms and
+    privacy practices.
   </p>
 
   <p>

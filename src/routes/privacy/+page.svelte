@@ -4,7 +4,7 @@
 
 <div>
   <h1>Privacy Policy for Ingress Plus</h1>
-    <p><em>Effective date: July 8th, 2025 (last updated: August 4th, 2026)</em></p>
+    <p><em>Effective date: August 18th, 2026 (last updated: August 18th, 2026)</em></p>
 
     <p>Welcome, Agent, to Ingress Plus! This project was created to support the Ingress community and enhance your experience in the field.
     We take your privacy seriously. This Privacy Policy explains what information we collect, how we use it,
@@ -78,21 +78,13 @@
 
     <h3>1.6 Optional Third-Party Stat Import</h3>
     <p>The Badges page offers optional tools to import your game statistics from third-party stat-tracking
-      services (currently <a href="https://www.agent-stats.com" target="_blank" rel="noopener noreferrer">Agent Stats</a>
-      and <a href="https://the-grid.org" target="_blank" rel="noopener noreferrer">The Grid</a>). If you choose to use
+      services (currently <a href="https://www.agent-stats.com" target="_blank" rel="noopener noreferrer">Agent Stats</a>,
+      <a href="https://the-grid.org" target="_blank" rel="noopener noreferrer">The Grid</a>, and
+      <a href="https://the-grid.blue" target="_blank" rel="noopener noreferrer">Stats Tracker Pro</a>). If you choose to use
       one, you provide an API key for that service, which we use to retrieve your statistics and match them against
       Ingress Plus badges. If you choose to save an API key to your profile for future use, it is stored alongside
       your other account data. These services are independent projects, not affiliated with or vetted by Ingress
       Plus - please review their own privacy practices before connecting an account.</p>
-
-    <h3>1.7 Email Delivery Service</h3>
-    <p>Any email we send you - including account-related emails as well as newsletters or update notices you
-      receive - is delivered through
-      <a href="https://www.mailjet.com/" target="_blank" rel="noopener noreferrer">Mailjet</a>, a third-party email
-      delivery service. Mailjet receives your email address, and any Agent name or Faction we include in the message
-      content, in order to deliver it to your inbox. Mailjet is an independent company, not affiliated with or vetted
-      beyond our use of their service to send email - please review their own privacy practices for details on how
-      they handle this data.</p>
 
     <h2>2. Purposes of Data Usage</h2>
     <p>We use your data for the following purposes:</p>

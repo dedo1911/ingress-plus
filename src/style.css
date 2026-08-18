@@ -167,7 +167,7 @@ blockquote, pre {
 }
 code {
   background: rgba(14, 11, 28, 0.9);
-  padding: 0.5em;
+  padding: 0 0.4em;
   border-radius: 8px;
   font-family: "Kode Mono", monospace;
   font-optical-sizing: auto;
