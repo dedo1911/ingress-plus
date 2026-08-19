@@ -21,24 +21,6 @@
     reloadKey += 1 // Force AgentName to reload
   }
 
-  const handleSaveUsername = async () => {
-    if (verified) {
-      toast.push('You must un-verify your account to change your username.', { classes: ['errorToast'] })
-      return
-    }
-    await saveUsername()
-    reloadKey += 1 // Force AgentName to reload
-  }
-
-  const handleSaveFaction = async () => {
-    if (verified) {
-      toast.push('You must un-verify your account to change your faction.', { classes: ['errorToast'] })
-      return
-    }
-    await saveFaction()
-    reloadKey += 1 // Force AgentName to reload
-  }
-
   const togglePublic = async () => {
     $authData.baseModel.public = !$authData.baseModel.public
     await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
@@ -49,13 +31,13 @@
     }
   }
 
-  const copyProfileLink = async () => {
-    try {
-      await navigator.clipboard.writeText(`https://ingress.plus/agent/${newUsername}`)
-      toast.push('Copied to clipboard!', { classes: ['successToast'] })
-    } catch (err) {
-      console.error(err)
-      toast.push('An error has occurred.', { classes: ['errorToast'] })
+  const toggleNewsletter = async () => {
+    $authData.baseModel.newsletterOptIn = !$authData.baseModel.newsletterOptIn
+    await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+    if ($authData.baseModel.newsletterOptIn) {
+      toast.push('You have been subscribed to newsletters and update emails!', { classes: ['successToast'] })
+    } else {
+      toast.push('You have been unsubscribed from newsletters and update emails.', { classes: ['successToast'] })
     }
   }
 
@@ -73,36 +55,36 @@
     }
   }
 
-  let selectedFaction = $state($authData?.baseModel?.faction || 'unaligned')
-
-  const saveFaction = async () => {
-    if ($authData.baseModel.faction === selectedFaction) {
-      console.log('Faction same as before, skipping')
-      return
-    }
-    $authData.baseModel.faction = selectedFaction
-    await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-    toast.push('Faction has been changed to ' + selectedFaction.charAt(0).toUpperCase() + selectedFaction.slice(1) + '!', {
-      classes: ['successToast']
-    })
-  }
-
+  // $derived (not $state) so this re-syncs once $authData actually resolves
+  // on a hard reload - a one-time $state snapshot taken before authData.set()
+  // fires would freeze on 'unaligned' and saveIdentity() would then overwrite
+  // the Agent's real faction with it even on a username-only edit. Matches
+  // newUsername below, which already relies on this same pattern.
+  let selectedFaction = $derived($authData?.baseModel?.faction || 'unaligned')
   let newUsername = $derived(username)
 
-  const saveUsername = async () => {
+  const saveIdentity = async () => {
+    if (verified) {
+      toast.push('You must un-verify your account to change your Username or Faction.', { classes: ['errorToast'] })
+      return
+    }
     const oldUsername = $authData.baseModel.username
-    if (oldUsername === newUsername) {
-      console.log('Username same as before, skipping')
+    const oldFaction = $authData.baseModel.faction
+    if (oldUsername === newUsername && oldFaction === selectedFaction) {
+      console.log('Username and Faction unchanged, skipping')
       return
     }
     try {
       $authData.baseModel.username = newUsername
+      $authData.baseModel.faction = selectedFaction
       await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      toast.push('Username has been changed to ' + $authData.baseModel.username, { classes: ['successToast'] })
+      toast.push('Your Username and Faction have been updated!', { classes: ['successToast'] })
+      reloadKey += 1 // Force AgentName to reload
     } catch (err) {
       $authData.baseModel.username = oldUsername
+      $authData.baseModel.faction = oldFaction
       const errorCode = err.response?.data?.username?.code
-      console.error('Username Error:', errorCode, err)
+      console.error('Save Identity Error:', errorCode, err)
 
       const errorMessages = {
         validation_not_unique: 'The username is already taken. Please choose a different username.',
@@ -117,196 +99,383 @@
     }
   }
 
-    let showUnverifyConfirm = $state(false)
+  let showUnverifyConfirm = $state(false)
 
-    const handleUnverify = async () => {
-      try {
-        $authData.baseModel.verification = ''
-        await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-        toast.push('You have been un-verified. You may now edit your Username or Faction.', { classes: ['successToast'] })
-        showUnverifyConfirm = false
-      } catch (err) {
-        console.error('Unverify error:', err)
-        toast.push('An error occurred while un-verifying. Please try again later.', { classes: ['errorToast'] })
-      }
+  const handleUnverify = async () => {
+    try {
+      $authData.baseModel.verification = ''
+      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+      toast.push('You have been un-verified. You may now edit your Username or Faction.', { classes: ['successToast'] })
+      showUnverifyConfirm = false
+    } catch (err) {
+      console.error('Unverify error:', err)
+      toast.push('An error occurred while un-verifying. Please try again later.', { classes: ['errorToast'] })
     }
+  }
 
-    let disableConfirmButton = $state(false)
+  let disableConfirmButton = $state(false)
 
-    function showConfirmationPrompt () {
-      showUnverifyConfirm = true
-      disableConfirmButton = true
+  function showConfirmationPrompt () {
+    showUnverifyConfirm = true
+    disableConfirmButton = true
 
-      setTimeout(() => {
-        disableConfirmButton = false
-      }, 1000) // Delay to avoid misclick
-    }
-
+    setTimeout(() => {
+      disableConfirmButton = false
+    }, 1000) // Delay to avoid misclick
+  }
 </script>
 
 <svelte:head>
   <title>Ingress Plus &middot; Settings</title>
 </svelte:head>
 
-<div>
+{#snippet toggleRow({ checked, onToggle, label, explanation, onTitle, offTitle, onStatus, offStatus })}
+  <div class="field">
+    <label class="checkbox-label">
+      <button type="button" class="checkbox-toggle" onclick={onToggle} title={checked ? onTitle : offTitle}>
+        <img class="checkbox" src="/images/{checked ? 'checkbox_on' : 'checkbox_off'}.png" alt="Checkbox" />
+      </button>
+      <b>{label}</b> - {checked ? onStatus : offStatus}
+    </label>
+    <p class="explanation">{explanation}</p>
+  </div>
+{/snippet}
+
+<section>
   {#if $authData.isValid}
-      <div class="profileData">
-          <p>
-              <img
-                  class="profilePicture"
-                  src={$authData?.baseModel?.avatar.slice(0, -6)}
-                  alt={username}
-              />
+    <h2>
+      {#key reloadKey}
+        <AgentName user={{ username }} linkable={false} factionLogo={true} />
+      {/key}
+    </h2>
+    <p class="subtitle">Manage your Agent details, privacy, and account.</p>
+    <p class="back-link"><a href={resolve('/agent')}>&larr; Back to Profile</a></p>
+
+    <div class="settings-grid">
+      <div class="card identity">
+        <h3>Agent details</h3>
+        <img class="profilePicture" src={$authData?.baseModel?.avatar.slice(0, -6)} alt={username} />
+
+        {#if verified}
+          <p class="locked-note">Your Username and Faction are locked while your account is verified - un-verify below to change them.</p>
+        {/if}
+
+        <div class="field">
+          <label for="settings-username">Username</label>
+          <input
+            id="settings-username"
+            type="text"
+            maxlength="15"
+            bind:value={newUsername}
+            disabled={verified}
+            class:locked={verified}
+            style="color: var(--color-faction-{selectedFaction || 'unaligned'})"
+          />
+          <p class="explanation">
+            Your public Agent name, shown across Ingress Plus. 3-15 characters, letters and numbers only.
           </p>
-          <p><b>Username</b>:
-            <input type="text" maxlength="15" bind:value={newUsername} disabled={verified} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'}); cursor: {verified ? 'not-allowed' : 'pointer'}; opacity: {verified ? 0.5 : 1}" />
-            <img src="../images/accept.svg" height="32" alt="Save" onclick={handleSaveUsername} disabled={verified} style="cursor: {verified ? 'not-allowed' : 'pointer'}; opacity: {verified ? 0.5 : 1}"/>
-          </p>
-          <p>
-            <b>Faction</b>:
-            <select bind:value={selectedFaction} disabled={verified} style="color: var(--color-faction-{$authData?.baseModel?.faction || 'unaligned'}); cursor: {verified ? 'not-allowed' : 'pointer'}; opacity: {verified ? 0.5 : 1}">
-              <option value="enlightened" >Enlightened</option>
-              <option value="resistance">Resistance</option>
-              {#if supporter === true}
-              <option value="machina">Machina</option>
-              {/if}
-            </select>
-            <button onclick={handleSaveFaction} style="cursor: {verified ? 'not-allowed' : 'pointer'}; opacity: {verified ? 0.5 : 1}">
-              <img src="../images/accept.svg" height="24" alt="Save faction" />
-            </button>
-          </p>
-          <p><b>Profile visiblity</b>:
-            <button onclick={togglePublic} title={$authData.baseModel.public ? 'Make Profile private' : 'Make Profile public'}>
-              <img
-                class="checkbox"
-                src="../images/{$authData.baseModel.public ? 'checkbox_on' : 'checkbox_off'}.png"
-                alt="Checkbox"
-              />
-            </button>
-            - {$authData.baseModel.public ? 'Public' : 'Private'}</p>
-            {#if $authData.baseModel.public}
-            <p class="publicNotice">
-              Your profile is public and will be visible at:<br />
-              <span onclick={copyProfileLink}>
-              https://ingress.plus/agent/{newUsername}
-              </span>
-            </p>
+        </div>
+
+        <div class="field">
+          <label for="settings-faction">Faction</label>
+          <select
+            id="settings-faction"
+            bind:value={selectedFaction}
+            disabled={verified}
+            class:locked={verified}
+            style="color: var(--color-faction-{selectedFaction || 'unaligned'})"
+          >
+            <option value="enlightened">Enlightened</option>
+            <option value="resistance">Resistance</option>
+            {#if supporter === true}
+              <option value="machina">MACHINA</option>
             {/if}
-            <br>
+          </select>
+          <p class="explanation">
+            Colors your Agent name and some site theming to match your Faction.
+            {#if supporter === true}
+              As a Supporter, Machina is available to you too!
+            {/if}
+          </p>
+        </div>
+
+        <button type="button" class="cta identity-save" disabled={verified} class:locked={verified} onclick={saveIdentity}>
+          Save Username &amp; Faction
+        </button>
+
+        <div class="field">
           <p><b>User ID:</b> <code>ING+{userId}</code></p>
+          <p class="explanation">Your internal Ingress Plus identifier.</p>
+        </div>
+        <div class="field">
           <p><b>E-mail:</b> <code>{email}</code></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Privacy &amp; Notifications</h3>
+        {@render toggleRow({
+          checked: $authData.baseModel.public,
+          onToggle: togglePublic,
+          label: 'Profile visibility',
+          explanation: `When public, anyone can view your earned badges at ingress.plus/agent/${newUsername}. When private, only you can see it.`,
+          onTitle: 'Make Profile private',
+          offTitle: 'Make Profile public',
+          onStatus: 'Public',
+          offStatus: 'Private'
+        })}
+        {@render toggleRow({
+          checked: $authData.baseModel.newsletterOptIn,
+          onToggle: toggleNewsletter,
+          label: 'Newsletter emails',
+          explanation: 'Occasional emails such as new features and announcements. You will still receive emails for important account updates regardless of this setting.',
+          onTitle: 'Unsubscribe from newsletters',
+          offTitle: 'Subscribe to newsletters',
+          onStatus: 'Subscribed',
+          offStatus: 'Not subscribed'
+        })}
+      </div>
+
+      {#if verified || $featureFlags.VERIFICATION_ENABLED}
+        <div class="card verification">
+          <h3>Verification</h3>
           {#if verified}
             {#if $featureFlags.VERIFICATION_ENABLED}
               <p>You are currently verified. You need to un-verify to change your Username or Faction.</p>
             {:else}
               <p>Verification is currently disabled. You must un-verify to edit your Username or Faction.</p>
             {/if}
-            <div style="text-align: center; margin-top: 0.5em;">
+            <div class="unverify-controls">
               {#if showUnverifyConfirm}
                 {#if !$featureFlags.VERIFICATION_ENABLED}
                   <p class="unverify-warning">Verification is disabled and you will not be able to re-verify yourself.</p>
                 {/if}
                 <button
-                  class="unverify-button"
+                  class="danger-button"
                   disabled={disableConfirmButton}
                   onclick={handleUnverify}
                   title={disableConfirmButton ? 'Please wait...' : 'Click to Confirm Un-Verify'}>Click to Confirm Un-Verify</button>
-                <button class="unverify-button" onclick={() => { showUnverifyConfirm = false }} style="margin-left: 1em;">Cancel</button>
+                <button class="secondary-button" onclick={() => { showUnverifyConfirm = false }}>Cancel</button>
               {:else}
-                <button class="unverify-button" onclick={showConfirmationPrompt}>Un-Verify Account</button>
+                <button class="secondary-button" onclick={showConfirmationPrompt}>Un-Verify Account</button>
               {/if}
             </div>
-          {:else if $featureFlags.VERIFICATION_ENABLED}
+          {:else}
             <p>You are not verified. You may change your Username or Faction.</p>
           {/if}
-          {#if supporter === true}
-            <br>
-            <p><b>For Supporters:</b></p>
-            <p>Enable glowing username:
-              <button onclick={handleToggleUsernameGlow} title={$authData.baseModel.hasUsernameGlow ? 'Disable glowing username' : 'Enable glowing username'}>
-                <img
-                  class="checkbox"
-                  src="../images/{$authData.baseModel.hasUsernameGlow ? 'checkbox_on' : 'checkbox_off'}.png"
-                  alt="Checkbox"
-                />
-              </button>
-              {#key reloadKey}
+        </div>
+      {/if}
+
+      {#if supporter === true}
+        <div class="card">
+          <h3>Supporter Perks</h3>
+          {@render toggleRow({
+            checked: $authData.baseModel.hasUsernameGlow,
+            onToggle: handleToggleUsernameGlow,
+            label: 'Glowing username',
+            explanation: 'Adds an animated shimmer and glow effect to your Agent name across the site, colored to match your Faction. Purely cosmetic.',
+            onTitle: 'Disable glowing username',
+            offTitle: 'Enable glowing username',
+            onStatus: 'Enabled',
+            offStatus: 'Disabled'
+          })}
+          <p class="preview">
+            Preview:
+            {#key reloadKey}
               <AgentName user={{ username }} linkable={false} factionLogo={true} />
-              {/key}
-               - {$authData.baseModel.hasUsernameGlow ? 'Enabled' : 'Disabled'}!
-            </p>
-          {/if}
+            {/key}
+          </p>
+        </div>
+      {/if}
+
+      <div class="card">
+        <h3>Account Actions</h3>
+        <p class="explanation">Want to go through the setup steps again? You can revisit the Onboarding anytime.</p>
+        <button type="button" class="secondary-button" onclick={() => goto(resolve('/onboarding'))}>Return to Onboarding</button>
       </div>
+    </div>
   {:else}
-      <p style="margin-top:2em;">
-          You are currently not logged in. Please log in first.
-      </p>
+    <p style="margin-top:2em;">
+      You are currently not logged in. Please log in first.
+    </p>
   {/if}
-</div>
+</section>
 
 <style>
-  div {
-      max-width: 1000px;
-      margin: auto;
-      padding: 0 1em;
-      line-height: 1.2em;
-      margin-top: 2em;
+  section {
+    max-width: 1000px;
+    margin: auto;
+    padding: 0 1em;
+    line-height: 1.2em;
+    margin-top: 2em;
+  }
+  h2 {
+    text-align: center;
+    text-shadow: 0 0 10px black;
+    margin-bottom: 0.25em;
+  }
+  p.subtitle {
+    text-align: center;
+    margin: 0 auto;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  p.back-link {
+    text-align: center;
+    margin: 0.5em auto 0;
   }
   p {
-      text-align: center;
-      margin: auto;
-      max-width: 800px;
+    text-align: center;
+    margin: auto;
+    max-width: 800px;
   }
 
-  img.badge {
-      height: 1em;
-      vertical-align: sub;
-      margin: 0 0.25em;
-  }
   img.checkbox {
-      height: 1.25em;
-      vertical-align: sub;
-      margin: 0 0.25em;
-  }
-  div.profileData {
-      display: flex;
-      flex-direction: column;
-      row-gap: 1em;
+    height: 1.25em;
+    vertical-align: sub;
+    margin: 0 0.25em;
   }
   img.profilePicture {
-      display: block;
-      margin: 1em auto;
-      max-width: 200px;
-      border-radius: 20%;
-      box-shadow: #9593c3 0px 0px 5px 1px;
-      border-radius: 6px;
+    display: block;
+    margin: 0 auto 1em;
+    max-width: 160px;
+    box-shadow: #9593c3 0px 0px 5px 1px;
+    border-radius: 6px;
   }
-  p.publicNotice span {
-    border: 3px double #5e5a75;
+
+  div.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+    margin-top: 1.5em;
+  }
+  @media (max-width: 700px) {
+    div.settings-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  div.card {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    text-align: left;
+    padding: 1em;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 8px;
-    display: inline-block;
-    padding: 1rem;
-    margin-top: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    box-sizing: border-box;
+  }
+  div.card.identity {
+    grid-column: 1 / -1;
+  }
+  div.card.verification {
+    border-left: 4px solid #e07b54;
+  }
+  div.card h3 {
+    margin: 0;
+    text-align: center;
+    text-shadow: 0 0 10px black;
+  }
+  div.card p {
+    text-align: left;
+    margin: 0;
+    max-width: none;
+  }
+
+  div.field {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35em;
+    margin: 0;
+  }
+  div.field label {
+    font-weight: bold;
+  }
+  div.field label.checkbox-label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5em;
     cursor: pointer;
   }
-  .unverify-button {
+  div.field input[type=text],
+  div.field select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  button.checkbox-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    line-height: 0;
+  }
+  button.identity-save {
+    max-width: none;
+    width: 100%;
+  }
+  p.explanation {
+    margin: 0;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  p.locked-note {
+    margin: 0;
+    font-size: 0.9em;
+    color: #e07b54;
+  }
+  input.locked,
+  select.locked,
+  button.locked {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  p.preview {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+  }
+
+  .secondary-button {
     padding: 0.5em 1em;
-    background-color: #5e5a75;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+  }
+  .secondary-button:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+  }
+  .secondary-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .danger-button {
+    padding: 0.5em 1em;
+    background-color: #e07b54;
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
   }
-  .unverify-button:hover {
-    background-color: #4a4660;
+  .danger-button:hover {
+    background-color: #c96a45;
   }
-  .unverify-button:disabled {
+  .danger-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+  div.unverify-controls {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    flex-wrap: wrap;
   }
   p.unverify-warning {
     color: #e07b54;
     margin-bottom: 0.75em;
   }
-
 </style>

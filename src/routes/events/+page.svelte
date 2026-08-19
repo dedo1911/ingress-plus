@@ -2,7 +2,8 @@
   import { onMount } from 'svelte'
   import { resolve } from '$app/paths'
   import { pb, serverAddress } from '$lib/pocketbase'
-  import { addToCalendar } from '$lib/utils.js'
+  import AddToCalendarButton from '$lib/components/AddToCalendarButton.svelte'
+  import EventBadges from '$lib/components/EventBadges.svelte'
   import Time, { dayjs } from 'svelte-time'
   import utc from 'dayjs/plugin/utc'
   import timezone from 'dayjs/plugin/timezone'
@@ -34,7 +35,7 @@
   const loadData = async () => {
     const userTZ = dayjs.tz.guess() || 'UTC'
     const r = await pb.collection('game_events_list').getFullList({
-
+      expand: 'linked_badge'
     })
     totalPages = Math.ceil(r.length / itemsPerPage)
     totalItems = r.length
@@ -42,6 +43,7 @@
       const isLocal = e.time_type === 'local'
       e = {
         ...e,
+        badges: e.expand?.linked_badge ?? [],
         start_time: isLocal
           ? dayjs(e.start_time.substring(0, 19)).tz(userTZ)
           : dayjs(e.start_time),
@@ -113,7 +115,7 @@
     <div class="event-row">
       <div class="event-icon">
         <a href={resolve(`/events/${e.id}`)} aria-label="Event details">
-          <span class="event-icon-image" style="background-image: url('{e.image !== '' ? `${serverAddress}/api/files/ncmy64l5pb3p039/${e.id}/${e.image}` : `images/events/${e.category}.png`}');" ></span>
+          <img class="event-icon-image" src={e.image !== '' ? `${serverAddress}/api/files/ncmy64l5pb3p039/${e.id}/${e.image}` : `images/events/${e.category}.png`} alt={e.title} />
         </a>
       </div>
       <div class="event-description">
@@ -143,21 +145,7 @@
           </span>
           {#if e.end_time.isAfter(dayjs())}
             <span>
-              <a href={`#event${e.id}`}
-                onclick={addToCalendar({
-                  title: e.title,
-                  description: e.description,
-                  startTime: e.start_time,
-                  endTime: e.end_time,
-                  location: e.location,
-                })} >
-                Add to Calendar
-                <img
-                  style="height:1em"
-                  src="images/add_to_calendar.svg"
-                  alt="Add to Calendar"
-                />
-              </a>
+              <AddToCalendarButton event={e} />
             </span>
           {/if}
         </div>
@@ -183,6 +171,11 @@
             <img style="height:1em" src="images/location.svg" alt="Location" />
           </span>
         </div>
+        {#if e.badges.length > 0}
+          <div class="event-badges-row">
+            <EventBadges badges={e.badges} size="2em" />
+          </div>
+        {/if}
       </div>
     </div>
   </div>
@@ -231,15 +224,25 @@
     box-shadow: black 0 0 0.25em;
     transition: all ease-in-out 0.2s;
     position: relative;
+    z-index: 1;
   }
   div.event-container:hover {
     background: rgba(0, 0, 0, 0.5);
     box-shadow: black 0 0 1em;
   }
+  /* Without its own stacking context, this container's z-index:3 event-row (below)
+     would be compared against every other event-row in the list rather than just its
+     own siblings, so later events (later in DOM order, same z-index) would always paint
+     over an earlier event's open Add to Calendar dropdown. :focus-within raises the
+     open one above the rest for as long as the dropdown holds focus. */
+  div.event-container:focus-within {
+    z-index: 5;
+  }
   div.event-row {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    align-items: center;
     position: relative;
     z-index: 3;
   }
@@ -276,21 +279,39 @@
   }
   div.event-icon {
     margin-right: 1em;
-    width: 100px;
-    text-align: center;
-  }
-  span.event-icon-image {
-    width: 6em;
+    width: 8em;
     height: 6em;
-    display: inline-block;
-    background-position: center;
-    background-size: cover;
+    flex-shrink: 0;
+  }
+  div.event-icon a {
+    /* The <a> is inline by default; giving it a definite size (rather than
+       leaving it to shrink-wrap an auto-sized img) is what makes the img's
+       own 100%/100% below resolve consistently instead of being ambiguous
+       against an auto-sized containing block - the actual cause of images
+       coming out squished (verified: happened identically in both Chromium
+       and Firefox, not a browser quirk) when height and max-width were set
+       independently without an explicit box to reconcile them against. */
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  img.event-icon-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* Fits the whole image inside the fixed box above without cropping or
+       stretching it - any leftover space (for images that aren't 8:6)
+       letterboxes instead of distorting the picture. */
+    object-fit: contain;
     border-radius: 0.5em;
     box-shadow: black 0 0 0.25em;
   }
   div.event-meta, div.event-time {
     display: flex;
     justify-content: space-between;
+    margin-top: .5em;
+  }
+  div.event-badges-row {
     margin-top: .5em;
   }
   div.event-description {
@@ -313,6 +334,27 @@
       vertical-align: sub;
       height: 1.5em;
       width: 1.5em;
+    }
+  }
+
+  @media (max-width: 700px) {
+    /* event-meta and event-time each hold two independent pieces of info
+       (category/add-to-calendar, date-range/location). Side by side with
+       justify-content: space-between they get squeezed into two narrow
+       columns and wrap heavily - stacking them gives each line the full
+       width to breathe. */
+    div.event-meta, div.event-time {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.35em;
+    }
+    div.event-icon {
+      width: 6em;
+      height: 4.5em;
+      margin-right: 0.75em;
+    }
+    div.event-description h2 {
+      font-size: 1.2em;
     }
   }
 </style>

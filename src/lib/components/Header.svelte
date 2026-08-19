@@ -5,7 +5,8 @@
   import { afterNavigate } from '$app/navigation'
   import { resolve } from '$app/paths'
   import { pb } from '$lib/pocketbase'
-  import { authData, ownedBadges } from '$lib/stores'
+  import { authData, freshLogin, ownedBadges } from '$lib/stores'
+  import { refreshOwnedBadges } from '$lib/badges'
 
   let menuOpen = $state(false)
   let showSubTools = $state(false)
@@ -43,6 +44,7 @@
       pb.collection('users').update(user.record.id, user.record)
     }
 
+    freshLogin.set(true)
     authData.set(pb.authStore)
     await refreshOwnedBadges()
   }
@@ -58,12 +60,6 @@
     menuOpen = false
     window.location.href = 'https://t.me/Ingress_Plus'
   }
-
-  const refreshOwnedBadges = async () => ownedBadges.set(
-    await pb.collection('user_badges').getFullList({
-      expand: 'badge,badge.category',
-      filter: `user="${pb.authStore.model.id}"`
-    }))
 
   onMount(async () => {
     if (!pb.authStore.isValid) return
