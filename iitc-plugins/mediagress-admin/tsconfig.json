@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "module": "es2022",
+    "target": "es2022",
+    "outDir": "dist/",
+    "rootDir": "./src",
+    "moduleResolution": "bundler",
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/iitcpluginkit/types"
+    ],
+    "types": [
+      "node",
+      "jquery",
+      "build_constances",
+      "greasemonkey",
+      "iitc",
+      "jqueryui",
+      "leaflet",
+      "images"
+    ],
+    "forceConsistentCasingInFileNames": true
+  },
+  "files": [
+    "src/Plugin.ts"
+  ],
+  "include": [
+    "src/*"
+  ]
+}

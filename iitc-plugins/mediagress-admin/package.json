@@ -1,0 +1,17 @@
+{
+  "name": "mediagress-admin",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "Unlicense",
+  "devDependencies": {
+    "iitcpluginkit": "^1.10.4"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "yarn build:prod",
+    "build:dev": "yarn ipk build:dev",
+    "build:prod": "yarn ipk build:prod",
+    "start": "yarn ipk fileserver",
+    "autobuild": "yarn ipk autobuild"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "IITC Plugin: Mediagress Admin",
+  "id": "mediagress-admin",
+  "version": "0.1.0",
+  "category": "Misc",
+  "description": "Admin tools for Mediagress on ingress.plus. Currently only a COMM send probe.",
+  "author": "IngressPlus",
+  "entry": "src/Plugin.ts",
+  "downloadURL": "https://ingress.plus/mediagress-admin.user.js",
+  "minimize": false,
+  "changelog": "",
+  "fileversion": "1.10.4",
+  "metablock": {
+    "namespace": "https://ingress.plus",
+    "homepageURL": "https://ingress.plus",
+    "include": "https://intel.ingress.com/*",
+    "grant": "none",
+    "icon": "https://ingress.plus/icons/icon_mediagress_32.png",
+    "icon64": "https://ingress.plus/icons/icon_mediagress_64.png"
+  }
+}
