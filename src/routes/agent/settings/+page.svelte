@@ -263,6 +263,12 @@
           {:else}
             <p>You are not verified. You may change your Username or Faction.</p>
           {/if}
+          {#if $featureFlags.VERIFICATION_ENABLED}
+            <p class="explanation">
+              The whole flow lives on the <a href={resolve('/verify')}>verification page</a> - this card
+              only un-verifies.
+            </p>
+          {/if}
         </div>
       {/if}
 
