@@ -244,10 +244,11 @@
           <p class="code"><code>{issued.code}</code></p>
           <button type="button" class="secondary-button" onclick={copyCode}>Copy</button>
           <p class="explanation">
-            Paste it into the Ingress Plus plugin on the Intel map. It is valid until {expiresAt} and
-            can only be used once - asking again before then gives you the same code back.
+            Paste it into the Ingress Plus plugin on the Intel map before {expiresAt}. It can only be
+            used once - asking again before then gives you the same code back.
             {#if tier !== 'basic'}
-              The plugin posts to COMM for you; an admin then confirms it, which can take a while.
+              The plugin then posts it to COMM for you, and an admin has a week to confirm it. That
+              part is not instant, so check back later.
             {/if}
           </p>
         </div>
