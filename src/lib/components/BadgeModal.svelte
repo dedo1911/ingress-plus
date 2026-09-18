@@ -174,28 +174,33 @@
       <img src="/images/download.svg" alt="Download" height="32" width="32" />
     </a>
   </header>
-  <section bind:this={content} style="--badge-size: {$badgeSize}px" class:has-wings={wingsOwned && isHighestTier}>
-    <h2>
-      {#if badgeData?.core_only}
-        <img src="/images/core.png" alt="C.O.R.E" class="core-flare" />
-      {/if}
-      {title}
-    </h2>
-    {#if badgeData}
-      <hr transition:slide />
-      <p transition:slide>{description}</p>
-      {#if badgeData.requirement}
+  <section style="--badge-size: {$badgeSize}px" class:has-wings={wingsOwned && isHighestTier}>
+    <!-- Only the description scrolls: Done and the footer stay outside the
+         scroller so they're reachable on a phone even when a long badge
+         text overflows (there's no scrollbar affordance on iOS). -->
+    <div class="body" bind:this={content}>
+      <h2>
+        {#if badgeData?.core_only}
+          <img src="/images/core.png" alt="C.O.R.E" class="core-flare" />
+        {/if}
+        {title}
+      </h2>
+      {#if badgeData}
+        <hr transition:slide />
+        <p transition:slide>{description}</p>
+        {#if badgeData.requirement}
+            <hr />
+            <p transition:slide >
+              <b>Requirements:</b><br />
+              {badgeData.requirement.replace('{0}', Requirement)}
+            </p>
+            {/if}
+        {#if badgeData.description_extra}
           <hr />
-          <p transition:slide >
-            <b>Requirements:</b><br />
-            {badgeData.requirement.replace('{0}', Requirement)}
-          </p>
-          {/if}
-      {#if badgeData.description_extra}
-        <hr />
-        <p transition:slide>{@html badgeData.description_extra}</p>
+          <p transition:slide>{@html badgeData.description_extra}</p>
+        {/if}
       {/if}
-    {/if}
+    </div>
 
     <button class="cta" onclick={() => (showModal = false)}>Done</button>
     <div class="footer">
@@ -213,14 +218,26 @@
 </Modal>
 
 <style>
+  /* The badge image floats over the top edge of the card (section pulls
+     itself up by --badge-size), so header and section must be explicitly
+     positioned siblings with explicit z-indices. Issue #97: iOS Safari
+     painted the card over the badge once the body became a real scroll
+     container - section had no position/z-index, so its promoted scrolling
+     layer won over the header regardless of the header's z-index. */
   header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.75));
-    position: sticky;
-    z-index: 9999;
+    /* relative, not sticky: it never had an inset to stick to, this is only
+       here so z-index applies - and it keeps WebKit off its sticky path. */
+    position: relative;
+    z-index: 2;
     overflow: visible;
+  }
+  /* Shadow on the images rather than the header itself, so the header isn't
+     a filter-promoted composited layer (the other half of #97). */
+  header img {
+    filter: drop-shadow(0px 5px 10px rgba(0,0,0,0.75));
   }
   header button, header span, header a {
     flex: 1;
@@ -250,6 +267,8 @@
     margin: 0.5em 0 0 0;
   }
   section {
+    position: relative;
+    z-index: 1;
     background: rgba(14, 11, 28, 0.9);
     margin-top: calc(var(--badge-size) * -1);
     padding: var(--badge-size) 2em 1em 2em;
@@ -260,6 +279,8 @@
     font-size: larger;
     white-space: pre-wrap;
     word-break: break-word;
+  }
+  section .body {
     overflow: auto;
     max-height: 50vh;
   }
