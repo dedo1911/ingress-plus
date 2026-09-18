@@ -50,6 +50,7 @@
       </a>
     </p>
     <p class="description">
+      <!-- eslint-disable-next-line svelte/no-at-html-tags -- admin-authored in the PocketBase UI, not user input -->
       {@html media.description}
     </p>
     <hr />

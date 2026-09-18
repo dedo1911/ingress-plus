@@ -100,16 +100,19 @@
     </div>
   {/if}
   <p class="center">
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -- admin-authored in the PocketBase UI, not user input -->
     {@html event.description}
   </p>
   {#if event.active_boni}
     <hr />
     <h2>Active Bonus</h2>
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -- admin-authored in the PocketBase UI, not user input -->
     <p>{@html event.active_boni}</p>
   {/if}
   {#if event.rewards}
     <hr />
     <h2>Rewards</h2>
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -- admin-authored in the PocketBase UI, not user input -->
     <p>{@html event.rewards}</p>
   {/if}
 </div>

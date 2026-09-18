@@ -9,11 +9,6 @@ export default [
   ...neostandard(),
   ...svelte.configs.recommended,
   {
-    rules: {
-      'svelte/no-at-html-tags': 'off'
-    }
-  },
-  {
     files: ['src/service-worker.js'],
     languageOptions: {
       globals: { ...globals.serviceworker }
