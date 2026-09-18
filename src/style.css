@@ -55,6 +55,11 @@ h2 a:link, h2 a:visited, h2 a:hover, h2 a:active {
   --toastContainerLeft: calc(50vw - 8rem);
   --toastWidth: 16rem;
 
+  /* svelte-multiselect defaults its text to light-dark(#222, #eee), and the
+     site never declares a color-scheme, so that resolves to the *light* value
+     - dark text on our dark background - wherever the CSS isn't post-processed
+     (yarn dev). Match the global input/select colour explicitly. */
+  --sms-text-color: #FFFFFF;
   --sms-bg: rgba(14, 11, 28, 0.9);
   --sms-border: 3px double #5e5a75;
   --sms-padding: 0.25em 0.5em;
