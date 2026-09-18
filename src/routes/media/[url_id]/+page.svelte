@@ -2,6 +2,7 @@
   import Time, { dayjs } from 'svelte-time'
   import { resolve } from '$app/paths'
   import AgentName from '$lib/components/AgentName.svelte'
+  import DOMPurify from 'isomorphic-dompurify'
 
   const { data } = $props()
   const media = $derived(data.media)
@@ -50,8 +51,8 @@
       </a>
     </p>
     <p class="description">
-      <!-- eslint-disable-next-line svelte/no-at-html-tags -- admin-authored in the PocketBase UI, not user input -->
-      {@html media.description}
+      <!-- eslint-disable-next-line svelte/no-at-html-tags -- sanitised: agents are expected to write this field eventually -->
+      {@html DOMPurify.sanitize(media.description)}
     </p>
     <hr />
     <p class="topic">
