@@ -1,15 +1,10 @@
 <script>
-  import { serverAddress } from '$lib/pocketbase'
-  import { authData, ownedBadges, badgeSize, siteSettings } from '$lib/stores'
+  import { pb } from '$lib/pocketbase'
+  import { thumbSize } from '$lib/utils'
+  import { authData, ownedBadgesByBadge, badgeSize, siteSettings } from '$lib/stores'
   import BadgeModal from '$lib/components/BadgeModal.svelte'
 
   const { category, index } = $props()
-
-  const thumbSize = (badgeSize) => {
-    if (badgeSize <= 64) return '96x96'
-    if (badgeSize <= 128) return '128x128'
-    return '256x256'
-  }
 
   let showModal = $state(false)
 
@@ -19,7 +14,7 @@
   const tier = $derived(hasTiers ? index % tiers.length : 0)
   const title = $derived(hasTiers ? `${badge?.title} - ${tiers[tier]}` : badge?.title)
   const owned = $derived(badge
-    ? $ownedBadges.some(b => b.badge === badge.id && b.tier >= tier)
+    ? $ownedBadgesByBadge.get(badge.id)?.tier >= tier
     : false)
   const opaque = $derived($authData.isValid ? ($siteSettings.opaqueOwned ? owned : !owned) : false)
   const placeholder = $derived(badge?.hasPlaceholderData)
@@ -27,7 +22,7 @@
   const wingsOwned = $derived(
     hasWings &&
     (hasTiers ? tier === tiers.length - 1 : true) &&
-    $ownedBadges.some(b => b.badge === badge?.id && b.hasWings === true)
+    $ownedBadgesByBadge.get(badge?.id)?.hasWings === true
   )
 
   const onBadgeClick = () => (showModal = true)
@@ -40,7 +35,7 @@
   <span onclick={onBadgeClick} onkeydown={onBadgeKeydown} role='button' tabindex='0' class="badge-wrapper">
     <span class="sr-only">{title}</span>
     <img loading="lazy" height="{$badgeSize}" width="{$badgeSize}" alt="{title}" class:opaque={opaque}
-    src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={thumbSize($badgeSize)}" />
+    src={pb.files.getURL(badge, badge.image[tier], { thumb: thumbSize($badgeSize) })} />
 
     {#if placeholder}
       <img
@@ -60,7 +55,12 @@
       />
     {/if}
   </span>
-  <BadgeModal bind:showModal {badge} {tier} {owned} {title} {hasWings} totalTiers={tiers.length}/>
+  <!-- Mounted only while open: /badges renders ~700 cells, and each modal
+       instance carries its own $derived/$effect subscriptions. BadgeModal
+       fetches on an $effect keyed on showModal, so mount-on-open is enough. -->
+  {#if showModal}
+    <BadgeModal bind:showModal {badge} {tier} {owned} {title} {hasWings} totalTiers={tiers.length}/>
+  {/if}
 {/if}
 
 <style>
