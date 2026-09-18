@@ -62,7 +62,14 @@
   }
 
   onMount(async () => {
-    if (!pb.authStore.isValid) return
+    if (!pb.authStore.isValid) {
+      // authData starts as { isValid: null } ("unknown"); pages that redirect
+      // signed-out visitors (/agent, /agent/settings, /badges/import) wait
+      // for an explicit false, which nothing set for a visitor with no
+      // stored session at all - so they rendered empty instead.
+      authData.set({ isValid: false })
+      return
+    }
     try {
       await pb.collection('users').authRefresh()
     } catch (err) {
