@@ -320,7 +320,7 @@
           ownedBadges.update(bs => [...bs.filter(b => b.id !== el.id), el])
         } else {
           const el = await pb.collection('user_badges').create({
-            user: pb.authStore.model.id,
+            user: pb.authStore.record.id,
             badge: badge.id,
             tier: tierIndex,
             hasWings: wingsEarned
