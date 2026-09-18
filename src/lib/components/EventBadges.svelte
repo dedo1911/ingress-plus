@@ -1,5 +1,5 @@
 <script>
-  import { serverAddress } from '$lib/pocketbase'
+  import { pb } from '$lib/pocketbase'
 
   // expandTiers: when a badge has multiple tiers, show every tier icon (grouped
   // under that badge's own single title) instead of just its highest one. Always
@@ -34,7 +34,7 @@
         <div class="event-badge-icons">
           {#each group.images as icon (icon.key)}
             <img
-              src="{serverAddress}/api/files/{group.badge.collectionId}/{group.badge.id}/{icon.image}?thumb=96x96"
+              src={pb.files.getURL(group.badge, icon.image, { thumb: '96x96' })}
               alt={icon.title}
               title={icon.title}
             />

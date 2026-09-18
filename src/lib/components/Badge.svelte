@@ -1,15 +1,10 @@
 <script>
-  import { serverAddress } from '$lib/pocketbase'
+  import { pb } from '$lib/pocketbase'
+  import { thumbSize } from '$lib/utils'
   import { authData, ownedBadgesByBadge, badgeSize, siteSettings } from '$lib/stores'
   import BadgeModal from '$lib/components/BadgeModal.svelte'
 
   const { category, index } = $props()
-
-  const thumbSize = (badgeSize) => {
-    if (badgeSize <= 64) return '96x96'
-    if (badgeSize <= 128) return '128x128'
-    return '256x256'
-  }
 
   let showModal = $state(false)
 
@@ -40,7 +35,7 @@
   <span onclick={onBadgeClick} onkeydown={onBadgeKeydown} role='button' tabindex='0' class="badge-wrapper">
     <span class="sr-only">{title}</span>
     <img loading="lazy" height="{$badgeSize}" width="{$badgeSize}" alt="{title}" class:opaque={opaque}
-    src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={thumbSize($badgeSize)}" />
+    src={pb.files.getURL(badge, badge.image[tier], { thumb: thumbSize($badgeSize) })} />
 
     {#if placeholder}
       <img

@@ -1,7 +1,6 @@
 <script>
   import { slide } from 'svelte/transition'
-  import { resolve } from '$app/paths'
-  import { pb, serverAddress } from '$lib/pocketbase'
+  import { pb } from '$lib/pocketbase'
   import { authData, ownedBadges, ownedBadgesByBadge, badgeSize } from '$lib/stores'
   import Modal from '$lib/components/Modal.svelte'
   import Time, { dayjs } from 'svelte-time'
@@ -155,7 +154,7 @@
         height={$badgeSize * 2}
         width={$badgeSize * 2}
         alt={title}
-        src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tier]}?thumb={$badgeSize * 2}x{$badgeSize * 2}"
+        src={pb.files.getURL(badge, badge.image[tier], { thumb: `${$badgeSize * 2}x${$badgeSize * 2}` })}
         class="badge-image"
       />
       {#if wingsOwned && isHighestTier}
@@ -168,7 +167,9 @@
       />
       {/if}
     </div>
-    <a title="Download" href={resolve(`${serverAddress}/api/files/${badge.collectionId}/${badge.id}/${badge.image[tier]}?download=true`)}>
+    <!-- A PocketBase file URL, not an app route, so resolve() doesn't apply. -->
+    <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+    <a title="Download" href={pb.files.getURL(badge, badge.image[tier], { download: true })}>
       <img src="/images/download.svg" alt="Download" height="32" width="32" />
     </a>
   </header>

@@ -5,14 +5,9 @@
   import { resolve } from '$app/paths'
   import { badgeSize, authData, ownedBadges } from '$lib/stores'
   import { featureFlags } from '$lib/featureFlags'
-  import { serverAddress } from '$lib/pocketbase'
+  import { pb } from '$lib/pocketbase'
+  import { thumbSize } from '$lib/utils'
   import AgentName from '$lib/components/AgentName.svelte'
-
-  const thumbSize = (badgeSize) => {
-    if (badgeSize <= 64) return '96x96'
-    if (badgeSize <= 128) return '128x128'
-    return '256x256'
-  }
 
   let width = $state(1)
 
@@ -83,7 +78,7 @@
           {@const badge = sortedBadges[r * badgesPerRow + c]}
           {#if badge}
             <img height="{$badgeSize}" width="{$badgeSize}" alt="{badge.expand.badge.title}"
-              src="{serverAddress}/api/files/{badge.expand.badge.collectionId}/{badge.expand.badge.id}/{badge.expand.badge.image[badge.tier]}?thumb={thumbSize($badgeSize)}" />
+              src={pb.files.getURL(badge.expand.badge, badge.expand.badge.image[badge.tier], { thumb: thumbSize($badgeSize) })} />
           {/if}
         {/each}
         </div>
@@ -102,7 +97,7 @@
                 {@const badge = group.badges[r * badgesPerRow + c]}
                 {#if badge}
                   <img height="{$badgeSize}" width="{$badgeSize}" alt="{badge.expand.badge.title}"
-                    src="{serverAddress}/api/files/{badge.expand.badge.collectionId}/{badge.expand.badge.id}/{badge.expand.badge.image[badge.tier]}?thumb={thumbSize($badgeSize)}" />
+                    src={pb.files.getURL(badge.expand.badge, badge.expand.badge.image[badge.tier], { thumb: thumbSize($badgeSize) })} />
                 {/if}
               {/each}
               </div>
