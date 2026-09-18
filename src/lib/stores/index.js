@@ -8,8 +8,6 @@ export const pendingRequests = writable(0)
 
 export const isLoading = derived(pendingRequests, count => count > 0)
 
-export const categories = writable([])
-
 export const authData = writable({ isValid: null })
 
 // Set by Header's login() right before it updates authData, so the

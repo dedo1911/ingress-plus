@@ -1,6 +1,5 @@
 import { error } from '@sveltejs/kit'
 import { pb } from '$lib/pocketbase'
-import { categories } from '$lib/stores/index.js'
 import sortBy from 'lodash.sortby'
 
 export async function load ({ fetch }) {
@@ -26,12 +25,15 @@ export async function load ({ fetch }) {
       ].join(','),
       fetch
     })
-    categories.set(items.map(i => {
+    // Returned rather than written into a store: this load also runs on the
+    // server, where module-level stores are shared by every concurrent SSR
+    // request (the same hazard pocketbase/index.js works around).
+    const categories = items.map(i => {
       const r = { ...i, badges: i.expand ? sortBy(i.expand.badges_via_category || [], 'sorting').reverse() : [] }
       delete r.expand
       return r
-    }))
-    return {}
+    })
+    return { categories }
   } catch (err) {
     console.error(err)
   }

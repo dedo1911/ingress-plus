@@ -2,10 +2,11 @@
   import { fly, slide } from 'svelte/transition'
   import { tick } from 'svelte'
   import { resolve } from '$app/paths'
-  import { categories, badgeSize, siteSettings, authData } from '$lib/stores'
+  import { badgeSize, siteSettings, authData } from '$lib/stores'
   import Category from '$lib/components/Category.svelte'
   import { onMount } from 'svelte'
 
+  const { data } = $props()
   let width = $state(1024)
   $effect(() => {
     badgeSize.set(Math.min(128, width / 7))
@@ -26,7 +27,7 @@
   }
 
   const badgeCategories = $derived(
-    $categories
+    data.categories
       .map(c => ({
         ...c,
         badges: c.badges.filter(b => {
