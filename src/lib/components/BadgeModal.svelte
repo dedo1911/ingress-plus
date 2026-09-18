@@ -2,7 +2,7 @@
   import { slide } from 'svelte/transition'
   import { resolve } from '$app/paths'
   import { pb, serverAddress } from '$lib/pocketbase'
-  import { authData, ownedBadges, badgeSize } from '$lib/stores'
+  import { authData, ownedBadges, ownedBadgesByBadge, badgeSize } from '$lib/stores'
   import Modal from '$lib/components/Modal.svelte'
   import Time, { dayjs } from 'svelte-time'
 
@@ -19,20 +19,18 @@
   let badgeData = $state()
   let Requirement = $state()
   const wingsOwned = $derived(
-    hasWings && $ownedBadges.some(b => b.badge === badge.id && b.hasWings === true)
+    hasWings && $ownedBadgesByBadge.get(badge.id)?.hasWings === true
   )
   const isHighestTier = $derived(tier === Math.max(0, totalTiers - 1))
 
   const toggleOwned = async () => {
     if (!$authData.isValid) return
     if (owned) {
-      const el = $ownedBadges.find(
-        (b) => b.badge === badge.id && b.tier >= tier
-      )
+      const el = $ownedBadgesByBadge.get(badge.id)
       await pb.collection('user_badges').delete(el.id)
       ownedBadges.update((bs) => bs.filter((b) => b.id !== el.id))
     } else {
-      const otherTier = $ownedBadges.find((b) => b.badge === badge.id)
+      const otherTier = $ownedBadgesByBadge.get(badge.id)
       if (otherTier) {
         const el = await pb
           .collection('user_badges')
@@ -58,7 +56,7 @@
 
   const toggleWings = async () => {
     if (!$authData.isValid) return
-    const existingRecord = $ownedBadges.find(b => b.badge === badge.id)
+    const existingRecord = $ownedBadgesByBadge.get(badge.id)
     if (wingsOwned) {
       const el = await pb.collection('user_badges').update(existingRecord.id, { hasWings: false })
       ownedBadges.update(bs => [...bs.filter(b => b.id !== el.id), el])

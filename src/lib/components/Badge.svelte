@@ -1,6 +1,6 @@
 <script>
   import { serverAddress } from '$lib/pocketbase'
-  import { authData, ownedBadges, badgeSize, siteSettings } from '$lib/stores'
+  import { authData, ownedBadgesByBadge, badgeSize, siteSettings } from '$lib/stores'
   import BadgeModal from '$lib/components/BadgeModal.svelte'
 
   const { category, index } = $props()
@@ -19,7 +19,7 @@
   const tier = $derived(hasTiers ? index % tiers.length : 0)
   const title = $derived(hasTiers ? `${badge?.title} - ${tiers[tier]}` : badge?.title)
   const owned = $derived(badge
-    ? $ownedBadges.some(b => b.badge === badge.id && b.tier >= tier)
+    ? $ownedBadgesByBadge.get(badge.id)?.tier >= tier
     : false)
   const opaque = $derived($authData.isValid ? ($siteSettings.opaqueOwned ? owned : !owned) : false)
   const placeholder = $derived(badge?.hasPlaceholderData)
@@ -27,7 +27,7 @@
   const wingsOwned = $derived(
     hasWings &&
     (hasTiers ? tier === tiers.length - 1 : true) &&
-    $ownedBadges.some(b => b.badge === badge?.id && b.hasWings === true)
+    $ownedBadgesByBadge.get(badge?.id)?.hasWings === true
   )
 
   const onBadgeClick = () => (showModal = true)
