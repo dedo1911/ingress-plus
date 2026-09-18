@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit'
+import { throwLoadError } from '$lib/load'
 import { pb } from '$lib/pocketbase'
 
 export async function load ({ fetch, params }) {
@@ -14,7 +14,6 @@ export async function load ({ fetch, params }) {
       ownedBadges
     }
   } catch (err) {
-    console.error(err)
+    throwLoadError(err, 'Agent not found')
   }
-  throw error(404, 'Agent not found')
 }

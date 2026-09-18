@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit'
+import { throwLoadError } from '$lib/load'
 import { pb } from '$lib/pocketbase'
 
 const DEFAULT_SORT = '-released_at'
@@ -54,7 +54,6 @@ export async function load ({ fetch, url }) {
       items: result.items
     }
   } catch (err) {
-    console.error(err)
+    throwLoadError(err)
   }
-  throw error(500, 'Internal server error')
 }

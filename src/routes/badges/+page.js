@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit'
+import { throwLoadError } from '$lib/load'
 import { pb } from '$lib/pocketbase'
 import sortBy from 'lodash.sortby'
 
@@ -35,7 +35,6 @@ export async function load ({ fetch }) {
     })
     return { categories }
   } catch (err) {
-    console.error(err)
+    throwLoadError(err)
   }
-  throw error(500, 'Internal server error')
 }

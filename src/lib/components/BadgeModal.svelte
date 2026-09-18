@@ -196,6 +196,7 @@
             {/if}
         {#if badgeData.description_extra}
           <hr />
+          <!-- eslint-disable-next-line svelte/no-at-html-tags -- admin-authored in the PocketBase UI, not user input -->
           <p transition:slide>{@html badgeData.description_extra}</p>
         {/if}
       {/if}
