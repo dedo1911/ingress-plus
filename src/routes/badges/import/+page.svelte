@@ -6,6 +6,7 @@
   import { toast } from '@zerodevx/svelte-toast'
   import { pb, serverAddress } from '$lib/pocketbase'
   import { authData, ownedBadges } from '$lib/stores'
+  import { updateOwnUser } from '$lib/user'
   import { parseTextExport } from '$lib/statImport/textExport.js'
   import { matchBadgesToStats } from '$lib/statImport/matchBadges.js'
   import { fetchAgentStats } from '$lib/statImport/agentStats.js'
@@ -97,9 +98,7 @@
     savingKey = true
     showApiKeyHint = false
     try {
-      $authData.baseModel.agentStatsApiKey = apiKey.trim()
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      authData.set($authData)
+      await updateOwnUser({ agentStatsApiKey: apiKey.trim() })
       apiKey = ''
       toast.push('API key saved to your profile.', { classes: ['successToast'] })
     } catch (err) {
@@ -114,9 +113,7 @@
     if (!$authData.isValid) return
     removingKey = true
     try {
-      $authData.baseModel.agentStatsApiKey = ''
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      authData.set($authData)
+      await updateOwnUser({ agentStatsApiKey: '' })
       toast.push('Removed your saved API key.', { classes: ['successToast'] })
     } catch (err) {
       console.error(err)
@@ -159,9 +156,7 @@
     savingGridKey = true
     showTheGridApiKeyHint = false
     try {
-      $authData.baseModel.theGridApiKey = theGridApiKey.trim()
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      authData.set($authData)
+      await updateOwnUser({ theGridApiKey: theGridApiKey.trim() })
       theGridApiKey = ''
       toast.push('API key saved to your profile.', { classes: ['successToast'] })
     } catch (err) {
@@ -176,9 +171,7 @@
     if (!$authData.isValid) return
     removingGridKey = true
     try {
-      $authData.baseModel.theGridApiKey = ''
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      authData.set($authData)
+      await updateOwnUser({ theGridApiKey: '' })
       toast.push('Removed your saved API key.', { classes: ['successToast'] })
     } catch (err) {
       console.error(err)
@@ -221,9 +214,7 @@
     savingStatsTrackerProKey = true
     showStatsTrackerProApiKeyHint = false
     try {
-      $authData.baseModel.statsTrackerProApiKey = statsTrackerProApiKey.trim()
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      authData.set($authData)
+      await updateOwnUser({ statsTrackerProApiKey: statsTrackerProApiKey.trim() })
       statsTrackerProApiKey = ''
       toast.push('API key saved to your profile.', { classes: ['successToast'] })
     } catch (err) {
@@ -238,9 +229,7 @@
     if (!$authData.isValid) return
     removingStatsTrackerProKey = true
     try {
-      $authData.baseModel.statsTrackerProApiKey = ''
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      authData.set($authData)
+      await updateOwnUser({ statsTrackerProApiKey: '' })
       toast.push('Removed your saved API key.', { classes: ['successToast'] })
     } catch (err) {
       console.error(err)
