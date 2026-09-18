@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit'
+import { guardImportRequest } from '$lib/server/importGuard'
 
 const STATS_TRACKER_PRO_BASE = 'https://the-grid.blue'
 
