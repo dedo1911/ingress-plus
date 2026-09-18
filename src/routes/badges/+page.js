@@ -20,11 +20,14 @@ export async function load ({ fetch }) {
         'expand.badges_via_category.unobtainable',
         'expand.badges_via_category.hasPlaceholderData',
         'expand.badges_via_category.wings_possible',
+        // Needed by the sort below - without it every badge's sorting is
+        // undefined and sortBy degrades to a no-op.
+        'expand.badges_via_category.sorting'
       ].join(','),
       fetch
     })
     categories.set(items.map(i => {
-      const r = { ...i, badges: i.expand ? sortBy(i.expand.badges_via_category || []).reverse() : [] }
+      const r = { ...i, badges: i.expand ? sortBy(i.expand.badges_via_category || [], 'sorting').reverse() : [] }
       delete r.expand
       return r
     }))
