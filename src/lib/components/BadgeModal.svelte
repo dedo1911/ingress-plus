@@ -38,7 +38,7 @@
         ownedBadges.update((bs) => [...bs.filter((b) => b.id !== el.id), el])
       } else {
         const el = await pb.collection('user_badges').create({
-          user: pb.authStore.model.id,
+          user: pb.authStore.record.id,
           badge: badge.id,
           tier
         })
@@ -49,7 +49,7 @@
   }
 
   const fetchBadge = async () => {
-    badgeData = await pb.collection('badges').getFirstListItem(`id="${badge.id}"`)
+    badgeData = await pb.collection('badges').getOne(badge.id)
     const requirementsArray = badgeData.tier_values.split(',').map(Number)
     Requirement = Number(requirementsArray[tier]).toLocaleString()
   }
@@ -66,7 +66,7 @@
         ownedBadges.update(bs => [...bs.filter(b => b.id !== el.id), el])
       } else {
         const el = await pb.collection('user_badges').create({
-          user: pb.authStore.model.id,
+          user: pb.authStore.record.id,
           badge: badge.id,
           tier,
           hasWings: true
@@ -84,7 +84,7 @@
     try {
       const owned = await pb.collection('owned_badges')
         .getFullList({
-          filter: `badge.id = '${badge.id}' && tier >= ${tier}`,
+          filter: pb.filter('badge.id = {:id} && tier >= {:tier}', { id: badge.id, tier }),
           sort: '-tier'
         })
       ownedCounter = owned.reduce((acc, o) => acc + o.count, 0)
@@ -93,7 +93,7 @@
     }
     if (hasWings) {
       try {
-        const wings = await pb.collection('wings_counts').getFirstListItem(`badge = '${badge.id}'`)
+        const wings = await pb.collection('wings_counts').getFirstListItem(pb.filter('badge = {:id}', { id: badge.id }))
         ownedWingsCounter = wings.count
       } catch {
         ownedWingsCounter = 0

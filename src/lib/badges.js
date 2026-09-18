@@ -8,5 +8,5 @@ import { ownedBadges } from '$lib/stores'
 export const refreshOwnedBadges = async () => ownedBadges.set(
   await pb.collection('user_badges').getFullList({
     expand: 'badge,badge.category',
-    filter: `user="${pb.authStore.model.id}"`
+    filter: pb.filter('user = {:id}', { id: pb.authStore.record.id })
   }))
