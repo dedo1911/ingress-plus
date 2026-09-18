@@ -1,7 +1,7 @@
 <script>
   import Time, { dayjs } from 'svelte-time'
   import { resolve } from '$app/paths'
-  import { serverAddress } from '$lib/pocketbase'
+  import { pb } from '$lib/pocketbase'
   import AgentName from '$lib/components/AgentName.svelte'
   import { formatNumber } from '$lib/utils.js'
 
@@ -77,7 +77,7 @@
       <div class="badge">
         <span>
           <img height="32" width="32" alt="{badge.expand.badge.title}"
-          src="{serverAddress}/api/files/{badge.expand.badge.collectionId}/{badge.expand.badge.id}/{badge.expand.badge.image[badge.tier]}?thumb=96x96" />
+          src={pb.files.getURL(badge.expand.badge, badge.expand.badge.image[badge.tier], { thumb: '96x96' })} />
           {badge.expand.badge.title}
         </span>
         {formatNumber(badge.count)}

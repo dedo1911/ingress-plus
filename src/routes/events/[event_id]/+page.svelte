@@ -1,5 +1,5 @@
 <script>
-  import { serverAddress } from '$lib/pocketbase'
+  import { pb } from '$lib/pocketbase'
   import AddToCalendarButton from '$lib/components/AddToCalendarButton.svelte'
   import EventBadges from '$lib/components/EventBadges.svelte'
   import Time, { dayjs } from 'svelte-time'
@@ -16,7 +16,7 @@
   const event = {
     ...data.event,
     badges: data.event.expand?.linked_badge ?? [],
-    image: `${serverAddress}/api/files/${data.event.collectionId}/${data.event.id}/${data.event.image}`,
+    image: pb.files.getURL(data.event, data.event.image),
     start_time: isLocal
       ? dayjs(data.event.start_time.substring(0, 19)).tz(userTZ)
       : dayjs(data.event.start_time),

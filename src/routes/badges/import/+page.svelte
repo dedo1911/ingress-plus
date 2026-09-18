@@ -4,7 +4,7 @@
   import { resolve } from '$app/paths'
   import { slide } from 'svelte/transition'
   import { toast } from '@zerodevx/svelte-toast'
-  import { pb, serverAddress } from '$lib/pocketbase'
+  import { pb } from '$lib/pocketbase'
   import { authData, ownedBadges } from '$lib/stores'
   import { updateOwnUser } from '$lib/user'
   import { parseTextExport } from '$lib/statImport/textExport.js'
@@ -348,7 +348,7 @@
                 {@const { badge, tierIndex, reached, wingsEarned } = matchedBadges[0]}
                 <span class="badge-wrapper">
                   <img
-                    src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tierIndex]}?thumb=64x64"
+                    src={pb.files.getURL(badge, badge.image[tierIndex], { thumb: '64x64' })}
                     alt={badge.title}
                     height="32"
                     width="32"
@@ -401,7 +401,7 @@
           <td class="badge-cell">
             <span class="badge-wrapper">
               <img
-                src="{serverAddress}/api/files/{candidate.badge.collectionId}/{candidate.badge.id}/{candidate.badge.image[candidate.tierIndex]}?thumb=64x64"
+                src={pb.files.getURL(candidate.badge, candidate.badge.image[candidate.tierIndex], { thumb: '64x64' })}
                 alt={candidate.badge.title}
                 height="32"
                 width="32"
