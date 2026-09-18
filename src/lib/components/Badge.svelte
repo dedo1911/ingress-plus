@@ -60,7 +60,12 @@
       />
     {/if}
   </span>
-  <BadgeModal bind:showModal {badge} {tier} {owned} {title} {hasWings} totalTiers={tiers.length}/>
+  <!-- Mounted only while open: /badges renders ~700 cells, and each modal
+       instance carries its own $derived/$effect subscriptions. BadgeModal
+       fetches on an $effect keyed on showModal, so mount-on-open is enough. -->
+  {#if showModal}
+    <BadgeModal bind:showModal {badge} {tier} {owned} {title} {hasWings} totalTiers={tiers.length}/>
+  {/if}
 {/if}
 
 <style>
