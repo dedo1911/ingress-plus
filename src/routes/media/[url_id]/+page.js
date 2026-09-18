@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit'
+import { throwLoadError } from '$lib/load'
 import { pb } from '$lib/pocketbase'
 
 export async function load ({ fetch, params }) {
@@ -11,7 +11,6 @@ export async function load ({ fetch, params }) {
       media
     }
   } catch (err) {
-    console.error(err)
+    throwLoadError(err, 'Media not found')
   }
-  throw error(404, 'Media not found')
 }

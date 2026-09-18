@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit'
+import { throwLoadError } from '$lib/load'
 import { pb } from '$lib/pocketbase'
 
 // Only the fetch lives here: the times are re-read in the agent's own
@@ -11,7 +11,6 @@ export async function load ({ fetch }) {
     })
     return { events }
   } catch (err) {
-    console.error(err)
+    throwLoadError(err)
   }
-  throw error(500, 'Internal server error')
 }
