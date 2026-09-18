@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit'
+import { throwLoadError } from '$lib/load'
 import { pb } from '$lib/pocketbase'
 
 export async function load ({ fetch }) {
@@ -44,7 +44,6 @@ export async function load ({ fetch }) {
 
     return { badges, theGridStatMatches, statsTrackerProStatMatches }
   } catch (err) {
-    console.error(err)
+    throwLoadError(err)
   }
-  throw error(500, 'Internal server error')
 }

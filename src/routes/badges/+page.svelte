@@ -2,10 +2,11 @@
   import { fly, slide } from 'svelte/transition'
   import { tick } from 'svelte'
   import { resolve } from '$app/paths'
-  import { categories, badgeSize, siteSettings, authData } from '$lib/stores'
+  import { badgeSize, siteSettings, authData } from '$lib/stores'
   import Category from '$lib/components/Category.svelte'
   import { onMount } from 'svelte'
 
+  const { data } = $props()
   let width = $state(1024)
   $effect(() => {
     badgeSize.set(Math.min(128, width / 7))
@@ -26,7 +27,7 @@
   }
 
   const badgeCategories = $derived(
-    $categories
+    data.categories
       .map(c => ({
         ...c,
         badges: c.badges.filter(b => {
@@ -49,22 +50,16 @@
     }
   }
 
+  // Category heading anchors are plain <a href="#id"> - the browser handles
+  // the jump and the hash, and html { scroll-behavior: smooth } (style.css)
+  // makes it smooth. Only the initial hash needs help: the grid is laid out
+  // after hydration, so the browser's own jump lands on the wrong spot.
   onMount(() => {
-    width = document.getElementsByTagName('section')[0].clientWidth
     if (window.location.hash) {
       setTimeout(() => {
-        document.querySelector(window.location.hash).scrollIntoView({ behavior: 'smooth' })
+        document.querySelector(window.location.hash)?.scrollIntoView()
       }, 1)
     }
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault()
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-          behavior: 'smooth'
-        })
-        window.history.pushState({}, '', this.getAttribute('href'))
-      })
-    })
   })
 </script>
 

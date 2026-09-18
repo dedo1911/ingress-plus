@@ -1,7 +1,7 @@
 <script>
   import { authData } from '$lib/stores'
   import { featureFlags } from '$lib/featureFlags'
-  import { pb } from '$lib/pocketbase'
+  import { updateOwnUser, usernameErrorMessage } from '$lib/user'
   import { toast } from '@zerodevx/svelte-toast'
   import AgentName from '$lib/components/AgentName.svelte'
   import { browser } from '$app/environment'
@@ -21,39 +21,35 @@
     reloadKey += 1 // Force AgentName to reload
   }
 
-  const togglePublic = async () => {
-    $authData.baseModel.public = !$authData.baseModel.public
-    await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-    if ($authData.baseModel.public) {
-      toast.push('Profile has been set to public!', { classes: ['successToast'] })
-    } else {
-      toast.push('Profile has been set to private!', { classes: ['successToast'] })
+  // No optimistic flip: updateOwnUser only commits locally once the server
+  // has confirmed, so a failed write can't leave the toggle showing a state
+  // that was never saved.
+  const toggleField = async (field, onMessage, offMessage) => {
+    const next = !$authData.baseModel[field]
+    try {
+      await updateOwnUser({ [field]: next })
+      toast.push(next ? onMessage : offMessage, { classes: ['successToast'] })
+    } catch (err) {
+      console.error(`Failed to update ${field}:`, err)
+      toast.push('Could not save that setting. Please try again later.', { classes: ['errorToast'] })
     }
   }
 
-  const toggleNewsletter = async () => {
-    $authData.baseModel.newsletterOptIn = !$authData.baseModel.newsletterOptIn
-    await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-    if ($authData.baseModel.newsletterOptIn) {
-      toast.push('You have been subscribed to newsletters and update emails!', { classes: ['successToast'] })
-    } else {
-      toast.push('You have been unsubscribed from newsletters and update emails.', { classes: ['successToast'] })
-    }
-  }
+  const togglePublic = () => toggleField('public',
+    'Profile has been set to public!',
+    'Profile has been set to private!')
+
+  const toggleNewsletter = () => toggleField('newsletterOptIn',
+    'You have been subscribed to newsletters and update emails!',
+    'You have been unsubscribed from newsletters and update emails.')
+
+  const toggleUsernameGlow = () => toggleField('hasUsernameGlow',
+    'Glowing Username has been enabled!',
+    'Glowing Username has been disabled!')
 
   $effect(() => {
     if (browser && $authData.isValid === false) goto(resolve('/'))
   })
-
-  const toggleUsernameGlow = async () => {
-    $authData.baseModel.hasUsernameGlow = !$authData.baseModel.hasUsernameGlow
-    await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-    if ($authData.baseModel.hasUsernameGlow) {
-      toast.push('Glowing Username has been enabled!', { classes: ['successToast'] })
-    } else {
-      toast.push('Glowing Username has been disabled!', { classes: ['successToast'] })
-    }
-  }
 
   // $derived (not $state) so this re-syncs once $authData actually resolves
   // on a hard reload - a one-time $state snapshot taken before authData.set()
@@ -68,34 +64,14 @@
       toast.push('You must un-verify your account to change your Username or Faction.', { classes: ['errorToast'] })
       return
     }
-    const oldUsername = $authData.baseModel.username
-    const oldFaction = $authData.baseModel.faction
-    if (oldUsername === newUsername && oldFaction === selectedFaction) {
-      console.log('Username and Faction unchanged, skipping')
-      return
-    }
+    if ($authData.baseModel.username === newUsername && $authData.baseModel.faction === selectedFaction) return
     try {
-      $authData.baseModel.username = newUsername
-      $authData.baseModel.faction = selectedFaction
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+      await updateOwnUser({ username: newUsername, faction: selectedFaction })
       toast.push('Your Username and Faction have been updated!', { classes: ['successToast'] })
       reloadKey += 1 // Force AgentName to reload
     } catch (err) {
-      $authData.baseModel.username = oldUsername
-      $authData.baseModel.faction = oldFaction
-      const errorCode = err.response?.data?.username?.code
-      console.error('Save Identity Error:', errorCode, err)
-
-      const errorMessages = {
-        validation_not_unique: 'The username is already taken. Please choose a different username.',
-        validation_required: 'Username cannot be blank.',
-        validation_min_text_constraint: 'The username is too short. It needs to be at least 3 characters long.',
-        validation_max_text_constraint: 'The username is too long. It needs to be 15 characters or less.',
-        validation_invalid_format: 'The username contains characters that are not allowed. You can only use letters or numbers.',
-      }
-
-      const message = errorMessages[errorCode] || 'An error has occurred. Please try again later.'
-      toast.push(message, { classes: ['errorToast'] })
+      console.error('Save Identity Error:', err)
+      toast.push(usernameErrorMessage(err, 'An error has occurred. Please try again later.'), { classes: ['errorToast'] })
     }
   }
 
@@ -103,8 +79,7 @@
 
   const handleUnverify = async () => {
     try {
-      $authData.baseModel.verification = ''
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+      await updateOwnUser({ verification: '' })
       toast.push('You have been un-verified. You may now edit your Username or Faction.', { classes: ['successToast'] })
       showUnverifyConfirm = false
     } catch (err) {

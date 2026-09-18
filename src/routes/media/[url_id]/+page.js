@@ -1,9 +1,9 @@
-import { error } from '@sveltejs/kit'
+import { throwLoadError } from '$lib/load'
 import { pb } from '$lib/pocketbase'
 
 export async function load ({ fetch, params }) {
   try {
-    const media = await pb.collection('medias').getFirstListItem(`url_id="${params.url_id}"`, {
+    const media = await pb.collection('medias').getFirstListItem(pb.filter('url_id = {:id}', { id: params.url_id }), {
       expand: 'destination,topic',
       fetch
     })
@@ -11,7 +11,6 @@ export async function load ({ fetch, params }) {
       media
     }
   } catch (err) {
-    console.error(err)
+    throwLoadError(err, 'Media not found')
   }
-  throw error(404, 'Media not found')
 }

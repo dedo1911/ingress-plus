@@ -1,6 +1,5 @@
-import { error } from '@sveltejs/kit'
+import { throwLoadError } from '$lib/load'
 import { pb } from '$lib/pocketbase'
-import { categories } from '$lib/stores/index.js'
 import sortBy from 'lodash.sortby'
 
 export async function load ({ fetch }) {
@@ -20,17 +19,22 @@ export async function load ({ fetch }) {
         'expand.badges_via_category.unobtainable',
         'expand.badges_via_category.hasPlaceholderData',
         'expand.badges_via_category.wings_possible',
+        // Needed by the sort below - without it every badge's sorting is
+        // undefined and sortBy degrades to a no-op.
+        'expand.badges_via_category.sorting'
       ].join(','),
       fetch
     })
-    categories.set(items.map(i => {
-      const r = { ...i, badges: i.expand ? sortBy(i.expand.badges_via_category || []).reverse() : [] }
+    // Returned rather than written into a store: this load also runs on the
+    // server, where module-level stores are shared by every concurrent SSR
+    // request (the same hazard pocketbase/index.js works around).
+    const categories = items.map(i => {
+      const r = { ...i, badges: i.expand ? sortBy(i.expand.badges_via_category || [], 'sorting').reverse() : [] }
       delete r.expand
       return r
-    }))
-    return {}
+    })
+    return { categories }
   } catch (err) {
-    console.error(err)
+    throwLoadError(err)
   }
-  throw error(500, 'Internal server error')
 }

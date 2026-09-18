@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit'
+import { throwLoadError } from '$lib/load'
 import { pb } from '$lib/pocketbase'
 
 export async function load ({ fetch }) {
@@ -10,6 +10,8 @@ export async function load ({ fetch }) {
         skipTotal: true,
         fetch
       }), // topBadges
+      // The three leaderboard views below are already capped to the top 10
+      // by their own SQL, so getFullList() fetches ten rows, not every user.
       pb.collection('public_users_owned_badges').getFullList({
         sort: '-count',
         fetch
@@ -21,7 +23,6 @@ export async function load ({ fetch }) {
       statistics
     }
   } catch (err) {
-    console.error(err)
+    throwLoadError(err)
   }
-  throw error(500, 'Internal server error')
 }

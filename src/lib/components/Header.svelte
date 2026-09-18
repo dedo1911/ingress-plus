@@ -7,6 +7,8 @@
   import { pb } from '$lib/pocketbase'
   import { authData, freshLogin, ownedBadges } from '$lib/stores'
   import { refreshOwnedBadges } from '$lib/badges'
+  import { updateOwnUser } from '$lib/user'
+  import { toast } from '@zerodevx/svelte-toast'
 
   let menuOpen = $state(false)
   let showSubTools = $state(false)
@@ -15,33 +17,43 @@
   const toggleMenu = () => { menuOpen = !menuOpen }
   const toggleSubTools = () => { showSubTools = !showSubTools }
 
-  const login = async () => {
-    menuOpen = false
-    const loginWindow = window.open('', '_blank')
-    const user = await pb.collection('users').authWithOAuth2({
-      provider: 'google',
-      urlCallback: (url) => {
-        loginWindow.location.href = url
-      }
-    })
-
-    if (pb.authStore.isValid) {
-      // Update username and avatar
-      user.record.avatar = user.meta.avatarUrl
-      user.record.display_name = user.meta.name
-      pb.collection('users').update(user.record.id, user.record)
-    }
-
-    freshLogin.set(true)
-    authData.set(pb.authStore)
-    await refreshOwnedBadges()
-  }
-
   const logout = () => {
     menuOpen = false
     pb.authStore.clear()
     authData.set({ isValid: false })
     ownedBadges.set([])
+  }
+
+  const login = async () => {
+    menuOpen = false
+    // Opened synchronously inside the click so popup blockers allow it; the
+    // OAuth URL only exists once the SDK hands it over in urlCallback.
+    const loginWindow = window.open('', '_blank')
+    let user
+    try {
+      user = await pb.collection('users').authWithOAuth2({
+        provider: 'google',
+        urlCallback: (url) => {
+          loginWindow.location.href = url
+        }
+      })
+    } catch (err) {
+      // A declined or failed Google prompt used to leave the blank popup open
+      // forever and the rejection unhandled.
+      loginWindow?.close()
+      console.error('Login failed:', err)
+      toast.push('Login was cancelled or failed. Please try again.', { classes: ['errorToast'] })
+      return
+    }
+
+    // Mirror the Google profile onto the record. Best-effort: not worth
+    // failing a successful login over.
+    updateOwnUser({ avatar: user.meta.avatarUrl, display_name: user.meta.name })
+      .catch(err => console.error('Failed to sync the Google profile:', err))
+
+    freshLogin.set(true)
+    authData.set(pb.authStore)
+    await refreshOwnedBadges()
   }
 
   const openTelegram = () => {
@@ -50,8 +62,27 @@
   }
 
   onMount(async () => {
-    if (!pb.authStore.isValid) return
-    await pb.collection('users').authRefresh()
+    if (!pb.authStore.isValid) {
+      // authData starts as { isValid: null } ("unknown"); pages that redirect
+      // signed-out visitors (/agent, /agent/settings, /badges/import) wait
+      // for an explicit false, which nothing set for a visitor with no
+      // stored session at all - so they rendered empty instead.
+      authData.set({ isValid: false })
+      return
+    }
+    try {
+      await pb.collection('users').authRefresh()
+    } catch (err) {
+      // A rejected token (revoked, expired, user deleted) means the stored
+      // session is dead: drop it rather than render a stale signed-in UI.
+      // status 0 is a network failure - keep the cached session then, the
+      // next request will sort it out.
+      if (err.status !== 0) {
+        console.error('Session refresh rejected, signing out:', err)
+        logout()
+        return
+      }
+    }
     authData.set(pb.authStore)
     await refreshOwnedBadges()
   })
@@ -66,9 +97,9 @@
   <ul transition:slide>
     {#if $authData.isValid }
       <a href={resolve('/agent')}>
-        <li class="{pathname === '/agent' ? 'active' : '{$authData.model.username}'}">
+        <li class:active={pathname === '/agent'}>
           <img src="{$authData?.baseModel?.avatar.slice(0, -6)}" alt={$authData.baseModel.username}
-            onerror={() => { this.src = '/images/user.svg' }} />
+            onerror={(e) => { e.currentTarget.src = '/images/user.svg' }} />
           {$authData.baseModel.username}
         </li>
       </a>
@@ -116,7 +147,7 @@
     {#if $authData.isValid }
       <li>
         <button onclick={logout}>
-          <img src="/images/logout.svg" alt="{$authData.model.username}" /> Logout
+          <img src="/images/logout.svg" alt="Logout" /> Logout
         </button>
       </li>
     {:else}
