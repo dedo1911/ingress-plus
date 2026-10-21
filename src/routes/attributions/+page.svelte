@@ -97,10 +97,14 @@
 
       <div class="card">
         <div class="card-header">
+          <img class="card-icon" src="/images/openstreetmap-logo.svg" alt="" />
           <h3><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a></h3>
         </div>
         <p>Map tiles in the MU Calculator are &copy; OpenStreetMap contributors, available under the
-          <a href="https://opendatacommons.org/licenses/odbl/" target="_blank" rel="noopener noreferrer">Open Database Licence</a>.</p>
+          <a href="https://opendatacommons.org/licenses/odbl/" target="_blank" rel="noopener noreferrer">Open Database Licence</a>.
+          Logo by Ken Vermette, based on the 2006 OpenStreetMap logo, under
+          <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 2.0</a>,
+          via <a href="https://commons.wikimedia.org/wiki/File:Openstreetmap_logo.svg" target="_blank" rel="noopener noreferrer">Wikimedia Commons</a>.</p>
       </div>
 
       <div class="card">
