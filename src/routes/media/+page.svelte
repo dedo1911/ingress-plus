@@ -1,84 +1,40 @@
 <script>
-    import { onMount } from 'svelte'
-    import { SvelteURLSearchParams } from 'svelte/reactivity'
     import MultiSelect from 'svelte-multiselect'
-    import { replaceState } from '$app/navigation'
+    import { SvelteURLSearchParams } from 'svelte/reactivity'
+    import { goto } from '$app/navigation'
     import { resolve } from '$app/paths'
-    import { pb } from '$lib/pocketbase'
 
     const { data } = $props()
-    const { topics, destinations } = data
+    const toOption = x => ({ label: x.name, value: x.id })
 
-    let itemsPerPage = $state('20')
-    let sorting = $state('-released_at')
-    let items = $state([])
-    let page = $state(1)
-    let totalPages = $state(1)
-    let totalItems = $state(1)
-    let searchFilter = $state('')
-    let topicsFilter = $state([])
-    let destinationsFilter = $state([])
+    // The controls are local state seeded from the URL (via load); the
+    // results themselves come straight from data, so a change of filter is
+    // a navigation and load does the fetching - on the server too.
+    let itemsPerPage = $state(String(data.perPage))
+    let sorting = $state(data.sort)
+    let searchFilter = $state(data.search)
+    let topicsFilter = $state(data.selectedTopics.map(toOption))
+    let destinationsFilter = $state(data.selectedDestinations.map(toOption))
 
-    const fetchMedias = async () => {
-      const options = {
-        sort: sorting
-      }
+    const navigate = (page) => {
+      // SvelteURLSearchParams only to satisfy svelte/prefer-svelte-reactivity;
+      // nothing reacts to it.
       const params = new SvelteURLSearchParams()
-      if (sorting !== '-released_at') {
-        params.set('s', sorting)
-      }
-      const filter = []
-      if (searchFilter.length > 0) {
-        filter.push(`(short_description ~ '${searchFilter}' || description ~ '${searchFilter}')`)
-        params.set('q', searchFilter)
-      }
-      if (topicsFilter.length > 0) {
-        filter.push(`(${topicsFilter.map(t => `topic ~ '${t.value}'`).join(' && ')})`)
-        params.set('t', topicsFilter.map(t => t.value))
-      }
-      if (destinationsFilter.length > 0) {
-        filter.push(`(${destinationsFilter.map(t => `destination ~ '${t.value}'`).join(' || ')})`)
-        params.set('d', destinationsFilter.map(d => d.value))
-      }
-      if (filter.length > 0) {
-        options.filter = filter.join(' && ')
-      }
-      const r = await pb.collection('medias').getList(page, 1 * itemsPerPage, options)
-      totalPages = r.totalPages
-      totalItems = r.totalItems
-      items = r.items
+      if (sorting !== '-released_at') params.set('s', sorting)
+      if (searchFilter) params.set('q', searchFilter)
+      if (topicsFilter.length > 0) params.set('t', topicsFilter.map(t => t.value).join(','))
+      if (destinationsFilter.length > 0) params.set('d', destinationsFilter.map(d => d.value).join(','))
+      if (itemsPerPage !== '20') params.set('n', itemsPerPage)
+      if (page > 1) params.set('p', page)
       const queryString = params.toString()
-      replaceState(resolve(`${window.location.pathname}${queryString.length > 0 ? '?' : ''}${queryString}`))
+      // replaceState: typing in the search box must not leave one history
+      // entry per keystroke; keepFocus for the same reason.
+      return goto(resolve(`/media${queryString ? `?${queryString}` : ''}`), { replaceState: true, keepFocus: true, noScroll: true })
     }
 
-    const prevPage = () => {
-      if (page <= 1) return
-      page--
-      fetchMedias()
-    }
-
-    const nextPage = () => {
-      if (page >= totalPages) return
-      page++
-      fetchMedias()
-    }
-
-    const executeSearch = async () => {
-      page = 1
-      await fetchMedias()
-    }
-
-    onMount(async () => {
-      const params = new Proxy(new URLSearchParams(window.location.search), {
-        get: (searchParams, prop) => searchParams.get(prop)
-      })
-      if (params.s) sorting = params.s
-      if (params.q) searchFilter = params.q
-      if (params.d) destinationsFilter = params.d.split(',').map(d => destinations.find(d2 => d2.id === d)).map(d => ({ label: d.name, value: d.id }))
-      if (params.t) topicsFilter = params.t.split(',').map(t => topics.find(t2 => t2.id === t)).map(t => ({ label: t.name, value: t.id }))
-
-      return fetchMedias()
-    })
+    const executeSearch = () => navigate(1)
+    const prevPage = () => { if (data.page > 1) navigate(data.page - 1) }
+    const nextPage = () => { if (data.page < data.totalPages) navigate(data.page + 1) }
 </script>
 
 <svelte:head>
@@ -88,7 +44,7 @@
 <div class="container">
     <div class="search">
         <div style="min-width: 270px">
-            <input type="text" bind:value={searchFilter} onkeydown={executeSearch} placeholder="Search..." />
+            <input type="text" bind:value={searchFilter} oninput={executeSearch} placeholder="Search..." />
         </div>
         <div style="min-width: 270px">
             <select bind:value={sorting} onchange={executeSearch}>
@@ -102,14 +58,14 @@
             </select>
         </div>
         <div>
-            <MultiSelect bind:selected={topicsFilter} on:change={executeSearch} options={topics.map(t => ({ label: t.name, value: t.id }))} placeholder="Topics" />
+            <MultiSelect bind:selected={topicsFilter} on:change={executeSearch} options={data.topics.map(toOption)} placeholder="Topics" />
         </div>
         <div>
-            <MultiSelect bind:selected={destinationsFilter} on:change={executeSearch} options={destinations.map(t => ({ label: t.name, value: t.id }))} placeholder="Destinations" />
+            <MultiSelect bind:selected={destinationsFilter} on:change={executeSearch} options={data.destinations.map(toOption)} placeholder="Destinations" />
         </div>
     </div>
     <div class="media-container">
-        {#each items as media (media.id)}
+        {#each data.items as media (media.id)}
             <a class="media" href={resolve(`/media/${media.url_id}`)}>
                 <div class="image" style="background-image: url('{media.image_url.replace('http://', 'https://')}"></div>
                 <div class={`level level-${media.level}`}>L<span>{media.level}</span></div>
@@ -117,17 +73,17 @@
             </a>
         {/each}
     </div>
-    {#if items.length === 0 }
+    {#if data.items.length === 0 }
         <p class="empty">Nothing to show!</p>
     {/if}
     <div class="paginator">
-        <img class:disabled={page <= 1} src="/images/left.svg" onclick={prevPage} alt="Previous Page" />
-        Page {page} of {totalPages} (Total Media: {totalItems})
-        <img class:disabled={page >= totalPages} src="/images/right.svg" onclick={nextPage} alt="Next Page" />
+        <img class:disabled={data.page <= 1} src="/images/left.svg" onclick={prevPage} alt="Previous Page" />
+        Page {data.page} of {data.totalPages} (Total Media: {data.totalItems})
+        <img class:disabled={data.page >= data.totalPages} src="/images/right.svg" onclick={nextPage} alt="Next Page" />
     </div>
     <div class="page-options">
         Media per page:&nbsp;
-        <select bind:value={itemsPerPage} onchange={fetchMedias}>
+        <select bind:value={itemsPerPage} onchange={executeSearch}>
             <option value="10">10</option>
             <option value="20">20</option>
             <option value="50">50</option>

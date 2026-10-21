@@ -7,6 +7,6 @@ import { ownedBadges } from '$lib/stores'
 // needing a full page reload.
 export const refreshOwnedBadges = async () => ownedBadges.set(
   await pb.collection('user_badges').getFullList({
-    expand: 'badge,badge.category',
-    filter: `user="${pb.authStore.model.id}"`
+    expand: 'badge,badge.category,badge.category.parent',
+    filter: pb.filter('user = {:id}', { id: pb.authStore.record.id })
   }))

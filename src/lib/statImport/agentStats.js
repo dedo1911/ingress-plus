@@ -1,3 +1,5 @@
+import { pb } from '$lib/pocketbase'
+
 // Agent Stats doesn't expose the agent's name or faction anywhere in its
 // API - only level and AP can be derived, from the "ap" medal's total and
 // its reached "level N" thresholds. Both are handled separately from the
@@ -49,7 +51,8 @@ export function buildAgentStatsResult (medals, progress) {
 export async function fetchAgentStats (apiKey) {
   const response = await fetch('/badges/import/agent-stats', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    // The proxy checks the session with PocketBase - see $lib/server/importGuard.
+    headers: { 'Content-Type': 'application/json', Authorization: pb.authStore.token },
     body: JSON.stringify({ apiKey })
   })
   const body = await response.json()

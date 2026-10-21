@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit'
+import { guardImportRequest } from '$lib/server/importGuard'
 
 const STATS_TRACKER_PRO_BASE = 'https://the-grid.blue'
 
@@ -9,6 +10,8 @@ const STATS_TRACKER_PRO_BASE = 'https://the-grid.blue'
 // HTTP status codes and a clear JSON error message on failure, so no
 // special-casing is needed here beyond passing those through.
 export async function POST ({ request, fetch }) {
+  const guard = await guardImportRequest(request)
+  if (guard instanceof Response) return guard
   const { apiKey } = await request.json()
   if (!apiKey || typeof apiKey !== 'string') {
     return json({ error: 'Missing API key.' }, { status: 400 })
@@ -39,7 +42,10 @@ export async function POST ({ request, fetch }) {
   }
 
   if (body.status !== 'success') {
-    return json({ error: body.message || 'Could not fetch your Stats Tracker Pro data.' }, { status: response.status })
+    // Upstream has answered 200 with {"status":"error"}; passing that status
+    // through made the client's !response.ok check miss it and blow up on
+    // the missing data. Keep a real error status, otherwise call it a 502.
+    return json({ error: body.message || 'Could not fetch your Stats Tracker Pro data.' }, { status: response.status >= 400 ? response.status : 502 })
   }
 
   return json({

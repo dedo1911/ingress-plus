@@ -5,6 +5,7 @@
   import { authData, ONBOARDING_DONE_STATES } from '$lib/stores'
   import { pb } from '$lib/pocketbase'
   import { refreshOwnedBadges } from '$lib/badges'
+  import { updateOwnUser, usernameErrorMessage } from '$lib/user'
   import { toast } from '@zerodevx/svelte-toast'
 
   const ONBOARDING_BADGE_ID = 'onl0wktktek3bn8'
@@ -23,8 +24,7 @@
   const setOnboardingState = async (value) => {
     savingState = value
     try {
-      $authData.baseModel.onboardingState = value
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
+      await updateOwnUser({ onboardingState: value })
     } finally {
       savingState = null
     }
@@ -80,52 +80,19 @@
   let submitting = $state(false)
   let formError = $state('')
 
-  // Same wording as saveUsername()'s errorMessages on /agent/settings.
-  const USERNAME_ERRORS = {
-    validation_not_unique: 'The username is already taken. Please choose a different username.',
-    validation_required: 'Username cannot be blank.',
-    validation_min_text_constraint: 'The username is too short. It needs to be at least 3 characters long.',
-    validation_max_text_constraint: 'The username is too long. It needs to be 15 characters or less.',
-    validation_invalid_format: 'The username contains characters that are not allowed. You can only use letters or numbers.'
-  }
-
-  // The users collection's updateRule checks @request.body.supporter (and
-  // other fields) against the record's own current value, e.g.
-  // "@request.body.supporter = false || (@request.body.supporter = true &&
-  // supporter = true)" - PocketBase resolves a field missing from the
-  // submitted body as empty, not as "unchanged", so a partial payload with
-  // only the fields we intend to change fails that comparison and PocketBase
-  // 404s the whole request (its standard response for an API-rule mismatch,
-  // same as a genuinely missing record). Sending the full current record
-  // with just our fields overridden - the same thing /agent/settings does -
-  // satisfies the rule.
-  //
-  // baseModel itself is only mutated from the server's confirmed response,
-  // after success: mutating it optimistically before the request resolves
-  // (an earlier version of this) meant a rejected save still flipped
-  // onboardingState locally, which made alreadyDone true and silently
-  // jumped the page to the "completed" view out from under the still-set
-  // form error.
+  // updateOwnUser only commits locally from the server's confirmed response:
+  // an earlier version mutated baseModel optimistically, so a rejected save
+  // still flipped onboardingState locally, made alreadyDone true and jumped
+  // the page to the "completed" view out from under the form error.
   const saveProfile = async () => {
     formError = ''
     submitting = true
     try {
-      const updated = await pb.collection('users').update($authData.baseModel.id, {
-        ...$authData.baseModel,
-        username,
-        faction,
-        public: isPublic,
-        newsletterOptIn
-      })
-      $authData.baseModel.username = updated.username
-      $authData.baseModel.faction = updated.faction
-      $authData.baseModel.public = updated.public
-      $authData.baseModel.newsletterOptIn = updated.newsletterOptIn
+      await updateOwnUser({ username, faction, public: isPublic, newsletterOptIn })
       step = 'tour'
     } catch (err) {
       console.error('Failed to save profile during onboarding:', err)
-      const errorCode = err.response?.data?.username?.code
-      formError = USERNAME_ERRORS[errorCode] || 'Something went wrong saving your profile. Please try again.'
+      formError = usernameErrorMessage(err, 'Something went wrong saving your profile. Please try again.')
     } finally {
       submitting = false
     }
