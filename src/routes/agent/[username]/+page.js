@@ -6,7 +6,7 @@ export async function load ({ fetch, params }) {
     const publicUser = await pb.collection('public_users').getFirstListItem(pb.filter('username = {:username}', { username: params.username }), { fetch })
     const ownedBadges = await pb.collection('user_badges').getFullList({
       filter: pb.filter('user = {:id}', { id: publicUser.id }),
-      expand: 'badge,badge.category',
+      expand: 'badge,badge.category,badge.category.parent',
       fetch
     })
     return {
