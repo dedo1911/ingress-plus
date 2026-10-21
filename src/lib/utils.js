@@ -9,3 +9,12 @@ export const thumbSize = (badgeSize) => {
   if (badgeSize <= 128) return '128x128'
   return '256x256'
 }
+
+// Anchor id for a category heading, e.g. "Mission Day badges" -> "mission-day-badges".
+export const generateId = (str) =>
+  str
+    .replace(/[^\w\s]+/g, '-')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase()
