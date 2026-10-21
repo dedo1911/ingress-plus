@@ -12,6 +12,7 @@
   const topUsers = $derived(s[2])
   const topMediaUsers = $derived(s[3])
   const topMediaUploads = $derived(s[4])
+  const topWings = $derived(s[5].items)
 </script>
 
 <svelte:head>
@@ -88,6 +89,21 @@
           {badge.expand.badge.title}
         </span>
         {formatNumber(badge.count)}
+      </div>
+    {/each}
+  </div>
+  <hr />
+  <h2>Most Recursion Wings</h2>
+  <div class="badges">
+    {#each topWings as wings (wings.id)}
+      <div class="badge">
+        <span>
+          <!-- Wings only exist on a badge's highest tier, i.e. its last image. -->
+          <img height="32" width="32" alt="{wings.expand.badge.title}"
+          src={pb.files.getURL(wings.expand.badge, wings.expand.badge.image.at(-1), { thumb: '96x96' })} />
+          {wings.expand.badge.title}
+        </span>
+        {formatNumber(wings.count)}
       </div>
     {/each}
   </div>
