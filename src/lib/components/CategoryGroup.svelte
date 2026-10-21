@@ -41,20 +41,16 @@
 </div>
 
 <style>
-  /* No top margin: the divider above already spaces the title, and the same
-     gap open or collapsed keeps the title from jumping when toggled. */
+  /* No vertical margins: the dividers around a category space its title, and
+     the same gap open or collapsed keeps the title from jumping when toggled. */
   h2, h3 {
     text-align: center;
-    margin: 0 0 calc(var(--badge-size) / 2) 0;
+    margin: 0;
     font-size: 2em;
     text-shadow: 0 0 10px black;
   }
   h3 {
     font-size: 1.5em;
-  }
-  /* Collapsed, nothing follows but the next divider, which has its own margin. */
-  h2.closed, h3.closed {
-    margin-bottom: 0;
   }
   span {
     position: relative;
