@@ -18,6 +18,11 @@
             <p><img src="/images/cmu.png" alt="CMU Calculator" /> CMU Calculator</p>
         </div>
     </a>
+    <a class="hero hero-left" href={resolve('/tools/mu-calc')}>
+        <div style="background-image: url('/images/hero_images/cat_tools.png');">
+            <p><img src="/images/location.svg" alt="" /> MU Calculator</p>
+        </div>
+    </a>
     <a class="hero hero-right" href={resolve('/tools/resources')}>
         <div style="background-image: url('/images/hero_images/cat_resources.jpg');">
             <p><img src="/images/resources.svg" alt="Resources" /> Resources</p>
