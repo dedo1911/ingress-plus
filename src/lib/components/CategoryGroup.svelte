@@ -48,8 +48,10 @@
   h3 {
     font-size: 1.5em;
   }
-  /* Nothing follows a collapsed heading but the divider, which has its own margin. */
+  /* A collapsed heading sits between two dividers, so both of its margins
+     go and the dividers' own margins give equal space above and below. */
   h2.closed, h3.closed {
+    margin-top: 0;
     margin-bottom: 0;
   }
   span {
