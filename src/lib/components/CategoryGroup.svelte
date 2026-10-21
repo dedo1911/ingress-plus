@@ -41,19 +41,19 @@
 </div>
 
 <style>
+  /* No top margin: the divider above already spaces the title, and the same
+     gap open or collapsed keeps the title from jumping when toggled. */
   h2, h3 {
     text-align: center;
-    margin: calc(var(--badge-size) / 3) 0 calc(var(--badge-size) / 2) 0;
+    margin: 0 0 calc(var(--badge-size) / 2) 0;
     font-size: 2em;
     text-shadow: 0 0 10px black;
   }
   h3 {
     font-size: 1.5em;
   }
-  /* A collapsed heading sits between two dividers, so both of its margins
-     go and the dividers' own margins give equal space above and below. */
+  /* Collapsed, nothing follows but the next divider, which has its own margin. */
   h2.closed, h3.closed {
-    margin-top: 0;
     margin-bottom: 0;
   }
   span {
