@@ -39,6 +39,13 @@
       <span>Total owned badges:</span>
       <strong>{formatNumber(statistics.total_owned_badges)}</strong>
     </div>
+    <!-- Absent until the statistics collection has its total_wings field. -->
+    {#if statistics.total_wings !== undefined}
+      <div class="stat">
+        <span>Badges with Recursion Wings:</span>
+        <strong>{formatNumber(statistics.total_wings)}</strong>
+      </div>
+    {/if}
     <div class="stat">
       <span>Estimated total media:</span>
       <strong>{formatNumber(statistics.estimate_total_media)}</strong>
