@@ -39,6 +39,7 @@
   // The world repeats horizontally, so everything is drawn once per world copy.
   // worldCopyJump keeps the map centred on the middle copy, so three are enough.
   const WORLD_OFFSETS = [-360, 0, 360]
+  const OSM_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
   const shift = (points, offset) => points.map(([lat, lon]) => [lat, lon + offset])
 
   // Great-circle path through the points: links on a globe are arcs, not straight
@@ -199,9 +200,14 @@
   onMount(async () => {
     L = await import('leaflet')
     map = L.map(mapElement, { zoomControl: true, worldCopyJump: true }).setView([46.2044, 6.1432], 5)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // OSM tile policy (operations.osmfoundation.org/policies/tiles): the plain
+    // tile.openstreetmap.org host only - the a/b/c subdomains aren't supported -
+    // visible attribution, and no cache-busting or prefetching. The browser's
+    // normal HTTP cache and Referer cover the rest; the service worker never
+    // touches tile requests.
+    L.tileLayer(OSM_TILE_URL, {
       maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · <a href="https://www.openstreetmap.org/fixthemap">Report a map issue</a>'
     }).addTo(map)
     drawnLayers = L.layerGroup().addTo(map)
     searchMarker = L.layerGroup().addTo(map)
