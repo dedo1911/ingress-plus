@@ -99,8 +99,11 @@
       <div class="badge">
         <span>
           <!-- Wings only exist on a badge's highest tier, i.e. its last image. -->
-          <img height="32" width="32" alt="{wings.expand.badge.title}"
-          src={pb.files.getURL(wings.expand.badge, wings.expand.badge.image.at(-1), { thumb: '96x96' })} />
+          <span class="wrap">
+            <img height="32" width="32" alt="{wings.expand.badge.title}"
+            src={pb.files.getURL(wings.expand.badge, wings.expand.badge.image.at(-1), { thumb: '96x96' })} />
+            <img class="wings" src="/images/badges/recursed_flair.png" alt="Wings" />
+          </span>
           {wings.expand.badge.title}
         </span>
         {formatNumber(wings.count)}
@@ -154,6 +157,22 @@
     border-radius: 16px;
     vertical-align: middle;
     margin: 0 0.25em;
+  }
+  div.badge span.wrap {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  div.badge span.wrap img.wings {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 65%;
+    height: auto;
+    margin: 0;
+    border-radius: 0;
+    pointer-events: none;
   }
   div.stats {
     display: flex;
