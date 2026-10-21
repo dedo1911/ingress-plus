@@ -97,6 +97,14 @@
 
       <div class="card">
         <div class="card-header">
+          <h3><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a></h3>
+        </div>
+        <p>Map tiles in the MU Calculator are &copy; OpenStreetMap contributors, available under the
+          <a href="https://opendatacommons.org/licenses/odbl/" target="_blank" rel="noopener noreferrer">Open Database Licence</a>.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
           <img class="card-icon" src="/images/kofi.png" alt="" />
           <h3><a href="https://ko-fi.com/dedo1911" target="_blank" rel="noopener noreferrer">Ko-fi</a></h3>
         </div>
