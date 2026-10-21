@@ -21,14 +21,17 @@
 </script>
 
 <div style="--badge-size: {$badgeSize}px">
-  <svelte:element this={`h${level}`} id={anchor ? id : undefined} class:sub={level === 3}>
-    <button type="button" class:closed={!open} aria-expanded={open}
-      aria-label="{open ? 'Collapse' : 'Expand'} {title}" onclick={ontoggle}>▾</button>
-    {#if anchor}
-      <a href={`#${id}`} onclick={copyCategoryLink}>{title}</a>
-    {:else}
-      {title}
-    {/if}
+  <svelte:element this={`h${level}`} id={anchor ? id : undefined} class:closed={!open}>
+    <!-- The arrow hangs off the title's left edge (absolute) so it doesn't push the centred title right. -->
+    <span>
+      <button type="button" class:closed={!open} aria-expanded={open}
+        aria-label="{open ? 'Collapse' : 'Expand'} {title}" onclick={ontoggle}>▾</button>
+      {#if anchor}
+        <a href={`#${id}`} onclick={copyCategoryLink}>{title}</a>
+      {:else}
+        {title}
+      {/if}
+    </span>
   </svelte:element>
   {#if open}
     {@render children()}
@@ -45,7 +48,19 @@
   h3 {
     font-size: 1.5em;
   }
+  /* Nothing follows a collapsed heading but the divider, which has its own margin. */
+  h2.closed, h3.closed {
+    margin-bottom: 0;
+  }
+  span {
+    position: relative;
+  }
   button {
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    margin-top: -0.6em;
+    line-height: 1.2em;
     background: none;
     border: none;
     color: inherit;
