@@ -133,6 +133,7 @@
       <img src="/images/tools.svg" alt="Tools" /> Tools &triangledown;
       <ul class="submenu" class:visible={showSubTools}>
         <li><img src="/images/cmu.png" alt="CMU icon" /><a href={resolve('/tools/cmu_calc')}>CMU Calculator</a></li>
+        <li><img src="/images/icon_mu.png" alt="MU icon" /><a href={resolve('/tools/mu-calc')}>MU Calculator</a></li>
         <li><img src="/images/resources.svg" alt="Tools" /><a href={resolve('/tools/resources')}>Resources</a></li>
       </ul>
     </li>

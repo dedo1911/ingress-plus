@@ -7,6 +7,7 @@
   let map
   let L
   let drawnLayers
+  let searchMarker
   let fields = $state([])
   let drawing = $state(false)
   let draftCoordinates = $state([])
@@ -35,6 +36,42 @@
     results = []
   }
 
+  // The world repeats horizontally, so everything is drawn once per world copy.
+  // worldCopyJump keeps the map centred on the middle copy, so three are enough.
+  const WORLD_OFFSETS = [-360, 0, 360]
+  const shift = (points, offset) => points.map(([lat, lon]) => [lat, lon + offset])
+
+  // Great-circle path through the points: links on a globe are arcs, not straight
+  // lines on the Mercator map. Longitudes are unwrapped so an arc crossing the
+  // antimeridian continues past ±180 instead of flying back across the map.
+  function geodesicPath (points, closed = false) {
+    if (points.length < 2) return points
+    const rad = Math.PI / 180
+    const toVector = ([lat, lon]) => [Math.cos(lat * rad) * Math.cos(lon * rad), Math.cos(lat * rad) * Math.sin(lon * rad), Math.sin(lat * rad)]
+    const path = []
+    for (let i = 0; i < (closed ? points.length : points.length - 1); i++) {
+      const a = toVector(points[i])
+      const b = toVector(points[(i + 1) % points.length])
+      const d = Math.acos(Math.min(1, Math.max(-1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2])))
+      // Identical or antipodal points have no unique arc; draw them straight.
+      const straight = d < 1e-6 || Math.PI - d < 1e-6
+      const steps = straight ? 1 : 32
+      for (let s = 0; s < steps; s++) { // the endpoint is the next edge's start
+        const f = s / steps
+        const wa = straight ? 1 : Math.sin((1 - f) * d) / Math.sin(d)
+        const wb = straight ? 0 : Math.sin(f * d) / Math.sin(d)
+        const [x, y, z] = [0, 1, 2].map(k => wa * a[k] + wb * b[k])
+        path.push([Math.atan2(z, Math.hypot(x, y)) / rad, Math.atan2(y, x) / rad])
+      }
+    }
+    if (!closed) path.push(points[points.length - 1])
+    for (let i = 1; i < path.length; i++) {
+      while (path[i][1] - path[i - 1][1] > 180) path[i][1] -= 360
+      while (path[i][1] - path[i - 1][1] < -180) path[i][1] += 360
+    }
+    return path
+  }
+
   function syncMap () {
     if (!drawnLayers || !L) return
     drawnLayers.clearLayers()
@@ -43,34 +80,54 @@
         .map(point => point.map(Number))
         .filter(([lat, lon]) => Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180)
       if (!coordinates.length) return
-      coordinates.forEach((point, pointIndex) => {
-        L.circleMarker(point, {
-          radius: 6,
-          color: '#ffffff',
-          weight: 2,
-          fillColor: '#00adef',
-          fillOpacity: 1
-        }).bindTooltip(`${field.name || `Field ${fieldIndex + 1}`} · ${pointIndex + 1}`).addTo(drawnLayers)
-      })
-      if (coordinates.length > 1) {
-        L.polygon(coordinates, {
-          color: '#00adef',
-          weight: 2,
-          fillColor: '#00adef',
-          fillOpacity: 0.18
-        }).addTo(drawnLayers)
+      const outline = coordinates.length > 1 ? geodesicPath(coordinates, coordinates.length > 2) : null
+      for (const offset of WORLD_OFFSETS) {
+        shift(coordinates, offset).forEach((point, pointIndex) => {
+          L.circleMarker(point, {
+            radius: 6,
+            color: '#ffffff',
+            weight: 2,
+            fillColor: '#00adef',
+            fillOpacity: 1
+          }).bindTooltip(`${field.name || `Field ${fieldIndex + 1}`} · ${pointIndex + 1}`).addTo(drawnLayers)
+        })
+        if (outline) {
+          L.polygon(shift(outline, offset), {
+            color: '#00adef',
+            weight: 2,
+            fillColor: '#00adef',
+            fillOpacity: 0.18
+          }).addTo(drawnLayers)
+        }
       }
     })
-    if (draftCoordinates.length) {
-      draftCoordinates.forEach((point, pointIndex) => {
+    for (const offset of WORLD_OFFSETS) {
+      shift(draftCoordinates, offset).forEach((point, pointIndex) => {
         L.circleMarker(point, { radius: 6, color: '#fff', fillColor: '#ffce00', fillOpacity: 1 })
           .bindTooltip(`New field · ${pointIndex + 1}`)
           .addTo(drawnLayers)
       })
       if (draftCoordinates.length > 1) {
-        L.polyline(draftCoordinates, { color: '#ffce00', dashArray: '6 6' }).addTo(drawnLayers)
+        L.polyline(shift(geodesicPath(draftCoordinates), offset), { color: '#ffce00', dashArray: '6 6' }).addTo(drawnLayers)
       }
     }
+  }
+
+  // Takes the first two decimals found, so "46.2044, 6.1432", "46.2044 6.1432" and
+  // an Intel link (".../?ll=46.2044,6.1432&z=17") all work without per-format parsing.
+  // Returns an error message, or '' on success.
+  function goToCoordinates (text) {
+    const [lat, lon] = (text.match(/-?\d+(?:\.\d+)?/g) || []).map(Number)
+    if (lat === undefined || lon === undefined || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+      return 'Enter coordinates as "latitude, longitude", e.g. 46.2044, 6.1432 or copy an Intel link.'
+    }
+    searchMarker.clearLayers()
+    for (const offset of WORLD_OFFSETS) {
+      // circleMarker, not L.marker: the default marker icon's image paths break under Vite.
+      L.circleMarker([lat, lon + offset], { radius: 8, color: '#fff', fillColor: '#ff3b6b', fillOpacity: 1 }).addTo(searchMarker)
+    }
+    map.setView([lat, lon], Math.max(map.getZoom(), 16))
+    return ''
   }
 
   function startDrawing () {
@@ -88,7 +145,9 @@
 
   function handleMapClick (event) {
     if (!drawing || draftCoordinates.length >= 3) return
-    draftCoordinates = [...draftCoordinates, [event.latlng.lat, event.latlng.lng]]
+    // wrap(): clicking in a repeated world copy yields longitudes beyond ±180, which the API rejects.
+    const { lat, lng } = event.latlng.wrap()
+    draftCoordinates = [...draftCoordinates, [lat, lng]]
     if (draftCoordinates.length === 3) {
       addField(draftCoordinates.map(point => point.map(value => Number(value.toFixed(6)))))
       fields = fields.map((field, index) => index === fields.length - 1 ? { ...field, name: `Field ${fields.length}` } : field)
@@ -139,33 +198,51 @@
 
   onMount(async () => {
     L = await import('leaflet')
-    map = L.map(mapElement, { zoomControl: true }).setView([46.2044, 6.1432], 5)
+    map = L.map(mapElement, { zoomControl: true, worldCopyJump: true }).setView([46.2044, 6.1432], 5)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map)
     drawnLayers = L.layerGroup().addTo(map)
+    searchMarker = L.layerGroup().addTo(map)
+    const SearchControl = L.Control.extend({
+      onAdd () {
+        const form = L.DomUtil.create('form', 'map-search')
+        form.innerHTML = '<input type="text" placeholder="Go to coordinates…" aria-label="Search coordinates" /><button type="submit">Go</button><p role="alert"></p>'
+        const input = form.querySelector('input')
+        const message = form.querySelector('p')
+        form.addEventListener('submit', event => {
+          event.preventDefault()
+          message.textContent = goToCoordinates(input.value)
+        })
+        // Keep typing and clicking in the box from panning/zooming the map underneath.
+        form.addEventListener('keydown', event => event.stopPropagation())
+        L.DomEvent.disableClickPropagation(form)
+        L.DomEvent.disableScrollPropagation(form)
+        return form
+      }
+    })
+    map.addControl(new SearchControl({ position: 'topright' }))
     map.on('click', handleMapClick)
     syncMap()
     return () => map.remove()
   })
 
   $effect(() => {
-    fields
-    draftCoordinates
-    syncMap()
+    // Read both so the effect re-runs when either changes.
+    if (fields && draftCoordinates) syncMap()
   })
 </script>
 
 <svelte:head>
   <title>Ingress Plus &middot; MU Calculator</title>
-  <meta name="description" content="Estimate Mind Units for Ingress fields from portal coordinates or by drawing triangles on a map." />
+  <meta name="description" content="Calculate Mind Units for Ingress fields from portal coordinates or by drawing triangles on a map." />
 </svelte:head>
 
 <div class="container">
   <a class="back" href={resolve('/tools')}>← Tools</a>
   <h1>MU Calculator</h1>
-  <p class="intro">Estimate the Mind Units your field plan would generate. Enter three portal coordinates for each triangle or draw fields directly on the map.</p>
+  <p class="intro">Calculate the Mind Units your field plan would generate. Enter three portal coordinates for each triangle or draw fields directly on the map.</p>
 
   <section class="map-panel" aria-label="Field drawing map">
     <div class="map-toolbar">
@@ -189,7 +266,7 @@
     </div>
 
     {#if fields.length === 0}
-      <p class="empty-fields">No fields yet. Draw a triangle on the map or add a field to enter coordinates.</p>
+      <p class="empty-fields">No fields yet. Draw a triangle on the map or add a field to enter its coordinates.</p>
     {:else}
       {#each fields as field, fieldIndex (fieldIndex)}
         <article class="field-card">
@@ -235,6 +312,15 @@
   .map-toolbar div, .section-heading div { display: grid; gap: 0.25em; }
   .map-toolbar span, .section-heading p, .limit-note { color: #aaa7c9; margin: 0; }
   .map { width: 100%; height: min(55vh, 480px); min-height: 300px; background: #17162a; z-index: 0; }
+  /* Dark mode: invert only the tile pane, so markers and shapes keep their colours. */
+  .map :global(.leaflet-tile-pane) { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
+  .map :global(.leaflet-control-attribution) { background: rgba(14, 11, 28, 0.8); color: #aaa7c9; }
+  .map :global(.leaflet-control-attribution a) { color: #c1bfdc; }
+  .map :global(.map-search) { display: flex; flex-wrap: wrap; gap: 0.4em; width: 20em; max-width: 60vw; padding: 0.4em; border-radius: 6px; background: rgba(14, 11, 28, 0.9); border: 1px solid #575371; }
+  .map :global(.map-search input) { flex: 1; min-width: 0; box-sizing: border-box; font-size: 0.95em; text-align: left; }
+  .map :global(.map-search button) { border-radius: 5px; padding: 0.2em 0.8em; color: #fff; background: rgba(94, 90, 117, 0.5); border: 1px solid #77738f; }
+  .map :global(.map-search p) { flex-basis: 100%; margin: 0; color: #ffb4c1; font-size: 0.85em; }
+  .map :global(.map-search p:empty) { display: none; }
   .fields { margin-top: 2em; }
   .empty-fields { padding: 1em; margin: 0.75em 0; text-align: center; border: 1px dashed #575371; border-radius: 10px; color: #aaa7c9; }
   .section-heading { margin-bottom: 1em; }
@@ -247,6 +333,9 @@
   .coordinate-row { display: grid; grid-template-columns: 2em 1fr 1fr; align-items: end; gap: 0.5em; }
   .coordinate-row label { display: grid; gap: 0.3em; font-size: 0.85em; }
   .coordinate-row input { width: 100%; box-sizing: border-box; font-size: 1em; text-align: left; }
+  /* Spinner arrows step by 1, which is meaningless for coordinates. */
+  .coordinate-row input[type='number'] { appearance: textfield; -moz-appearance: textfield; }
+  .coordinate-row input::-webkit-inner-spin-button, .coordinate-row input::-webkit-outer-spin-button { appearance: none; -webkit-appearance: none; margin: 0; }
   .point-number { display: grid; place-items: center; width: 1.8em; height: 1.8em; border-radius: 50%; background: #00adef; color: #080818; font-weight: 700; }
   button.cta, button.secondary { border-radius: 6px; padding: 0.55em 1em; font-size: 1em; color: #fff; }
   button.cta { background: linear-gradient(90deg, #323c6e, #532a76); border: 1px solid #aaa7c9; }
