@@ -5,9 +5,8 @@
   import { resolve } from '$app/paths'
   import { badgeSize, authData, ownedBadges } from '$lib/stores'
   import { featureFlags } from '$lib/featureFlags'
-  import { pb } from '$lib/pocketbase'
-  import { thumbSize } from '$lib/utils'
   import AgentName from '$lib/components/AgentName.svelte'
+  import ProfileBadge from '$lib/components/ProfileBadge.svelte'
 
   let width = $state(1)
 
@@ -77,8 +76,7 @@
         {#each { length: badgesPerRow } as _, c (c)}
           {@const badge = sortedBadges[r * badgesPerRow + c]}
           {#if badge}
-            <img height="{$badgeSize}" width="{$badgeSize}" alt="{badge.expand.badge.title}"
-              src={pb.files.getURL(badge.expand.badge, badge.expand.badge.image[badge.tier], { thumb: thumbSize($badgeSize) })} />
+            <ProfileBadge owned={badge} />
           {/if}
         {/each}
         </div>
@@ -96,8 +94,7 @@
               {#each { length: badgesPerRow } as _, c (c)}
                 {@const badge = group.badges[r * badgesPerRow + c]}
                 {#if badge}
-                  <img height="{$badgeSize}" width="{$badgeSize}" alt="{badge.expand.badge.title}"
-                    src={pb.files.getURL(badge.expand.badge, badge.expand.badge.image[badge.tier], { thumb: thumbSize($badgeSize) })} />
+                  <ProfileBadge owned={badge} />
                 {/if}
               {/each}
               </div>
