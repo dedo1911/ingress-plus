@@ -22,14 +22,16 @@
 
 <div style="--badge-size: {$badgeSize}px">
   <svelte:element this={`h${level}`} id={anchor ? id : undefined} class:closed={!open}>
-    <!-- The arrow hangs off the title's left edge (absolute) so it doesn't push the centred title right. -->
+    <!-- The arrow and the link button hang off the title's edges (absolute) so
+         they don't push the centred title sideways. -->
     <span>
-      <button type="button" class:closed={!open} aria-expanded={open}
-        aria-label="{open ? 'Collapse' : 'Expand'} {title}" onclick={ontoggle}>▾</button>
+      <button type="button" class="title" aria-expanded={open} onclick={ontoggle}>
+        <span class="arrow" class:closed={!open}>▾</span>{title}
+      </button>
       {#if anchor}
-        <a href={`#${id}`} onclick={copyCategoryLink}>{title}</a>
-      {:else}
-        {title}
+        <button type="button" class="link" aria-label="Copy link to {title}" title="Copy link" onclick={copyCategoryLink}>
+          <img src="/images/link.svg" alt="" />
+        </button>
       {/if}
     </span>
   </svelte:element>
@@ -58,25 +60,40 @@
     position: relative;
   }
   button {
-    position: absolute;
-    right: 100%;
-    top: 50%;
-    margin-top: -0.6em;
-    line-height: 1.2em;
     background: none;
     border: none;
     color: inherit;
     font: inherit;
     cursor: pointer;
-    padding: 0 0.25em;
+    padding: 0;
+  }
+  button.title {
+    text-shadow: inherit;
+  }
+  .arrow {
+    position: absolute;
+    right: 100%;
+    padding-right: 0.25em;
     transition: transform 0.2s ease-in-out;
   }
-  button.closed {
+  .arrow.closed {
     transform: rotate(-90deg);
   }
-  a:hover {
-    padding: 0 1.25em;
-    background: url(/images/link.svg) no-repeat left center;
-    background-size: 1em;
+  button.link {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    padding-left: 0.5em;
+    opacity: 0.4;
+    transition: opacity 0.2s ease-in-out;
+  }
+  button.link:hover,
+  button.link:focus-visible {
+    opacity: 1;
+  }
+  button.link img {
+    height: 0.6em;
+    display: block;
   }
 </style>
