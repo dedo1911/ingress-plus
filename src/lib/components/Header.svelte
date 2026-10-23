@@ -11,11 +11,15 @@
   import { toast } from '@zerodevx/svelte-toast'
 
   let menuOpen = $state(false)
-  let showSubTools = $state(false)
+  // A native <details>, so opening/closing, Enter/Space and screen-reader state come from
+  // the browser. Only closing it again needs code: on navigation and on a click elsewhere.
+  let toolsOpen = $state(false)
   let pathname = $state('/')
 
   const toggleMenu = () => { menuOpen = !menuOpen }
-  const toggleSubTools = () => { showSubTools = !showSubTools }
+  const closeToolsOnOutsideClick = (event) => {
+    if (toolsOpen && !event.target.closest('.tools')) toolsOpen = false
+  }
 
   const logout = () => {
     menuOpen = false
@@ -90,8 +94,11 @@
   afterNavigate(() => {
     pathname = window.location.pathname
     menuOpen = false
+    toolsOpen = false
   })
 </script>
+
+<svelte:window onclick={closeToolsOnOutsideClick} />
 
 {#snippet menu()}
   <ul transition:slide>
@@ -126,15 +133,16 @@
       </li>
     </a>
     -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-    <li class="tools {pathname.startsWith('/tools') ? 'active' : ''}"
-        onclick={toggleSubTools}>
-      <img src="/images/tools.svg" alt="Tools" /> Tools &triangledown;
-      <ul class="submenu" class:visible={showSubTools}>
-        <li><img src="/images/cmu.png" alt="CMU icon" /><a href={resolve('/tools/cmu_calc')}>CMU Calculator</a></li>
-        <li><img src="/images/resources.svg" alt="Tools" /><a href={resolve('/tools/resources')}>Resources</a></li>
-      </ul>
+    <li class="tools" class:active={pathname.startsWith('/tools')}>
+      <details bind:open={toolsOpen}>
+        <summary><img src="/images/tools.svg" alt="" /> Tools</summary>
+        <!-- Each link wraps its icon too, so the whole row is clickable, not just the text. -->
+        <ul class="submenu">
+          <li><a href={resolve('/tools/cmu_calc')}><img src="/images/cmu.png" alt="" />CMU Calculator</a></li>
+          <li><a href={resolve('/tools/mu-calc')}><img src="/images/icon_mu.png" alt="" />MU Calculator</a></li>
+          <li><a href={resolve('/tools/resources')}><img src="/images/resources.svg" alt="" />Resources</a></li>
+        </ul>
+      </details>
     </li>
     <a href={resolve('/stats')}>
       <li class="{pathname === '/stats' ? 'active' : ''}">
@@ -255,7 +263,9 @@
   nav[data-nav="mobile"] button.hamburger.open {
     background-image: url('/images/close.png');
   }
-  nav[data-nav="mobile"] ul {
+  /* `>`: without it this also matched the Tools submenu, which then jumped to the top
+     of the mobile menu as a second full-width panel. */
+  nav[data-nav="mobile"] > ul {
     position: absolute;
     top: 75px;
     background: rgb(47,55,97);
@@ -297,8 +307,26 @@
     position: relative;
   }
 
-  .submenu {
+  .tools summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    list-style: none;
+    cursor: pointer;
+  }
+  .tools summary::-webkit-details-marker {
     display: none;
+  }
+  .tools summary::after {
+    content: '▾';
+    margin-left: 0.3em;
+    transition: transform 0.2s ease-in-out;
+  }
+  .tools details[open] summary::after {
+    transform: rotate(180deg);
+  }
+
+  .submenu {
     position: absolute;
     top: 100%;
     left: 0;
@@ -311,15 +339,22 @@
     padding: 0;
     margin: 0;
   }
-
-  .submenu.visible {
-    display: flex;
+  .submenu li {
+    padding: 0;
   }
   .submenu li:hover {
     background: #222;
   }
   .submenu a {
+    flex: 1;
+    padding: 0.5em;
     color: #fff;
     text-decoration: none;
+  }
+  /* In the mobile column the submenu opens in place, pushing the items below down. */
+  nav[data-nav="mobile"] .submenu {
+    position: static;
+    background: transparent;
+    box-shadow: none;
   }
 </style>
