@@ -394,7 +394,8 @@
 
   <section class="fields" aria-labelledby="fields-title">
     <div class="section-heading">
-      <div><h2 id="fields-title">Your fields</h2><p>Coordinates use decimal degrees in latitude, longitude order. You can also paste a coordinate pair or an Intel link into any latitude or longitude box and both will be filled in.</p></div>
+      <h2 id="fields-title">Your fields</h2>
+      <p>Coordinates use decimal degrees in latitude, longitude order. You can also paste a coordinate pair or an Intel link into any latitude or longitude box and both will be filled in.</p>
       <button class="secondary" onclick={() => addField()} disabled={fields.length >= 50}>＋ Add field</button>
     </div>
 
@@ -402,7 +403,13 @@
       <p class="empty-fields">No fields yet. Draw a triangle on the map or add a field to enter its coordinates.</p>
     {:else}
       {#each fields as field, fieldIndex (fieldIndex)}
-        <article class="field-card">
+        <!-- Collapsed state lives on the field (mutated in place, so the field keeps its
+             identity for matching calculation results); a native <details> does the rest. -->
+        <details class="field-card" open={!field.collapsed} ontoggle={event => { fields[fieldIndex].collapsed = !event.currentTarget.open }}>
+          <summary>
+            <span class="field-title">{field.name.trim() || `Field ${fieldIndex + 1}`}</span>
+            <span class="field-status">{isCalculated(field) ? `${formatMu(field.mu)} MU` : pendingText(field)}</span>
+          </summary>
           <div class="field-heading">
             <label class="name-label">Field name <input type="text" maxlength="200" value={field.name} placeholder={`Field ${fieldIndex + 1}`} oninput={event => { fields[fieldIndex].name = event.currentTarget.value; fields = [...fields] }} /></label>
             <button class="remove" aria-label={`Remove field ${fieldIndex + 1}`} onclick={() => removeField(fieldIndex)}>Remove</button>
@@ -416,7 +423,7 @@
               </div>
             {/each}
           </div>
-        </article>
+        </details>
       {/each}
       <p class="limit-note">Up to 50 fields per calculation.</p>
     {/if}
@@ -443,9 +450,9 @@
   h1 { margin: 0.5em 0; text-shadow: 0 0 10px #000; }
   .intro { max-width: 720px; margin: 0 auto 2em; text-align: center; }
   .map-panel, .field-card, .results { border: 1px solid #575371; border-radius: 12px; background: rgba(14, 11, 28, 0.82); overflow: hidden; }
-  .map-toolbar, .section-heading, .field-heading, .result-row, .total { display: flex; align-items: center; justify-content: space-between; gap: 1em; }
+  .map-toolbar, .field-heading, .result-row, .total { display: flex; align-items: center; justify-content: space-between; gap: 1em; }
   .map-toolbar { padding: 1em; }
-  .map-toolbar div, .section-heading div { display: grid; gap: 0.25em; }
+  .map-toolbar div { display: grid; gap: 0.25em; }
   .map-toolbar span, .section-heading p, .limit-note { color: #aaa7c9; margin: 0; }
   .map { width: 100%; height: min(55vh, 480px); min-height: 300px; background: #17162a; z-index: 0; }
   /* Dark mode: invert only the tile pane, so markers and shapes keep their colours. */
@@ -459,9 +466,16 @@
   .map :global(.map-search p:empty) { display: none; }
   .fields { margin-top: 2em; }
   .empty-fields { padding: 1em; margin: 0.75em 0; text-align: center; border: 1px dashed #575371; border-radius: 10px; color: #aaa7c9; }
-  .section-heading { margin-bottom: 1em; }
+  .section-heading { display: grid; justify-items: start; gap: 0.5em; margin-bottom: 1em; }
   h2 { text-align: left; margin: 0; }
   .field-card { padding: 1em; margin: 0.75em 0; }
+  .field-card summary { display: flex; align-items: center; gap: 0.75em; cursor: pointer; list-style: none; }
+  .field-card summary::-webkit-details-marker { display: none; }
+  .field-card summary::before { content: '▸'; color: var(--field-color); transition: transform 0.2s ease-in-out; }
+  .field-card[open] summary::before { transform: rotate(90deg); }
+  .field-card[open] summary { margin-bottom: 0.75em; }
+  .field-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+  .field-status { color: #ffce00; font-size: 0.9em; white-space: nowrap; }
   .field-heading { margin-bottom: 0.75em; }
   .name-label { display: flex; align-items: center; gap: 0.75em; }
   .name-label input { max-width: 22em; }
@@ -491,7 +505,7 @@
   .map :global(.mu-popup strong) { color: #ffce00; font-size: 1.2em; }
   @media (max-width: 720px) {
     .coordinate-grid { grid-template-columns: 1fr; }
-    .section-heading, .map-toolbar { align-items: flex-start; }
+    .map-toolbar { align-items: flex-start; }
     .name-label { align-items: flex-start; flex-direction: column; gap: 0.35em; }
     .name-label input { max-width: none; width: 100%; box-sizing: border-box; }
   }
