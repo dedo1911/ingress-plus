@@ -11,6 +11,9 @@ export async function load ({ fetch }) {
         'id',
         'title',
         'tiers',
+        // Subcategories point at their parent; the parent's sorting orders it.
+        'parent',
+        'sorting',
         'expand.badges_via_category.collectionId',
         'expand.badges_via_category.id',
         'expand.badges_via_category.image',

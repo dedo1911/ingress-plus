@@ -17,7 +17,13 @@ export async function load ({ fetch }) {
         fetch
       }), // topUsers
       pb.collection('media_users').getFullList({ fetch }), // topMediaUsers
-      pb.collection('top_media_uploads').getFullList({ fetch }) // topMediaUsers
+      pb.collection('top_media_uploads').getFullList({ fetch }), // topMediaUploads
+      pb.collection('wings_counts').getList(1, 10, {
+        sort: '-count',
+        expand: 'badge',
+        skipTotal: true,
+        fetch
+      }) // topWings
     ])
     return {
       statistics
