@@ -149,12 +149,30 @@
 
   // Takes the first two decimals found, so "46.2044, 6.1432", "46.2044 6.1432" and
   // an Intel link (".../?ll=46.2044,6.1432&z=17") all work without per-format parsing.
+  // Returns [lat, lon], or null if there aren't two in-range numbers.
+  function parseCoordinates (text) {
+    const [lat, lon] = (text.match(/-?\d+(?:\.\d+)?/g) || []).map(Number)
+    if (lat === undefined || lon === undefined || Math.abs(lat) > 90 || Math.abs(lon) > 180) return null
+    return [lat, lon]
+  }
+
+  // Pasting a coordinate pair or an Intel link into either box of an anchor fills both.
+  // Anything else (a single number, junk) is left to the browser's normal paste.
+  function pasteCoordinates (event, fieldIndex, pointIndex) {
+    const pair = parseCoordinates(event.clipboardData.getData('text'))
+    if (!pair) return
+    event.preventDefault()
+    updateCoordinate(fieldIndex, pointIndex, 0, String(pair[0]))
+    updateCoordinate(fieldIndex, pointIndex, 1, String(pair[1]))
+  }
+
   // Returns an error message, or '' on success.
   function goToCoordinates (text) {
-    const [lat, lon] = (text.match(/-?\d+(?:\.\d+)?/g) || []).map(Number)
-    if (lat === undefined || lon === undefined || Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+    const pair = parseCoordinates(text)
+    if (!pair) {
       return 'Enter coordinates as "latitude, longitude", e.g. 46.2044, 6.1432 or copy an Intel link.'
     }
+    const [lat, lon] = pair
     searchMarker.clearLayers()
     for (const offset of WORLD_OFFSETS) {
       // circleMarker, not L.marker: the default marker icon's image paths break under Vite.
@@ -321,7 +339,7 @@
 
   <section class="fields" aria-labelledby="fields-title">
     <div class="section-heading">
-      <div><h2 id="fields-title">Your fields</h2><p>Coordinates use decimal degrees in latitude, longitude order.</p></div>
+      <div><h2 id="fields-title">Your fields</h2><p>Coordinates use decimal degrees in latitude, longitude order. You can also paste a coordinate pair or an Intel link into any latitude or longitude box and both will be filled in.</p></div>
       <button class="secondary" onclick={() => addField()} disabled={fields.length >= 50}>＋ Add field</button>
     </div>
 
@@ -338,8 +356,8 @@
             {#each field.coordinates as point, pointIndex (pointIndex)}
               <div class="coordinate-row">
                 <span class="point-number">{pointIndex + 1}</span>
-                <label>Latitude<input type="number" step="any" min="-90" max="90" placeholder="46.2044" value={point[0]} oninput={event => updateCoordinate(fieldIndex, pointIndex, 0, event.currentTarget.value)} /></label>
-                <label>Longitude<input type="number" step="any" min="-180" max="180" placeholder="6.1432" value={point[1]} oninput={event => updateCoordinate(fieldIndex, pointIndex, 1, event.currentTarget.value)} /></label>
+                <label>Latitude<input type="number" step="any" min="-90" max="90" placeholder="46.2044" value={point[0]} onpaste={event => pasteCoordinates(event, fieldIndex, pointIndex)} oninput={event => updateCoordinate(fieldIndex, pointIndex, 0, event.currentTarget.value)} /></label>
+                <label>Longitude<input type="number" step="any" min="-180" max="180" placeholder="6.1432" value={point[1]} onpaste={event => pasteCoordinates(event, fieldIndex, pointIndex)} oninput={event => updateCoordinate(fieldIndex, pointIndex, 1, event.currentTarget.value)} /></label>
               </div>
             {/each}
           </div>
