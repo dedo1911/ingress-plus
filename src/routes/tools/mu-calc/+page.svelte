@@ -220,6 +220,10 @@
     const snapped = snapToAnchor(event)
     // wrap(): clicking in a repeated world copy yields longitudes beyond ±180, which the API rejects.
     const { lat, lng } = snapped ? { lat: snapped[0], lng: snapped[1] } : event.latlng.wrap()
+    // Snapping makes a second click on an anchor of this same triangle land exactly on it;
+    // a triangle with a repeated portal is rejected by the calculator, so ignore the click.
+    const same = ([a, b]) => a.toFixed(6) === lat.toFixed(6) && b.toFixed(6) === lng.toFixed(6)
+    if (draftCoordinates.some(same)) return
     draftCoordinates = [...draftCoordinates, [lat, lng]]
     if (draftCoordinates.length === 3) {
       addField(draftCoordinates.map(point => point.map(value => Number(value.toFixed(6)))))
@@ -230,7 +234,13 @@
     syncMap()
   }
 
+  // Adding, removing or editing a field's coordinates clears `results` (renaming doesn't,
+  // since it can't change the MU), so results on screen always match the current fields
+  // and asking again would only repeat the same request.
+  const upToDate = $derived(results.length > 0)
+
   async function calculate () {
+    if (upToDate) return
     error = ''
     results = []
     const payload = []
@@ -250,27 +260,47 @@
     if (!payload.length) return
 
     calculating = true
+    // Every edit reassigns `fields`, so if it is a different array when the response
+    // arrives, the user changed the plan mid-request and these results are stale.
+    const sent = fields
     try {
       const response = await fetch('/api/mu-calc', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
-      const body = await response.json()
-      if (!response.ok) throw new Error(body.error || 'The calculation failed. Please check the coordinates.')
+      // 429 comes from PocketBase's rate limiter ({ message }), not from the route.
+      if (response.status === 429) throw new Error('Too many calculations in a short time. Please wait a minute and try again.')
+      // A proxy or gateway error page isn't JSON; don't show the user a parse error.
+      const body = await response.json().catch(() => null)
+      if (!response.ok) throw new Error(body?.error || 'The calculation failed. Please try again.')
       if (!Array.isArray(body) || body.length !== payload.length || body.some(result => !Number.isFinite(result.mu))) {
         throw new Error('The calculator returned an unexpected response.')
       }
-      results = body
+      if (fields === sent) results = body
     } catch (err) {
-      error = err.message || 'The calculation failed. Please try again.'
+      if (fields === sent) error = err.message || 'The calculation failed. Please try again.'
     } finally {
       calculating = false
     }
   }
 
-  onMount(async () => {
-    L = await import('leaflet')
+  // Synchronous on purpose: Svelte only calls a cleanup returned directly from onMount,
+  // and an async callback returns a promise, so map.remove() would never run.
+  onMount(() => {
+    let cancelled = false
+    import('leaflet').then(leaflet => {
+      if (cancelled) return
+      L = leaflet
+      setUpMap()
+    })
+    return () => {
+      cancelled = true
+      map?.remove()
+    }
+  })
+
+  function setUpMap () {
     map = L.map(mapElement, { zoomControl: true, worldCopyJump: true }).setView([46.2044, 6.1432], 5)
     // OSM tile policy (operations.osmfoundation.org/policies/tiles): the plain
     // tile.openstreetmap.org host only - the a/b/c subdomains aren't supported -
@@ -303,8 +333,7 @@
     map.addControl(new SearchControl({ position: 'topright' }))
     map.on('click', handleMapClick)
     syncMap()
-    return () => map.remove()
-  })
+  }
 
   $effect(() => {
     // Read both so the effect re-runs when either changes (syncMap also tracks the faction colour).
@@ -349,7 +378,7 @@
       {#each fields as field, fieldIndex (fieldIndex)}
         <article class="field-card">
           <div class="field-heading">
-            <label class="name-label">Field name <input type="text" value={field.name} placeholder={`Field ${fieldIndex + 1}`} oninput={event => { fields[fieldIndex].name = event.currentTarget.value; fields = [...fields] }} /></label>
+            <label class="name-label">Field name <input type="text" maxlength="200" value={field.name} placeholder={`Field ${fieldIndex + 1}`} oninput={event => { fields[fieldIndex].name = event.currentTarget.value; fields = [...fields] }} /></label>
             <button class="remove" aria-label={`Remove field ${fieldIndex + 1}`} onclick={() => removeField(fieldIndex)}>Remove</button>
           </div>
           <div class="coordinate-grid">
@@ -365,7 +394,7 @@
       {/each}
       <p class="limit-note">Up to 50 fields per calculation.</p>
     {/if}
-    <button class="cta calculate" onclick={calculate} disabled={calculating || fields.length === 0}>{calculating ? 'Calculating…' : 'Calculate Mind Units'}</button>
+    <button class="cta calculate" onclick={calculate} disabled={calculating || fields.length === 0 || upToDate}>{calculating ? 'Calculating…' : upToDate ? 'Results are up to date' : 'Calculate Mind Units'}</button>
   </section>
 
   {#if error}<p class="error" role="alert">{error}</p>{/if}
@@ -373,7 +402,7 @@
     <section class="results" aria-live="polite">
       <div class="total"><span>Total Mind Units</span><strong>{formatMu(totalMu)} MU</strong></div>
       {#each results as result, index (result.id)}
-        <div class="result-row"><span>{result.name || `Field ${index + 1}`}</span><strong>{formatMu(result.mu)} MU</strong></div>
+        <div class="result-row"><span>{fields[index]?.name.trim() || `Field ${index + 1}`}</span><strong>{formatMu(result.mu)} MU</strong></div>
       {/each}
     </section>
   {/if}
