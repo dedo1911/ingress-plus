@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import { resolve } from '$app/paths'
   import 'leaflet/dist/leaflet.css'
+  import { authData } from '$lib/stores'
 
   let mapElement
   let map
@@ -14,6 +15,16 @@
   let calculating = $state(false)
   let error = $state('')
   let results = $state([])
+
+  // Teal by default so the calculator doesn't favour ENL green or RES blue; a signed-in
+  // agent with a faction set gets their own colour. 'unaligned' is the profile default,
+  // not a choice, so it stays teal too.
+  const NEUTRAL_COLOR = '#14b8a6'
+  const faction = $derived($authData?.baseModel?.faction)
+  const factionVar = $derived(['enlightened', 'resistance', 'machina'].includes(faction) ? `--color-faction-${faction}` : null)
+  // Leaflet writes colours into SVG attributes, where var() doesn't resolve, so read the
+  // computed value (client only: syncMap never runs during SSR).
+  const fieldColor = () => (factionVar && window.getComputedStyle(document.documentElement).getPropertyValue(factionVar).trim()) || NEUTRAL_COLOR
 
   const totalMu = $derived(results.reduce((total, result) => total + result.mu, 0))
   const formatMu = value => Number(value).toLocaleString()
@@ -42,6 +53,7 @@
   const OSM_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
   const shift = (points, offset) => points.map(([lat, lon]) => [lat, lon + offset])
 
+  const MERCATOR_MAX_LAT = 85.0511
   // Great-circle path through the points: links on a globe are arcs, not straight
   // lines on the Mercator map. Longitudes are unwrapped so an arc crossing the
   // antimeridian continues past ±180 instead of flying back across the map.
@@ -65,10 +77,28 @@
         path.push([Math.atan2(z, Math.hypot(x, y)) / rad, Math.atan2(y, x) / rad])
       }
     }
-    if (!closed) path.push(points[points.length - 1])
+    // A copy: the unwrapping below mutates path entries, and this one would otherwise be
+    // the caller's own point (draftCoordinates), saving an out-of-range longitude.
+    if (!closed) path.push([...points[points.length - 1]])
     for (let i = 1; i < path.length; i++) {
       while (path[i][1] - path[i - 1][1] > 180) path[i][1] -= 360
       while (path[i][1] - path[i - 1][1] < -180) path[i][1] += 360
+    }
+    if (closed) {
+      // Unwrap the closing step too. A triangle that encloses a pole winds a full 360° in
+      // longitude, which Mercator can't close with a straight edge (it drew a rectangle
+      // beside the real shape). Close it along the map's edge at the enclosed pole instead.
+      let closing = path[0][1] - path[path.length - 1][1]
+      while (closing > 180) closing -= 360
+      while (closing < -180) closing += 360
+      const winding = path[path.length - 1][1] + closing - path[0][1]
+      if (Math.abs(winding) > 180) {
+        // ponytail: picks the pole by the mean latitude of the outline, which is wrong only
+        // for a triangle whose arcs mostly lie in the opposite hemisphere to the pole it encloses.
+        const pole = path.reduce((sum, [lat]) => sum + lat, 0) < 0 ? -MERCATOR_MAX_LAT : MERCATOR_MAX_LAT
+        const end = path[0][1] + Math.round(winding / 360) * 360
+        path.push([path[0][0], end], [pole, end], [pole, path[0][1]])
+      }
     }
     return path
   }
@@ -76,6 +106,7 @@
   function syncMap () {
     if (!drawnLayers || !L) return
     drawnLayers.clearLayers()
+    const color = fieldColor()
     fields.forEach((field, fieldIndex) => {
       const coordinates = field.coordinates
         .map(point => point.map(Number))
@@ -88,16 +119,18 @@
             radius: 6,
             color: '#ffffff',
             weight: 2,
-            fillColor: '#00adef',
+            fillColor: color,
             fillOpacity: 1
           }).bindTooltip(`${field.name || `Field ${fieldIndex + 1}`} · ${pointIndex + 1}`).addTo(drawnLayers)
         })
         if (outline) {
           L.polygon(shift(outline, offset), {
-            color: '#00adef',
+            color,
             weight: 2,
-            fillColor: '#00adef',
-            fillOpacity: 0.18
+            fillColor: color,
+            fillOpacity: 0.18,
+            // Not clickable, so the filled triangle never sits between the cursor and an anchor.
+            interactive: false
           }).addTo(drawnLayers)
         }
       }
@@ -144,10 +177,31 @@
     syncMap()
   }
 
+  // A click lands a few pixels off an anchor's centre, so reusing a portal across fields
+  // would otherwise leave a slightly different coordinate. Snap to the nearest existing
+  // anchor within the marker's own radius (every world copy, since the click may be on any).
+  const SNAP_PIXELS = 10
+  function snapToAnchor (event) {
+    let best = null
+    let bestDistance = SNAP_PIXELS
+    for (const field of fields) {
+      for (const point of field.coordinates) {
+        const [lat, lon] = point.map(Number)
+        if (!Number.isFinite(lat) || !Number.isFinite(lon) || point.some(value => String(value).trim() === '')) continue
+        for (const offset of WORLD_OFFSETS) {
+          const distance = map.latLngToContainerPoint([lat, lon + offset]).distanceTo(event.containerPoint)
+          if (distance <= bestDistance) { best = [lat, lon]; bestDistance = distance }
+        }
+      }
+    }
+    return best
+  }
+
   function handleMapClick (event) {
     if (!drawing || draftCoordinates.length >= 3) return
+    const snapped = snapToAnchor(event)
     // wrap(): clicking in a repeated world copy yields longitudes beyond ±180, which the API rejects.
-    const { lat, lng } = event.latlng.wrap()
+    const { lat, lng } = snapped ? { lat: snapped[0], lng: snapped[1] } : event.latlng.wrap()
     draftCoordinates = [...draftCoordinates, [lat, lng]]
     if (draftCoordinates.length === 3) {
       addField(draftCoordinates.map(point => point.map(value => Number(value.toFixed(6)))))
@@ -235,7 +289,7 @@
   })
 
   $effect(() => {
-    // Read both so the effect re-runs when either changes.
+    // Read both so the effect re-runs when either changes (syncMap also tracks the faction colour).
     if (fields && draftCoordinates) syncMap()
   })
 </script>
@@ -245,7 +299,7 @@
   <meta name="description" content="Calculate Mind Units for Ingress fields from portal coordinates or by drawing triangles on a map." />
 </svelte:head>
 
-<div class="container">
+<div class="container" style="--field-color: {factionVar ? `var(${factionVar})` : NEUTRAL_COLOR}">
   <a class="back" href={resolve('/tools')}>← Tools</a>
   <h1>MU Calculator</h1>
   <p class="intro">Calculate the Mind Units your field plan would generate. Enter three portal coordinates for each triangle or draw fields directly on the map.</p>
@@ -342,7 +396,7 @@
   /* Spinner arrows step by 1, which is meaningless for coordinates. */
   .coordinate-row input[type='number'] { appearance: textfield; -moz-appearance: textfield; }
   .coordinate-row input::-webkit-inner-spin-button, .coordinate-row input::-webkit-outer-spin-button { appearance: none; -webkit-appearance: none; margin: 0; }
-  .point-number { display: grid; place-items: center; width: 1.8em; height: 1.8em; border-radius: 50%; background: #00adef; color: #080818; font-weight: 700; }
+  .point-number { display: grid; place-items: center; width: 1.8em; height: 1.8em; border-radius: 50%; background: var(--field-color); color: #080818; font-weight: 700; }
   button.cta, button.secondary { border-radius: 6px; padding: 0.55em 1em; font-size: 1em; color: #fff; }
   button.cta { background: linear-gradient(90deg, #323c6e, #532a76); border: 1px solid #aaa7c9; }
   button.secondary { background: rgba(94, 90, 117, 0.35); border: 1px solid #77738f; }
