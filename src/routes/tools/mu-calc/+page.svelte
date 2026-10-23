@@ -14,7 +14,6 @@
   let draftCoordinates = $state([])
   let calculating = $state(false)
   let error = $state('')
-  let results = $state([])
 
   // Teal by default so the calculator doesn't favour ENL green or RES blue; a signed-in
   // agent with a faction set gets their own colour. 'unaligned' is the profile default,
@@ -26,25 +25,33 @@
   // computed value (client only: syncMap never runs during SSR).
   const fieldColor = () => (factionVar && window.getComputedStyle(document.documentElement).getPropertyValue(factionVar).trim()) || NEUTRAL_COLOR
 
-  const totalMu = $derived(results.reduce((total, result) => total + result.mu, 0))
+  // Each field carries its own `mu` once calculated. Editing a field's coordinates
+  // replaces just that field object without it, so the others keep their results and
+  // only fields with no `mu` are sent the next time (renaming can't change the MU).
+  const isCalculated = field => field.mu !== undefined
+  const calculatedFields = $derived(fields.filter(isCalculated))
+  const totalMu = $derived(calculatedFields.reduce((total, field) => total + field.mu, 0))
+  const upToDate = $derived(fields.length > 0 && calculatedFields.length === fields.length)
   const formatMu = value => Number(value).toLocaleString()
+  const pendingText = field => field.stale ? 'Needs re-calculating' : 'Needs calculating'
 
   function addField (coordinates = [['', ''], ['', ''], ['', '']]) {
     if (fields.length >= 50) return
     fields = [...fields, { name: '', coordinates }]
-    results = []
   }
 
   function removeField (index) {
     fields = fields.filter((_, i) => i !== index)
-    results = []
   }
 
   function updateCoordinate (fieldIndex, pointIndex, axis, value) {
-    const next = fields.map(field => ({ ...field, coordinates: field.coordinates.map(point => [...point]) }))
-    next[fieldIndex].coordinates[pointIndex][axis] = value
-    fields = next
-    results = []
+    fields = fields.map((field, i) => {
+      if (i !== fieldIndex) return field
+      const coordinates = field.coordinates.map(point => [...point])
+      coordinates[pointIndex][axis] = value
+      // `stale` remembers it had a result once, for the "Needs re-calculating" wording.
+      return { name: field.name, coordinates, stale: isCalculated(field) || field.stale }
+    })
   }
 
   // The world repeats horizontally, so everything is drawn once per world copy.
@@ -103,6 +110,19 @@
     return path
   }
 
+  // Built as DOM nodes, not an HTML string: Leaflet renders popup strings as HTML and
+  // the field name is user input.
+  function muPopup (field, fieldIndex) {
+    const content = document.createElement('div')
+    content.className = 'mu-popup'
+    const name = document.createElement('span')
+    name.textContent = field.name.trim() || `Field ${fieldIndex + 1}`
+    const mu = document.createElement(isCalculated(field) ? 'strong' : 'em')
+    mu.textContent = isCalculated(field) ? `${formatMu(field.mu)} MU` : pendingText(field)
+    content.append(name, mu)
+    return content
+  }
+
   function syncMap () {
     if (!drawnLayers || !L) return
     drawnLayers.clearLayers()
@@ -124,14 +144,15 @@
           }).bindTooltip(`${field.name || `Field ${fieldIndex + 1}`} · ${pointIndex + 1}`).addTo(drawnLayers)
         })
         if (outline) {
+          // Clicking shows the field's MU (or that it needs calculating), but never while
+          // drawing, so the filled triangle never sits between the cursor and an anchor.
           L.polygon(shift(outline, offset), {
             color,
             weight: 2,
             fillColor: color,
             fillOpacity: 0.18,
-            // Not clickable, so the filled triangle never sits between the cursor and an anchor.
-            interactive: false
-          }).addTo(drawnLayers)
+            interactive: !drawing
+          }).bindPopup(muPopup(field, fieldIndex)).addTo(drawnLayers)
         }
       }
     })
@@ -234,25 +255,27 @@
     syncMap()
   }
 
-  // Adding, removing or editing a field's coordinates clears `results` (renaming doesn't,
-  // since it can't change the MU), so results on screen always match the current fields
-  // and asking again would only repeat the same request.
-  const upToDate = $derived(results.length > 0)
-
   async function calculate () {
-    if (upToDate) return
     error = ''
-    results = []
+    // Only fields without a result are sent; the rest haven't changed since they were calculated.
+    const pending = fields.filter(field => !isCalculated(field))
     const payload = []
-    for (const [index, field] of fields.entries()) {
+    for (const field of pending) {
+      // Numbered by position in the whole list, as the user sees it, not in the request.
+      const label = `Field ${fields.indexOf(field) + 1}`
       if (field.coordinates.some(point => point.some(value => String(value).trim() === ''))) {
-        error = `Field ${index + 1}: enter three valid latitude and longitude pairs.`
+        error = `${label}: enter three valid latitude and longitude pairs.`
         return
       }
       const coordinates = field.coordinates.map(point => point.map(value => Number(String(value).trim())))
       if (coordinates.some(point => point.length !== 2 || point.some(value => !Number.isFinite(value))) ||
           coordinates.some(([lat, lon]) => Math.abs(lat) > 90 || Math.abs(lon) > 180)) {
-        error = `Field ${index + 1}: enter three valid latitude and longitude pairs.`
+        error = `${label}: enter three valid latitude and longitude pairs.`
+        return
+      }
+      // The backend checks this too, but its "Field N" counts only the fields in the request.
+      if (new Set(coordinates.map(point => point.map(value => value.toFixed(6)).join())).size < 3) {
+        error = `${label}: the three portals must be different.`
         return
       }
       payload.push({ ...(field.name.trim() ? { name: field.name.trim() } : {}), coordinates })
@@ -260,9 +283,6 @@
     if (!payload.length) return
 
     calculating = true
-    // Every edit reassigns `fields`, so if it is a different array when the response
-    // arrives, the user changed the plan mid-request and these results are stale.
-    const sent = fields
     try {
       const response = await fetch('/api/mu-calc', {
         method: 'POST',
@@ -277,9 +297,14 @@
       if (!Array.isArray(body) || body.length !== payload.length || body.some(result => !Number.isFinite(result.mu))) {
         throw new Error('The calculator returned an unexpected response.')
       }
-      if (fields === sent) results = body
+      // A field edited or removed mid-request is a different object now (or gone), so it
+      // simply doesn't match and stays uncalculated; untouched fields get their result.
+      fields = fields.map(field => {
+        const index = pending.indexOf(field)
+        return index === -1 ? field : { ...field, mu: body[index].mu }
+      })
     } catch (err) {
-      if (fields === sent) error = err.message || 'The calculation failed. Please try again.'
+      error = err.message || 'The calculation failed. Please try again.'
     } finally {
       calculating = false
     }
@@ -336,7 +361,8 @@
   }
 
   $effect(() => {
-    // Read both so the effect re-runs when either changes (syncMap also tracks the faction colour).
+    // Read both so the effect re-runs when either changes (syncMap also tracks the faction
+    // colour, the results and `drawing`, which decide whether fields are clickable).
     if (fields && draftCoordinates) syncMap()
   })
 </script>
@@ -398,11 +424,14 @@
   </section>
 
   {#if error}<p class="error" role="alert">{error}</p>{/if}
-  {#if results.length}
+  {#if calculatedFields.length}
     <section class="results" aria-live="polite">
       <div class="total"><span>Total Mind Units</span><strong>{formatMu(totalMu)} MU</strong></div>
-      {#each results as result, index (result.id)}
-        <div class="result-row"><span>{fields[index]?.name.trim() || `Field ${index + 1}`}</span><strong>{formatMu(result.mu)} MU</strong></div>
+      {#each fields as field, index (field)}
+        <div class="result-row">
+          <span>{field.name.trim() || `Field ${index + 1}`}{#if !isCalculated(field)}<em class="pending">{pendingText(field)}</em>{/if}</span>
+          {#if isCalculated(field)}<strong>{formatMu(field.mu)} MU</strong>{/if}
+        </div>
       {/each}
     </section>
   {/if}
@@ -456,6 +485,10 @@
   .total { padding-bottom: 0.8em; border-bottom: 1px solid #575371; }
   .total strong { color: #ffce00; font-size: 1.5em; }
   .result-row { padding-top: 0.8em; }
+  .pending, .map :global(.mu-popup em) { display: block; color: #aaa7c9; font-size: 0.85em; }
+  .map :global(.leaflet-popup-content-wrapper), .map :global(.leaflet-popup-tip) { background: rgba(14, 11, 28, 0.95); color: #fff; border: 1px solid #575371; }
+  .map :global(.mu-popup) { display: grid; gap: 0.2em; text-align: center; }
+  .map :global(.mu-popup strong) { color: #ffce00; font-size: 1.2em; }
   @media (max-width: 720px) {
     .coordinate-grid { grid-template-columns: 1fr; }
     .section-heading, .map-toolbar { align-items: flex-start; }
