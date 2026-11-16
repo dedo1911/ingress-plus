@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name IITC Plugin: Ingress Plus
 // @category Misc
-// @version 1.0.0
+// @version 1.1.0
 // @namespace https://ingress.plus
 // @downloadURL https://ingress.plus/ingress-plus.user.js
 // @updateURL https://ingress.plus/ingress-plus.user.js
@@ -15,6 +15,9 @@
 // @grant none
 // ==/UserScript==
 
+//
+//  Changelog 1.1.0
+//    Plugins load as soon as you tick them, no reload needed
 //
 //  Changelog 1.0.0
 //    First release: connect to Ingress Plus, pick plugins from the store, load them on every IITC start
@@ -31,7 +34,7 @@ function wrapper (pluginInfo) {
   if (typeof window.plugin !== 'function') window.plugin = function () {}
 
   pluginInfo.buildName = 'IngressPlus'
-  pluginInfo.dateTimeVersion = '202611160000'
+  pluginInfo.dateTimeVersion = '202611161200'
   pluginInfo.pluginId = 'ingress-plus'
 
   const self = window.plugin.ingressPlus = function () {}
@@ -145,8 +148,17 @@ function wrapper (pluginInfo) {
     ;(document.body || document.head || document.documentElement).appendChild(script)
   }
 
-  const loadPlugin = async (plugin) => {
-    if (self.loaded[plugin.slug]) return
+  const loading = {} // slug -> promise, so the startup load and a click never inject twice
+
+  const loadPlugin = (plugin) => {
+    if (self.loaded[plugin.slug]) return Promise.resolve()
+    if (!loading[plugin.slug]) {
+      loading[plugin.slug] = doLoadPlugin(plugin).finally(() => { delete loading[plugin.slug] })
+    }
+    return loading[plugin.slug]
+  }
+
+  const doLoadPlugin = async (plugin) => {
     const dev = plugin.isAuthor && plugin.devVersion && useDev().has(plugin.slug)
     try {
       const result = await fetchPluginCode(plugin, dev ? plugin.devVersion : '')
@@ -268,6 +280,18 @@ function wrapper (pluginInfo) {
     return node
   }
 
+  // Turning a plugin on loads it right away; IITC has no way to unload a
+  // plugin, so turning one off only takes effect after a reload.
+  const toggle = async (plugin, on) => {
+    setEnabled(plugin.slug, on)
+    if (on && !self.loaded[plugin.slug]) {
+      const pending = loadPlugin(plugin)
+      renderDialog()
+      await pending
+    }
+    renderDialog()
+  }
+
   const pluginRow = (plugin) => {
     const isOn = enabled().has(plugin.slug)
     const loaded = self.loaded[plugin.slug]
@@ -279,7 +303,7 @@ function wrapper (pluginInfo) {
 
     return el('div', { class: 'ingressplus-plugin' },
       el('label', {},
-        el('input', { type: 'checkbox', checked: isOn, onchange: (e) => { setEnabled(plugin.slug, e.target.checked); renderDialog() } }),
+        el('input', { type: 'checkbox', checked: isOn, onchange: (e) => toggle(plugin, e.target.checked) }),
         ' ', el('b', {}, plugin.name), ' ',
         el('span', { class: 'ingressplus-muted' }, version ? `v${version}` : '', plugin.author ? ` by ${plugin.author}` : '')
       ),
@@ -290,7 +314,9 @@ function wrapper (pluginInfo) {
           ` Use my version ${plugin.devVersion}, still waiting for review`)
         : null,
       failed ? el('div', { class: 'ingressplus-error' }, `Failed to load: ${failed}`) : null,
-      changed ? el('div', { class: 'ingressplus-muted' }, isOn ? 'Will load after a reload.' : 'Will stop after a reload.') : null
+      loading[plugin.slug]
+        ? el('div', { class: 'ingressplus-muted' }, 'Loading…')
+        : changed && !isOn ? el('div', { class: 'ingressplus-muted' }, 'Will stop after a reload.') : null
     )
   }
 
