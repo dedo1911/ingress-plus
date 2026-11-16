@@ -24,8 +24,9 @@ if (!browser) pb.autoCancellation(false)
 // beforeSend/afterSend pair because afterSend only runs on a successful
 // response — network failures and requests killed by the SDK's auto-cancellation
 // would leak the count and leave the bar stuck on forever.
-if (browser) {
-  pb.beforeSend = (url, options) => {
+export const withRequestCounter = (client) => {
+  if (!browser) return
+  client.beforeSend = (url, options) => {
     // `options.fetch` is set when a load function passes the framework fetch
     // through; fall back to the platform one for plain client-side calls.
     const send = options.fetch ?? globalThis.fetch
@@ -46,3 +47,5 @@ if (browser) {
     }
   }
 }
+
+withRequestCounter(pb)

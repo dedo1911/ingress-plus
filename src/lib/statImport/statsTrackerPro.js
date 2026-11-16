@@ -1,3 +1,4 @@
+import { pb } from '$lib/pocketbase'
 // Not real stats - metadata about the upload itself, or (in the case of
 // "5time_span") a malformed key the API occasionally sends.
 const PLAYER_INFO_KEYS = new Set(['stat_date', 'stat_time', 'level', 'current_ap', 'lifetime_ap', 'created_at'])
@@ -56,7 +57,8 @@ export function buildStatsTrackerProResult ({ data, agentName, callsRemainingThi
 export async function fetchStatsTrackerProStats (apiKey, statKeyLabels) {
   const response = await fetch('/badges/import/stats-tracker-pro', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    // The proxy checks the session with PocketBase - see $lib/server/importGuard.
+    headers: { 'Content-Type': 'application/json', Authorization: pb.authStore.token },
     body: JSON.stringify({ apiKey })
   })
   const body = await response.json()

@@ -35,15 +35,16 @@ worker.addEventListener('activate', (event) => {
 })
 
 /**
- * Fetch the asset from the network and store it in the cache.
- * Fall back to the cache if the user is offline.
+ * Fetch a page from the network and keep a copy so it can be served offline.
+ * Only successful responses are kept - a cached 404 or 500 would otherwise be
+ * re-served on the next offline visit as if it were the page.
  */
 async function fetchAndCache (request) {
   const cache = await caches.open(`offline${version}`)
 
   try {
     const response = await fetch(request)
-    cache.put(request, response.clone())
+    if (response.ok) cache.put(request, response.clone())
     return response
   } catch (err) {
     const response = await cache.match(request)
@@ -65,16 +66,20 @@ worker.addEventListener('fetch', (event) => {
   const isStaticAsset = url.host === self.location.host && staticAssets.has(url.pathname)
   const skipBecauseUncached = event.request.cache === 'only-if-cached' && !isStaticAsset
 
-  if (isHttp && !isDevServerRequest && !skipBecauseUncached) {
-    event.respondWith(
-      (async () => {
-        // always serve static files and bundler-generated assets from cache.
-        // if your application has other URLs with data that will never change,
-        // set this variable to true for them and they will only be fetched once.
-        const cachedAsset = isStaticAsset && (await caches.match(event.request))
+  if (!isHttp || isDevServerRequest || skipBecauseUncached) return
 
-        return cachedAsset || fetchAndCache(event.request)
-      })()
-    )
+  if (isStaticAsset) {
+    // always serve static files and bundler-generated assets from cache.
+    event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request)))
+    return
+  }
+
+  // Only page navigations are cached for offline use. Everything else - the
+  // /api/collections reads behind every page, badge images, cross-origin
+  // media thumbnails - goes straight to the network: caching those served
+  // stale data and error bodies back to agents who were merely offline for
+  // a moment.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(fetchAndCache(event.request))
   }
 })

@@ -26,11 +26,11 @@
   // until the page was fully remounted (navigating away and back).
   $effect(() => {
     if (id) {
-      pb.collection('public_users').getFirstListItem(`id="${id}"`, { requestKey: null }).then(record => { user = record })
+      pb.collection('public_users').getOne(id, { requestKey: null }).then(record => { user = record })
       return
     }
     if (user?.username && user.supporter === undefined) {
-      pb.collection('public_users').getFirstListItem(`username="${user.username}"`, { requestKey: null }).then(record => { user = record })
+      pb.collection('public_users').getFirstListItem(pb.filter('username = {:username}', { username: user.username }), { requestKey: null }).then(record => { user = record })
     }
   })
 </script>

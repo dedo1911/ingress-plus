@@ -4,8 +4,9 @@
   import { resolve } from '$app/paths'
   import { slide } from 'svelte/transition'
   import { toast } from '@zerodevx/svelte-toast'
-  import { pb, serverAddress } from '$lib/pocketbase'
+  import { pb } from '$lib/pocketbase'
   import { authData, ownedBadges } from '$lib/stores'
+  import { updateOwnUser } from '$lib/user'
   import { parseTextExport } from '$lib/statImport/textExport.js'
   import { matchBadgesToStats } from '$lib/statImport/matchBadges.js'
   import { fetchAgentStats } from '$lib/statImport/agentStats.js'
@@ -97,9 +98,7 @@
     savingKey = true
     showApiKeyHint = false
     try {
-      $authData.baseModel.agentStatsApiKey = apiKey.trim()
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      authData.set($authData)
+      await updateOwnUser({ agentStatsApiKey: apiKey.trim() })
       apiKey = ''
       toast.push('API key saved to your profile.', { classes: ['successToast'] })
     } catch (err) {
@@ -114,9 +113,7 @@
     if (!$authData.isValid) return
     removingKey = true
     try {
-      $authData.baseModel.agentStatsApiKey = ''
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      authData.set($authData)
+      await updateOwnUser({ agentStatsApiKey: '' })
       toast.push('Removed your saved API key.', { classes: ['successToast'] })
     } catch (err) {
       console.error(err)
@@ -159,9 +156,7 @@
     savingGridKey = true
     showTheGridApiKeyHint = false
     try {
-      $authData.baseModel.theGridApiKey = theGridApiKey.trim()
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      authData.set($authData)
+      await updateOwnUser({ theGridApiKey: theGridApiKey.trim() })
       theGridApiKey = ''
       toast.push('API key saved to your profile.', { classes: ['successToast'] })
     } catch (err) {
@@ -176,9 +171,7 @@
     if (!$authData.isValid) return
     removingGridKey = true
     try {
-      $authData.baseModel.theGridApiKey = ''
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      authData.set($authData)
+      await updateOwnUser({ theGridApiKey: '' })
       toast.push('Removed your saved API key.', { classes: ['successToast'] })
     } catch (err) {
       console.error(err)
@@ -221,9 +214,7 @@
     savingStatsTrackerProKey = true
     showStatsTrackerProApiKeyHint = false
     try {
-      $authData.baseModel.statsTrackerProApiKey = statsTrackerProApiKey.trim()
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      authData.set($authData)
+      await updateOwnUser({ statsTrackerProApiKey: statsTrackerProApiKey.trim() })
       statsTrackerProApiKey = ''
       toast.push('API key saved to your profile.', { classes: ['successToast'] })
     } catch (err) {
@@ -238,9 +229,7 @@
     if (!$authData.isValid) return
     removingStatsTrackerProKey = true
     try {
-      $authData.baseModel.statsTrackerProApiKey = ''
-      await pb.collection('users').update($authData.baseModel.id, $authData.baseModel)
-      authData.set($authData)
+      await updateOwnUser({ statsTrackerProApiKey: '' })
       toast.push('Removed your saved API key.', { classes: ['successToast'] })
     } catch (err) {
       console.error(err)
@@ -320,7 +309,7 @@
           ownedBadges.update(bs => [...bs.filter(b => b.id !== el.id), el])
         } else {
           const el = await pb.collection('user_badges').create({
-            user: pb.authStore.model.id,
+            user: pb.authStore.record.id,
             badge: badge.id,
             tier: tierIndex,
             hasWings: wingsEarned
@@ -359,7 +348,7 @@
                 {@const { badge, tierIndex, reached, wingsEarned } = matchedBadges[0]}
                 <span class="badge-wrapper">
                   <img
-                    src="{serverAddress}/api/files/{badge.collectionId}/{badge.id}/{badge.image[tierIndex]}?thumb=64x64"
+                    src={pb.files.getURL(badge, badge.image[tierIndex], { thumb: '64x64' })}
                     alt={badge.title}
                     height="32"
                     width="32"
@@ -412,7 +401,7 @@
           <td class="badge-cell">
             <span class="badge-wrapper">
               <img
-                src="{serverAddress}/api/files/{candidate.badge.collectionId}/{candidate.badge.id}/{candidate.badge.image[candidate.tierIndex]}?thumb=64x64"
+                src={pb.files.getURL(candidate.badge, candidate.badge.image[candidate.tierIndex], { thumb: '64x64' })}
                 alt={candidate.badge.title}
                 height="32"
                 width="32"

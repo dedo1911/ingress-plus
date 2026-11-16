@@ -41,6 +41,11 @@
   }
 
   const handleLogout = () => {
+    // An impersonation token lives in the *site's* authStore, not the admin
+    // one, so clearing pbAdmin alone left the browser signed in as the
+    // impersonated Agent for up to 30 minutes, with the admin's own prior
+    // session still parked in localStorage.
+    if (impersonation) stopImpersonating()
     pbAdmin.authStore.clear()
   }
 

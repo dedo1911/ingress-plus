@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit'
+import { guardImportRequest } from '$lib/server/importGuard'
 
 const AGENT_STATS_BASE = 'https://api.agent-stats.com'
 
@@ -8,6 +9,8 @@ const AGENT_STATS_BASE = 'https://api.agent-stats.com'
 // invalid key instead of a real error status, so that has to be detected
 // by trying to parse the response as JSON rather than checking res.ok.
 export async function POST ({ request, fetch }) {
+  const guard = await guardImportRequest(request)
+  if (guard instanceof Response) return guard
   const { apiKey } = await request.json()
   if (!apiKey || typeof apiKey !== 'string') {
     return json({ error: 'Missing API key.' }, { status: 400 })

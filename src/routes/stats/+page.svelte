@@ -1,7 +1,7 @@
 <script>
   import Time, { dayjs } from 'svelte-time'
   import { resolve } from '$app/paths'
-  import { serverAddress } from '$lib/pocketbase'
+  import { pb } from '$lib/pocketbase'
   import AgentName from '$lib/components/AgentName.svelte'
   import { formatNumber } from '$lib/utils.js'
 
@@ -12,6 +12,7 @@
   const topUsers = $derived(s[2])
   const topMediaUsers = $derived(s[3])
   const topMediaUploads = $derived(s[4])
+  const topWings = $derived(s[5].items)
 </script>
 
 <svelte:head>
@@ -39,6 +40,13 @@
       <span>Total owned badges:</span>
       <strong>{formatNumber(statistics.total_owned_badges)}</strong>
     </div>
+    <!-- Absent until the statistics collection has its total_wings field. -->
+    {#if statistics.total_wings !== undefined}
+      <div class="stat">
+        <span>Badges with Recursion Wings:</span>
+        <strong>{formatNumber(statistics.total_wings)}</strong>
+      </div>
+    {/if}
     <div class="stat">
       <span>Estimated total media:</span>
       <strong>{formatNumber(statistics.estimate_total_media)}</strong>
@@ -77,10 +85,28 @@
       <div class="badge">
         <span>
           <img height="32" width="32" alt="{badge.expand.badge.title}"
-          src="{serverAddress}/api/files/{badge.expand.badge.collectionId}/{badge.expand.badge.id}/{badge.expand.badge.image[badge.tier]}?thumb=96x96" />
+          src={pb.files.getURL(badge.expand.badge, badge.expand.badge.image[badge.tier], { thumb: '96x96' })} />
           {badge.expand.badge.title}
         </span>
         {formatNumber(badge.count)}
+      </div>
+    {/each}
+  </div>
+  <hr />
+  <h2>Most Recursion Wings</h2>
+  <div class="badges">
+    {#each topWings as wings (wings.id)}
+      <div class="badge">
+        <span>
+          <!-- Wings only exist on a badge's highest tier, i.e. its last image. -->
+          <span class="wrap">
+            <img height="32" width="32" alt="{wings.expand.badge.title}"
+            src={pb.files.getURL(wings.expand.badge, wings.expand.badge.image.at(-1), { thumb: '96x96' })} />
+            <img class="wings" src="/images/badges/recursed_flair.png" alt="Wings" />
+          </span>
+          {wings.expand.badge.title}
+        </span>
+        {formatNumber(wings.count)}
       </div>
     {/each}
   </div>
@@ -131,6 +157,22 @@
     border-radius: 16px;
     vertical-align: middle;
     margin: 0 0.25em;
+  }
+  div.badge span.wrap {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  div.badge span.wrap img.wings {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 65%;
+    height: auto;
+    margin: 0;
+    border-radius: 0;
+    pointer-events: none;
   }
   div.stats {
     display: flex;

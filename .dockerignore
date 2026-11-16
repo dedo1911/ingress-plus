@@ -1,0 +1,8 @@
+# Only package.json, yarn.lock, src, static and the two config files are
+# COPYed, but everything here is still shipped to the daemon as build context.
+.git
+node_modules
+build
+.svelte-kit
+.env
+.env.*

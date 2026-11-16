@@ -1,11 +1,15 @@
 <script>
   import { fly, slide } from 'svelte/transition'
+  import { SvelteSet } from 'svelte/reactivity'
   import { tick } from 'svelte'
   import { resolve } from '$app/paths'
-  import { categories, badgeSize, siteSettings, authData } from '$lib/stores'
+  import { badgeSize, siteSettings, authData } from '$lib/stores'
   import Category from '$lib/components/Category.svelte'
+  import CategoryGroup from '$lib/components/CategoryGroup.svelte'
+  import { nestCategories } from '$lib/categories'
   import { onMount } from 'svelte'
 
+  const { data } = $props()
   let width = $state(1024)
   $effect(() => {
     badgeSize.set(Math.min(128, width / 7))
@@ -26,7 +30,7 @@
   }
 
   const badgeCategories = $derived(
-    $categories
+    data.categories
       .map(c => ({
         ...c,
         badges: c.badges.filter(b => {
@@ -37,6 +41,23 @@
       }))
       .filter(c => c.badges.length > 0)
   )
+
+  // A parent category may have no badges of its own, so it is looked up in the
+  // full list rather than in badgeCategories (which drops empty categories).
+  const categoriesById = $derived(new Map(data.categories.map(c => [c.id, c])))
+  const tree = $derived(nestCategories(badgeCategories, c => categoriesById.get(c.parent)))
+
+  // Ids of collapsed categories and subcategories. Not persisted: every visit
+  // starts fully expanded, which is also what a #category link needs.
+  const collapsed = new SvelteSet()
+  const toggle = (key) => () => (collapsed.has(key) ? collapsed.delete(key) : collapsed.add(key))
+  const allCollapsed = $derived(tree.length > 0 && tree.every(n => collapsed.has(n.key)))
+  const toggleAll = () => {
+    if (allCollapsed) collapsed.clear()
+    else tree.forEach(n => collapsed.add(n.key))
+  }
+  // While searching, matches inside a collapsed category would be invisible.
+  const isOpen = (key) => !!searchQuery || !collapsed.has(key)
 
   const toggleSiteSettings = (name) => {
     return () => {
@@ -49,22 +70,16 @@
     }
   }
 
+  // Category heading anchors are plain <a href="#id"> - the browser handles
+  // the jump and the hash, and html { scroll-behavior: smooth } (style.css)
+  // makes it smooth. Only the initial hash needs help: the grid is laid out
+  // after hydration, so the browser's own jump lands on the wrong spot.
   onMount(() => {
-    width = document.getElementsByTagName('section')[0].clientWidth
     if (window.location.hash) {
       setTimeout(() => {
-        document.querySelector(window.location.hash).scrollIntoView({ behavior: 'smooth' })
+        document.querySelector(window.location.hash)?.scrollIntoView()
       }, 1)
     }
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault()
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-          behavior: 'smooth'
-        })
-        window.history.pushState({}, '', this.getAttribute('href'))
-      })
-    })
   })
 </script>
 
@@ -78,6 +93,9 @@
         <button onclick={toggleSearch} class:active={showSearch}>
           <img src="/images/glasses.svg" height="24" alt="Search badges" />
           Search
+        </button>
+        <button onclick={toggleAll}>
+          {allCollapsed ? '▸ Expand all' : '▾ Collapse all'}
         </button>
         <button onclick={toggleSiteSettings('showUnobtainable')}>
           <img src={`/images/${$siteSettings.showUnobtainable ? 'hide' : 'show'}.svg`} height="24" alt="Show unobtainable badges" />
@@ -106,14 +124,22 @@
       {/if}
     </div>
 
-  {#if searchQuery && badgeCategories.length === 0}
+  {#if searchQuery && tree.length === 0}
     <p class="no-results">No badges with "{searchQuery}" in their title have been found.</p>
   {/if}
 
-  {#each badgeCategories as category (category.id)}
-    {#if category.badges.length > 0 }
-      <Category {width} {category} />
-    {/if}
+  {#each tree as node (node.key)}
+    <CategoryGroup anchor title={node.title} open={isOpen(node.key)} ontoggle={toggle(node.key)}>
+      {#if node.own}
+        <Category {width} category={node.own} />
+      {/if}
+      {#each node.children as child (child.id)}
+        <CategoryGroup anchor level={3} title={child.title} open={isOpen(child.id)} ontoggle={toggle(child.id)}>
+          <Category {width} category={child} />
+        </CategoryGroup>
+      {/each}
+    </CategoryGroup>
+    <hr />
   {/each}
 
 </section>

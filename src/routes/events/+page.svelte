@@ -1,7 +1,6 @@
 <script>
-  import { onMount } from 'svelte'
   import { resolve } from '$app/paths'
-  import { pb, serverAddress } from '$lib/pocketbase'
+  import { pb } from '$lib/pocketbase'
   import AddToCalendarButton from '$lib/components/AddToCalendarButton.svelte'
   import EventBadges from '$lib/components/EventBadges.svelte'
   import Time, { dayjs } from 'svelte-time'
@@ -11,15 +10,15 @@
   dayjs.extend(utc)
   dayjs.extend(timezone)
 
-  let eventsList = $state([])
+  const { data } = $props()
   let showAll = $state(true)
   let page = $state(1)
-  let totalPages = $state(1)
-  let totalItems = $state(1)
   const itemsPerPage = 5
 
   const toggleShowAll = () => {
     showAll = !showAll
+    // The filtered list is shorter, so the current page may no longer exist.
+    page = 1
   }
 
   const prevPage = () => {
@@ -32,14 +31,14 @@
     page++
   }
 
-  const loadData = async () => {
+  // Derived rather than computed once on mount so the rows are server-rendered
+  // too; on the server tz.guess() is UTC, and hydration re-runs this with the
+  // agent's real zone. A local event's clock is parsed and displayed in the
+  // same zone either way, so the rendered text matches - only is_active can
+  // differ, and the client wins.
+  const eventsList = $derived.by(() => {
     const userTZ = dayjs.tz.guess() || 'UTC'
-    const r = await pb.collection('game_events_list').getFullList({
-      expand: 'linked_badge'
-    })
-    totalPages = Math.ceil(r.length / itemsPerPage)
-    totalItems = r.length
-    eventsList = r.map((e) => {
+    return data.events.map((e) => {
       const isLocal = e.time_type === 'local'
       e = {
         ...e,
@@ -81,14 +80,13 @@
       if (categoryTitles[e.category]) {
         e.categoryTitle = categoryTitles[e.category]
       } else {
-        console.log('Unknown Event type:', e.category)
         e.categoryTitle = 'Unknown Event type'
         e.category = 'special'
       }
 
       return e
     })
-  }
+  })
   const filteredList = $derived([
     ...eventsList
       .filter(e => e.is_active)
@@ -101,9 +99,11 @@
       .sort((a, b) => b.end_time.valueOf() - a.end_time.valueOf())
   ].filter(e => showAll || !e.homepage_hidden))
 
+  // Counted on the filtered list - the unfiltered total let "show less"
+  // page into empty pages.
+  const totalItems = $derived(filteredList.length)
+  const totalPages = $derived(Math.max(1, Math.ceil(totalItems / itemsPerPage)))
   const shownEvents = $derived(filteredList.slice((page - 1) * itemsPerPage, page * itemsPerPage))
-
-  onMount(loadData)
 </script>
 
 <svelte:head>
@@ -115,7 +115,7 @@
     <div class="event-row">
       <div class="event-icon">
         <a href={resolve(`/events/${e.id}`)} aria-label="Event details">
-          <img class="event-icon-image" src={e.image !== '' ? `${serverAddress}/api/files/ncmy64l5pb3p039/${e.id}/${e.image}` : `images/events/${e.category}.png`} alt={e.title} />
+          <img class="event-icon-image" src={e.image ? pb.files.getURL(e, e.image) : `images/events/${e.category}.png`} alt={e.title} />
         </a>
       </div>
       <div class="event-description">

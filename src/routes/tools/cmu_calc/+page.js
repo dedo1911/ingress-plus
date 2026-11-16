@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit'
+import { throwLoadError } from '$lib/load'
 import { pb } from '$lib/pocketbase'
 
 const TIERS = [2500, 7000, 15000, 32000, 90000, 200000]
@@ -24,7 +24,6 @@ export async function load ({ fetch }) {
 
     return { currencies, packsByCurrency }
   } catch (err) {
-    console.error(err)
+    throwLoadError(err)
   }
-  throw error(500, 'Internal server error')
 }
