@@ -4,7 +4,7 @@
 
 <div>
   <h1>Privacy Policy for Ingress Plus</h1>
-    <p><em>Effective date: August 18th, 2026 (last updated: October 23rd, 2026)</em></p>
+    <p><em>Effective date: August 18th, 2026 (last updated: November 16th, 2026)</em></p>
 
     <p>Welcome, Agent, to Ingress Plus! This project was created to support the Ingress community and enhance your experience in the field.
     We take your privacy seriously. This Privacy Policy explains what information we collect, how we use it,
@@ -79,6 +79,10 @@
       <a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'s
       tile servers, so your browser likewise sends your IP address and standard request data to the OpenStreetMap
       Foundation while you use it.</p>
+    <p>When you calculate Mind Units in the MU Calculator, your browser sends the field coordinates you entered,
+      along with your IP address and standard request data, directly to the
+      <a href="https://mu.investigatexm.com/api.html" target="_blank" rel="noopener noreferrer">InvestigateXM MU API</a>,
+      which performs the calculation. No account details are sent.</p>
 
     <h3>1.6 Optional Third-Party Stat Import</h3>
     <p>The Badges page offers optional tools to import your game statistics from third-party stat-tracking

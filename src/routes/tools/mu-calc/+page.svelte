@@ -57,6 +57,8 @@
   // The world repeats horizontally, so everything is drawn once per world copy.
   // worldCopyJump keeps the map centred on the middle copy, so three are enough.
   const WORLD_OFFSETS = [-360, 0, 360]
+  // Public MU calculation API (https://mu.investigatexm.com/api.html): no key, open CORS.
+  const MU_API_URL = 'https://api.investigatexm.com'
   const OSM_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
   const shift = (points, offset) => points.map(([lat, lon]) => [lat, lon + offset])
 
@@ -273,36 +275,51 @@
         error = `${label}: enter three valid latitude and longitude pairs.`
         return
       }
-      // The backend checks this too, but its "Field N" counts only the fields in the request.
+      // The API checks this too, but it can only point at the field by its place in the request.
       if (new Set(coordinates.map(point => point.map(value => value.toFixed(6)).join())).size < 3) {
         error = `${label}: the three portals must be different.`
         return
       }
-      payload.push({ ...(field.name.trim() ? { name: field.name.trim() } : {}), coordinates })
+      payload.push(coordinates)
     }
     if (!payload.length) return
 
     calculating = true
     try {
-      const response = await fetch('/api/mu-calc', {
+      // The bulk endpoint takes up to 50 fields (the same cap as addField) and answers
+      // every field in request order, each with its own `ok`, so one bad field doesn't
+      // sink the rest. Coordinates go as "lat,lng" strings; the API rounds to 6 decimals.
+      const response = await fetch(`${MU_API_URL}/getMUbulk`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          fields: payload.map(coordinates => ({ coordinates: coordinates.map(point => point.join(',')) }))
+        })
       })
-      // 429 comes from PocketBase's rate limiter ({ message }), not from the route.
+      // The API has no rate limit of its own, but a reverse proxy in front of it may add one.
       if (response.status === 429) throw new Error('Too many calculations in a short time. Please wait a minute and try again.')
+      if (response.status === 504) throw new Error('The calculator is busy right now. Please try again in a moment.')
       // A proxy or gateway error page isn't JSON; don't show the user a parse error.
       const body = await response.json().catch(() => null)
       if (!response.ok) throw new Error(body?.error || 'The calculation failed. Please try again.')
-      if (!Array.isArray(body) || body.length !== payload.length || body.some(result => !Number.isFinite(result.mu))) {
+      const results = body?.results
+      if (!Array.isArray(results) || results.length !== payload.length ||
+          results.some(result => result.ok ? !Number.isFinite(result.mu) : typeof result.error !== 'string')) {
         throw new Error('The calculator returned an unexpected response.')
       }
       // A field edited or removed mid-request is a different object now (or gone), so it
       // simply doesn't match and stays uncalculated; untouched fields get their result.
       fields = fields.map(field => {
         const index = pending.indexOf(field)
-        return index === -1 ? field : { ...field, mu: body[index].mu }
+        return index === -1 || !results[index].ok ? field : { ...field, mu: results[index].mu }
       })
+      // Fields that failed stay uncalculated; name them the way the user numbers them. One
+      // edited or removed mid-request is skipped, since its error no longer applies.
+      const failures = results.flatMap((result, index) => {
+        const position = fields.indexOf(pending[index])
+        return result.ok || position === -1 ? [] : [`Field ${position + 1}: ${result.error}`]
+      })
+      if (failures.length) error = failures.join(' ')
     } catch (err) {
       error = err.message || 'The calculation failed. Please try again.'
     } finally {
