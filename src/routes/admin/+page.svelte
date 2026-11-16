@@ -8,6 +8,7 @@
   import { toast } from '@zerodevx/svelte-toast'
   import Callout from '$lib/components/Callout.svelte'
   import Modal from '$lib/components/Modal.svelte'
+  import AdminPlugins from '$lib/components/plugins/AdminPlugins.svelte'
 
   // pbAdmin.authStore is PocketBase's own store, not a Svelte one - it has
   // to be mirrored into local state via onChange to react to it here.
@@ -54,7 +55,8 @@
   const tabs = [
     { id: 'impersonation', label: 'Impersonation' },
     { id: 'emails', label: 'Emails' },
-    { id: 'flags', label: 'Feature Flags' }
+    { id: 'flags', label: 'Feature Flags' },
+    { id: 'plugins', label: 'IITC Plugins' }
   ]
   let activeTab = $state('impersonation')
   const switchTab = (id) => { activeTab = id }
@@ -664,6 +666,10 @@
         </button>
       {/each}
     </div>
+
+    {#if activeTab === 'plugins'}
+      <AdminPlugins />
+    {/if}
 
     {#if activeTab === 'impersonation'}
       <div class="card">

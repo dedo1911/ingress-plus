@@ -6,6 +6,7 @@
   import { resolve } from '$app/paths'
   import { pb } from '$lib/pocketbase'
   import { authData, freshLogin, ownedBadges } from '$lib/stores'
+  import { featureFlags } from '$lib/featureFlags'
   import { refreshOwnedBadges } from '$lib/badges'
   import { updateOwnUser } from '$lib/user'
   import { toast } from '@zerodevx/svelte-toast'
@@ -133,7 +134,7 @@
       </li>
     </a>
     -->
-    <li class="tools" class:active={pathname.startsWith('/tools')}>
+    <li class="tools" class:active={pathname.startsWith('/tools') || pathname.startsWith('/plugins')}>
       <details bind:open={toolsOpen}>
         <summary><img src="/images/tools.svg" alt="" /> Tools</summary>
         <!-- Each link wraps its icon too, so the whole row is clickable, not just the text. -->
@@ -141,6 +142,9 @@
           <li><a href={resolve('/tools/cmu_calc')}><img src="/images/cmu.png" alt="" />CMU Calculator</a></li>
           <li><a href={resolve('/tools/mu-calc')}><img src="/images/icon_mu.png" alt="" />MU Calculator</a></li>
           <li><a href={resolve('/tools/resources')}><img src="/images/resources.svg" alt="" />Resources</a></li>
+          {#if $featureFlags.PLUGIN_STORE_ENABLED}
+            <li><a href={resolve('/plugins')}><img src="/images/tools.svg" alt="" />IITC Plugins</a></li>
+          {/if}
         </ul>
       </details>
     </li>

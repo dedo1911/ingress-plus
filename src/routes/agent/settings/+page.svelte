@@ -4,6 +4,7 @@
   import { updateOwnUser, usernameErrorMessage } from '$lib/user'
   import { toast } from '@zerodevx/svelte-toast'
   import AgentName from '$lib/components/AgentName.svelte'
+  import IITCDevices from '$lib/components/plugins/IITCDevices.svelte'
   import { browser } from '$app/environment'
   import { goto } from '$app/navigation'
   import { resolve } from '$app/paths'
@@ -210,6 +211,10 @@
           offStatus: 'Not subscribed'
         })}
       </div>
+
+      {#if $featureFlags.PLUGIN_STORE_ENABLED}
+        <IITCDevices />
+      {/if}
 
       {#if verified || $featureFlags.VERIFICATION_ENABLED}
         <div class="card verification">
