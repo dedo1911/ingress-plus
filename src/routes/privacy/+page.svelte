@@ -4,7 +4,7 @@
 
 <div>
   <h1>Privacy Policy for Ingress Plus</h1>
-    <p><em>Effective date: August 18th, 2026 (last updated: August 18th, 2026)</em></p>
+    <p><em>Effective date: August 18th, 2026 (last updated: October 23rd, 2026)</em></p>
 
     <p>Welcome, Agent, to Ingress Plus! This project was created to support the Ingress community and enhance your experience in the field.
     We take your privacy seriously. This Privacy Policy explains what information we collect, how we use it,
@@ -75,6 +75,10 @@
       <a href="https://policies.google.com/?hl=en" target="_blank" rel="noopener noreferrer">Google</a>'s Google Fonts
       servers rather than hosting them ourselves. As a result, your browser sends your IP address and standard
       request data (as described in section 1.1) directly to Google when a page loads.</p>
+    <p>The map in the MU Calculator loads its tiles directly from
+      <a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'s
+      tile servers, so your browser likewise sends your IP address and standard request data to the OpenStreetMap
+      Foundation while you use it.</p>
 
     <h3>1.6 Optional Third-Party Stat Import</h3>
     <p>The Badges page offers optional tools to import your game statistics from third-party stat-tracking
@@ -85,7 +89,6 @@
       Ingress Plus badges. If you choose to save an API key to your profile for future use, it is stored alongside
       your other account data. These services are independent projects, not affiliated with or vetted by Ingress
       Plus - please review their own privacy practices before connecting an account.</p>
-
     <h2>2. Purposes of Data Usage</h2>
     <p>We use your data for the following purposes:</p>
     <ul>

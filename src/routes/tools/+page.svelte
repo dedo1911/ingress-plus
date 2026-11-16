@@ -23,6 +23,11 @@
             <p><img src="/images/resources.svg" alt="Resources" /> Resources</p>
         </div>
     </a>
+    <a class="hero hero-left" href={resolve('/tools/mu-calc')}>
+        <div style="background-image: url('/images/hero_images/cat_mu-calc.png');">
+            <p><img src="/images/icon_mu.png" alt="" /> MU Calculator</p>
+        </div>
+    </a>
 </div>
 
 <style>
