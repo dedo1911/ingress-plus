@@ -245,15 +245,30 @@
     </div>
 
     <Modal bind:showModal={showDelete}>
-      <h3>Delete {plugin.name}?</h3>
-      <p>This deletes the plugin and every uploaded version, and it disappears from everyone's IITC. It can't be undone.</p>
-      <label>Type <code>{plugin.slug}</code> to confirm <input type="text" bind:value={deleteConfirm} /></label>
-      <button type="button" class="cta danger" disabled={deleteConfirm !== plugin.slug} onclick={remove}>Delete</button>
+      <div class="delete-card">
+        <h3>Delete {plugin.name}?</h3>
+        <p>This deletes the plugin and every uploaded version, and it disappears from everyone's IITC. It can't be undone.</p>
+        <label>Type <code>{plugin.slug}</code> to confirm <input type="text" bind:value={deleteConfirm} /></label>
+        <button type="button" class="cta danger" disabled={deleteConfirm !== plugin.slug} onclick={remove}>Delete</button>
+      </div>
     </Modal>
   {/if}
 </div>
 
 <style>
+  div.delete-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    background: rgba(14, 11, 28, 0.9);
+    border: 3px double #5e5a75;
+    border-radius: 8px;
+    padding: 1.5em;
+  }
+  div.delete-card h3,
+  div.delete-card p {
+    margin: 0;
+  }
   div.page {
     max-width: 800px;
     margin: auto;
