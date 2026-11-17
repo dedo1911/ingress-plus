@@ -7,7 +7,7 @@
 // window.plugin.ingressPlus.
 /* global $, Node */
 (function () {
-  const STORE_VERSION = '1.1.0'
+  const STORE_VERSION = '1.1.1'
   const API_VERSION = 1
   const LOG_PREFIX = '[Ingress Plus store]'
 
@@ -286,7 +286,9 @@
           el('p', {}, el('button', { type: 'button', onclick: ip.connect }, 'Connect to Ingress Plus')),
           el('details', {},
             el('summary', {}, 'Paste a connection code instead'),
-            el('p', { class: 'ingressplus-muted' }, 'For IITC Mobile or blocked popups: open ', ip.baseUrl(), '/iitc/connect in a browser where you are signed in and create a code.'),
+            el('p', { class: 'ingressplus-muted' }, 'For IITC Mobile or blocked popups: open ',
+              el('a', { class: 'ingressplus-link', href: ip.baseUrl() + '/iitc/connect', target: '_blank', rel: 'noopener' }, ip.baseUrl() + '/iitc/connect'),
+              ' in a browser where you are signed in and create a code.'),
             codeInput,
             el('p', {}, el('button', {
               type: 'button',
@@ -459,6 +461,7 @@
       #ingressplus-store .ingressplus-home:hover span { text-decoration: underline; }
       #ingressplus-store .ingressplus-attention { box-shadow: 0 0 0 1px var(--ipx-accent), 0 0 6px var(--ipx-accent); }
       #ingressplus-store .ingressplus-connect { padding: 0 4px; }
+      #ingressplus-store .ingressplus-link { color: var(--ipx-accent); text-decoration: underline; word-break: break-all; }
 
       @media (max-width: 560px) {
         #ingressplus-store .ingressplus-toolbar { flex-direction: column; align-items: stretch; }
