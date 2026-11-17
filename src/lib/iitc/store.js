@@ -7,7 +7,7 @@
 // window.plugin.ingressPlus.
 /* global $, Node */
 (function () {
-  const STORE_VERSION = '1.0.0'
+  const STORE_VERSION = '1.1.0'
   const API_VERSION = 1
   const LOG_PREFIX = '[Ingress Plus store]'
 
@@ -70,6 +70,25 @@
     return Object.keys(ip.loaded).some(slug => !on.has(slug))
   }
 
+  // The API returns icon paths relative to the site (/api/files/...), and
+  // icon files are public, so a plain <img> works from intel.ingress.com.
+  // Without an icon, or if it fails to load, show the name's first letter.
+  const iconFallback = (plugin) =>
+    el('span', { class: 'ingressplus-icon ingressplus-icon-empty', 'aria-hidden': 'true' },
+      (plugin.name || plugin.slug || '?').trim().charAt(0).toUpperCase())
+
+  const pluginIcon = (plugin) => {
+    if (!plugin.icon) return iconFallback(plugin)
+    const src = /^https?:\/\//.test(plugin.icon) ? plugin.icon : ip.baseUrl() + plugin.icon
+    return el('img', {
+      class: 'ingressplus-icon',
+      src,
+      alt: '',
+      loading: 'lazy',
+      onerror: (e) => e.target.replaceWith(iconFallback(plugin))
+    })
+  }
+
   const pluginRow = (plugin) => {
     const isOn = ip.enabled().has(plugin.slug)
     const loaded = ip.loaded[plugin.slug]
@@ -81,23 +100,38 @@
 
     let status = null
     if (ip.isLoading(plugin.slug)) status = el('div', { class: 'ingressplus-muted' }, 'Loading…')
-    else if (changed && !isOn) status = el('div', { class: 'ingressplus-muted' }, 'Will stop after a reload.')
+    else if (changed && !isOn) status = el('div', { class: 'ingressplus-pending' }, 'Will stop after a reload.')
 
+    // The title is a label for the switch, so clicking the name toggles too.
+    const toggleId = 'ingressplus-toggle-' + plugin.slug
     return el('div', { class: 'ingressplus-plugin' + (isOn ? ' is-on' : '') },
-      el('label', { class: 'ingressplus-plugin-title' },
-        el('input', { type: 'checkbox', checked: isOn, onchange: (e) => toggle(plugin, e.target.checked) }),
-        el('b', {}, plugin.name),
-        el('span', { class: 'ingressplus-muted' }, version ? `v${version}` : '', plugin.author ? ` by ${plugin.author}` : ''),
-        ui.category === ALL ? el('span', { class: 'ingressplus-chip' }, categoryOf(plugin)) : null
-      ),
-      description ? el('div', { class: 'ingressplus-desc' }, description) : null,
-      plugin.isAuthor && plugin.devVersion
-        ? el('label', { class: 'ingressplus-muted' },
-          el('input', { type: 'checkbox', checked: ip.useDev().has(plugin.slug), onchange: (e) => ip.setUseDev(plugin.slug, e.target.checked) }),
+      pluginIcon(plugin),
+      el('div', { class: 'ingressplus-plugin-body' },
+        el('label', { class: 'ingressplus-plugin-title', for: toggleId },
+          el('b', {}, plugin.name),
+          el('span', { class: 'ingressplus-muted' }, version ? `v${version}` : '', plugin.author ? ` by ${plugin.author}` : ''),
+          ui.category === ALL ? el('span', { class: 'ingressplus-chip' }, categoryOf(plugin)) : null
+        ),
+        description ? el('div', { class: 'ingressplus-desc' }, description) : null,
+        plugin.isAuthor && plugin.devVersion
+          ? el('label', { class: 'ingressplus-muted' },
+            el('input', { type: 'checkbox', checked: ip.useDev().has(plugin.slug), onchange: (e) => ip.setUseDev(plugin.slug, e.target.checked) }),
           ` Use my version ${plugin.devVersion}, still waiting for review`)
-        : null,
-      failed ? el('div', { class: 'ingressplus-error' }, `Failed to load: ${failed}`) : null,
-      status
+          : null,
+        failed ? el('div', { class: 'ingressplus-error' }, `Failed to load: ${failed}`) : null,
+        status
+      ),
+      el('label', { class: 'ingressplus-switch', title: isOn ? 'Turn off' : 'Turn on' },
+        el('input', {
+          type: 'checkbox',
+          role: 'switch',
+          id: toggleId,
+          checked: isOn,
+          'aria-label': `Enable ${plugin.name}`,
+          onchange: (e) => toggle(plugin, e.target.checked)
+        }),
+        el('span', { class: 'ingressplus-switch-track', 'aria-hidden': 'true' })
+      )
     )
   }
 
@@ -157,16 +191,49 @@
     if (list) list.scrollTop = scroll
   }
 
+  // The agent's faction, as Intel reports it for the signed-in player.
+  const FACTIONS = {
+    ENLIGHTENED: { name: 'Enlightened', key: 'enl', image: 'enlightened.svg', color: '#03dc03' },
+    RESISTANCE: { name: 'Resistance', key: 'res', image: 'resistance.svg', color: '#0088ff' }
+  }
+
+  // The logos are white SVGs on ingress.plus, which sends no CORS headers,
+  // so a CSS mask can't load them from Intel. An <img> can, and an SVG
+  // filter paints its shape in the faction colour. The wrapper carries the
+  // pulsing glow, so it shines in the colour the image already has.
+  const factionLogo = () => {
+    const faction = FACTIONS[window.PLAYER && window.PLAYER.team]
+    if (!faction) return null
+    return el('span', { class: 'ingressplus-faction', style: `--ipx-faction: ${faction.color}`, title: faction.name },
+      el('img', {
+        src: `${ip.baseUrl()}/images/${faction.image}`,
+        alt: faction.name,
+        style: `filter: url(#ingressplus-tint-${faction.key})`
+      }))
+  }
+
+  // The tint filters live outside the dialog, which is rebuilt on every
+  // state change, so the images never point at a filter that is gone.
+  const addFactionFilters = () => {
+    const holder = document.createElement('div')
+    holder.setAttribute('aria-hidden', 'true')
+    holder.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden'
+    // Static markup built from the constants above, no outside data.
+    holder.innerHTML = '<svg width="0" height="0">' + Object.values(FACTIONS).map(f =>
+      `<filter id="ingressplus-tint-${f.key}" color-interpolation-filters="sRGB"><feFlood flood-color="${f.color}"/><feComposite in2="SourceAlpha" operator="in"/></filter>`
+    ).join('') + '</svg>'
+    document.body.appendChild(holder)
+  }
+
   const header = (connected) => {
     const total = catalog().length
     const on = ip.enabled().size
     return el('div', { class: 'ingressplus-header' },
-      el('img', { class: 'ingressplus-logo', src: ip.baseUrl() + '/icons/icon_ingressplus_64.png', alt: '' }),
       el('div', { class: 'ingressplus-who' },
         connected
           ? [
               el('div', { class: 'ingressplus-label' }, 'Connected agent'),
-              el('div', { class: 'ingressplus-name' }, ip.username() || '?'),
+              el('div', { class: 'ingressplus-name' }, factionLogo(), el('span', {}, ip.username() || '?')),
               el('div', { class: 'ingressplus-muted' }, `${on} of ${total} plugin${total === 1 ? '' : 's'} enabled`)
             ]
           : [
@@ -188,7 +255,9 @@
   const footer = (connected) => {
     const reloadHint = connected && needsReload()
     return el('div', { class: 'ingressplus-footer' },
-      el('a', { class: 'ingressplus-button', href: ip.baseUrl(), target: '_blank', rel: 'noopener' }, 'Open Ingress Plus'),
+      el('a', { class: 'ingressplus-home', href: ip.baseUrl(), target: '_blank', rel: 'noopener' },
+        el('img', { src: ip.baseUrl() + '/icons/icon_ingressplus_64.png', alt: '' }),
+        el('span', {}, 'Open Ingress Plus')),
       el('span', { class: 'ingressplus-spacer' }),
       connected
         ? el('button', {
@@ -267,7 +336,7 @@
   }
 
   const openDialog = () => {
-    dialogNode = el('div', { class: 'ingressplus-dialog' })
+    dialogNode = el('div', { id: 'ingressplus-store', class: 'ingressplus-dialog' })
     renderDialog()
     window.dialog({
       html: dialogNode,
@@ -281,68 +350,124 @@
   const addStyles = () => {
     const style = document.createElement('style')
     style.textContent = `
-      .ingressplus-dialog { --ipx-accent: #ffce00; --ipx-teal: #20a8b1; --ipx-line: rgba(255,255,255,0.12); }
-      .ingressplus-dialog .ingressplus-muted { opacity: 0.7; font-size: 0.9em; }
-      .ingressplus-dialog .ingressplus-error { color: #ff8a8a; font-size: 0.9em; }
+      #ingressplus-store { --ipx-accent: #ffce00; --ipx-teal: #20a8b1; --ipx-line: rgba(255,255,255,0.12); }
 
-      .ingressplus-dialog .ingressplus-header {
+      /* Every rule is scoped to the dialog's id. Layout plugins such as
+         Prime Intel restyle all buttons and inputs in IITC windows with
+         selectors like "body.x .ui-dialog-content button"; an id outranks
+         them without !important. So the store sets every property those
+         plugins touch, instead of inheriting whatever the page has. */
+      #ingressplus-store button {
+        margin: 0; padding: 3px 10px; cursor: pointer;
+        font: inherit; font-weight: normal; letter-spacing: normal; text-transform: none; line-height: normal;
+        background: rgba(8,48,78,0.9); border: 1px solid var(--ipx-accent); border-radius: 2px;
+        color: var(--ipx-accent); box-shadow: none; transition: none;
+      }
+      #ingressplus-store button:where(:hover) { background: rgba(255,206,0,0.12); }
+      #ingressplus-store input[type="text"], #ingressplus-store input[type="search"] {
+        margin: 0; font: inherit; letter-spacing: normal; text-transform: none;
+        background: rgba(0,0,0,0.3); border: 1px solid var(--ipx-line); border-radius: 2px;
+        color: inherit; box-shadow: none; outline: none;
+      }
+      #ingressplus-store input[type="text"]:focus, #ingressplus-store input[type="search"]:focus { border-color: var(--ipx-teal); }
+      #ingressplus-store .ingressplus-muted { opacity: 0.7; font-size: 0.9em; }
+      #ingressplus-store .ingressplus-error { color: #ff8a8a; font-size: 0.9em; }
+      #ingressplus-store .ingressplus-pending { color: var(--ipx-accent); font-size: 0.9em; font-weight: bold; }
+
+      #ingressplus-store .ingressplus-header {
         display: flex; align-items: center; gap: 12px;
         padding: 10px 12px; margin-bottom: 10px;
         background: linear-gradient(90deg, rgba(32,168,177,0.28), rgba(32,168,177,0.06));
         border-left: 3px solid var(--ipx-teal); border-radius: 2px;
       }
-      .ingressplus-dialog .ingressplus-logo { width: 40px; height: 40px; flex: none; }
-      .ingressplus-dialog .ingressplus-who { flex: 1; min-width: 0; line-height: 1.3; }
-      .ingressplus-dialog .ingressplus-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ipx-teal); }
-      .ingressplus-dialog .ingressplus-name { font-size: 1.35em; font-weight: bold; color: var(--ipx-accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .ingressplus-dialog .ingressplus-disconnect { flex: none; opacity: 0.8; }
-      .ingressplus-dialog .ingressplus-disconnect:hover { opacity: 1; }
-
-      .ingressplus-dialog .ingressplus-toolbar { display: flex; gap: 10px; align-items: flex-end; border-bottom: 1px solid var(--ipx-line); margin-bottom: 8px; }
-      .ingressplus-dialog .ingressplus-tabs { display: flex; gap: 2px; }
-      .ingressplus-dialog .ingressplus-tab {
-        background: transparent; border: 1px solid transparent; border-bottom: none;
-        color: inherit; padding: 5px 12px; cursor: pointer; opacity: 0.75; margin: 0;
+      #ingressplus-store .ingressplus-who { flex: 1; min-width: 0; line-height: 1.3; }
+      #ingressplus-store .ingressplus-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ipx-teal); }
+      #ingressplus-store .ingressplus-name { display: flex; align-items: center; gap: 8px; font-size: 1.35em; font-weight: bold; color: var(--ipx-accent); }
+      #ingressplus-store .ingressplus-name > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      #ingressplus-store .ingressplus-faction { flex: none; display: inline-flex; animation: ingressplus-pulse 2.4s ease-in-out infinite; }
+      #ingressplus-store .ingressplus-faction img { display: block; height: 1.3em; width: auto; }
+      @keyframes ingressplus-pulse {
+        0%, 100% { filter: drop-shadow(0 0 1px var(--ipx-faction)); }
+        50% { filter: drop-shadow(0 0 6px var(--ipx-faction)) drop-shadow(0 0 2px var(--ipx-faction)); }
       }
-      .ingressplus-dialog .ingressplus-tab.active { opacity: 1; color: var(--ipx-accent); border-color: var(--ipx-line); background: rgba(255,255,255,0.05); box-shadow: inset 0 2px 0 var(--ipx-accent); }
-      .ingressplus-dialog .ingressplus-search { flex: 1; min-width: 120px; margin-bottom: 4px; padding: 4px 6px; box-sizing: border-box; }
+      #ingressplus-store .ingressplus-disconnect { flex: none; opacity: 0.8; }
+      #ingressplus-store .ingressplus-disconnect:hover { opacity: 1; }
 
-      .ingressplus-dialog .ingressplus-count { margin-left: 6px; font-size: 0.8em; opacity: 0.7; }
-      .ingressplus-dialog .ingressplus-main { display: flex; gap: 10px; height: min(50vh, 380px); min-height: 180px; }
-      .ingressplus-dialog .ingressplus-cats { flex: 0 0 140px; overflow-y: auto; display: flex; flex-direction: column; gap: 1px; }
-      .ingressplus-dialog .ingressplus-cat {
+      #ingressplus-store .ingressplus-toolbar { display: flex; gap: 10px; align-items: flex-end; border-bottom: 1px solid var(--ipx-line); margin-bottom: 8px; }
+      #ingressplus-store .ingressplus-tabs { display: flex; gap: 2px; }
+      #ingressplus-store .ingressplus-tab {
+        background: transparent; border: 1px solid transparent; border-bottom: none;
+        color: inherit; padding: 5px 12px; cursor: pointer; opacity: 0.75; margin: 0; border-radius: 0;
+      }
+      #ingressplus-store .ingressplus-tab.active { opacity: 1; color: var(--ipx-accent); border-color: var(--ipx-line); background: rgba(255,255,255,0.05); box-shadow: inset 0 2px 0 var(--ipx-accent); }
+      #ingressplus-store .ingressplus-search { flex: 1; min-width: 120px; margin-bottom: 4px; padding: 4px 6px; box-sizing: border-box; height: auto; }
+
+      #ingressplus-store .ingressplus-count { margin-left: 6px; font-size: 0.8em; opacity: 0.7; }
+      #ingressplus-store .ingressplus-main { display: flex; gap: 10px; height: min(50vh, 380px); min-height: 180px; }
+      #ingressplus-store .ingressplus-cats { flex: 0 0 140px; overflow-y: auto; display: flex; flex-direction: column; gap: 1px; }
+      #ingressplus-store .ingressplus-cat {
         display: flex; justify-content: space-between; align-items: center; gap: 6px;
         width: 100%; text-align: left; margin: 0; padding: 5px 8px;
-        background: transparent; border: none; border-left: 2px solid transparent; color: inherit; cursor: pointer;
+        background: transparent; border: none; border-left: 2px solid transparent; border-radius: 0; color: inherit; cursor: pointer;
       }
-      .ingressplus-dialog .ingressplus-cat:hover { background: rgba(255,255,255,0.06); }
-      .ingressplus-dialog .ingressplus-cat.active { border-left-color: var(--ipx-accent); background: rgba(255,206,0,0.12); color: var(--ipx-accent); }
-      .ingressplus-dialog .ingressplus-cat.all { margin-top: auto; border-top: 1px solid var(--ipx-line); padding-top: 7px; }
-      .ingressplus-dialog .ingressplus-list { flex: 1; min-width: 0; overflow-y: auto; padding-right: 4px; }
-      .ingressplus-dialog .ingressplus-empty { opacity: 0.7; text-align: center; margin-top: 30px; }
+      #ingressplus-store .ingressplus-cat:hover { background: rgba(255,255,255,0.06); }
+      #ingressplus-store .ingressplus-cat.active { border-left-color: var(--ipx-accent); background: rgba(255,206,0,0.12); color: var(--ipx-accent); }
+      #ingressplus-store .ingressplus-cat.all { margin-top: auto; border-top: 1px solid var(--ipx-line); padding-top: 7px; }
+      #ingressplus-store .ingressplus-list { flex: 1; min-width: 0; overflow-y: auto; padding-right: 4px; }
+      #ingressplus-store .ingressplus-empty { opacity: 0.7; text-align: center; margin-top: 30px; }
 
-      .ingressplus-dialog .ingressplus-plugin { padding: 7px 6px; border-bottom: 1px solid var(--ipx-line); border-left: 2px solid transparent; }
-      .ingressplus-dialog .ingressplus-plugin.is-on { border-left-color: var(--ipx-teal); background: rgba(32,168,177,0.07); }
-      .ingressplus-dialog .ingressplus-plugin-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; cursor: pointer; }
-      .ingressplus-dialog .ingressplus-desc { opacity: 0.8; font-size: 0.9em; margin: 2px 0 0 22px; }
-      .ingressplus-dialog .ingressplus-plugin > .ingressplus-muted,
-      .ingressplus-dialog .ingressplus-plugin > .ingressplus-error { margin: 2px 0 0 22px; }
-      .ingressplus-dialog .ingressplus-chip { font-size: 0.75em; padding: 0 6px; border: 1px solid var(--ipx-line); border-radius: 8px; opacity: 0.8; }
+      #ingressplus-store .ingressplus-plugin { display: flex; gap: 10px; align-items: flex-start; padding: 7px 6px; border-bottom: 1px solid var(--ipx-line); border-left: 2px solid transparent; }
+      #ingressplus-store .ingressplus-plugin-body { flex: 1; min-width: 0; }
+      #ingressplus-store .ingressplus-icon { flex: none; width: 36px; height: 36px; object-fit: contain; border-radius: 4px; }
+      #ingressplus-store .ingressplus-icon-empty {
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(32,168,177,0.2); color: var(--ipx-teal); font-weight: bold; font-size: 1.2em;
+      }
+      #ingressplus-store .ingressplus-plugin.is-on { border-left-color: var(--ipx-teal); background: rgba(32,168,177,0.07); }
+      #ingressplus-store .ingressplus-plugin-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; cursor: pointer; }
+      #ingressplus-store .ingressplus-desc { opacity: 0.8; font-size: 0.9em; margin-top: 2px; }
+      #ingressplus-store .ingressplus-plugin-body > .ingressplus-muted,
+      #ingressplus-store .ingressplus-plugin-body > .ingressplus-error,
+      #ingressplus-store .ingressplus-plugin-body > .ingressplus-pending { margin-top: 2px; }
 
-      .ingressplus-dialog .ingressplus-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--ipx-line); }
-      .ingressplus-dialog .ingressplus-spacer { flex: 1; }
-      .ingressplus-dialog .ingressplus-button { border: 1px solid var(--ipx-accent); padding: 2px 8px; text-decoration: none; }
-      .ingressplus-dialog .ingressplus-attention { box-shadow: 0 0 0 1px var(--ipx-accent), 0 0 6px var(--ipx-accent); }
-      .ingressplus-dialog .ingressplus-connect { padding: 0 4px; }
+      #ingressplus-store .ingressplus-switch { flex: none; align-self: center; position: relative; display: block; width: 38px; height: 22px; cursor: pointer; }
+      #ingressplus-store .ingressplus-switch input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+      #ingressplus-store .ingressplus-switch-track {
+        position: absolute; inset: 0; border-radius: 11px; pointer-events: none;
+        background: rgba(255,255,255,0.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
+        transition: background 0.18s, box-shadow 0.18s;
+      }
+      #ingressplus-store .ingressplus-switch-track::after {
+        content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%;
+        background: #cfd8dc; box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        transition: transform 0.18s ease, background 0.18s;
+      }
+      #ingressplus-store .ingressplus-switch input:checked + .ingressplus-switch-track { background: var(--ipx-teal); box-shadow: inset 0 0 0 1px var(--ipx-teal), 0 0 8px rgba(32,168,177,0.5); }
+      #ingressplus-store .ingressplus-switch input:checked + .ingressplus-switch-track::after { transform: translateX(16px); background: #fff; }
+      #ingressplus-store .ingressplus-switch:hover .ingressplus-switch-track { box-shadow: inset 0 0 0 1px var(--ipx-accent); }
+      #ingressplus-store .ingressplus-switch input:focus-visible + .ingressplus-switch-track { outline: 2px solid var(--ipx-accent); outline-offset: 2px; }
+      @media (prefers-reduced-motion: reduce) {
+        #ingressplus-store .ingressplus-switch-track, #ingressplus-store .ingressplus-switch-track::after { transition: none; }
+        #ingressplus-store .ingressplus-faction { animation: none; filter: drop-shadow(0 0 3px var(--ipx-faction)); }
+      }
+      #ingressplus-store .ingressplus-chip { font-size: 0.75em; padding: 0 6px; border: 1px solid var(--ipx-line); border-radius: 8px; opacity: 0.8; }
+
+      #ingressplus-store .ingressplus-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--ipx-line); }
+      #ingressplus-store .ingressplus-spacer { flex: 1; }
+      #ingressplus-store .ingressplus-home { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+      #ingressplus-store .ingressplus-home img { width: 22px; height: 22px; }
+      #ingressplus-store .ingressplus-home:hover span { text-decoration: underline; }
+      #ingressplus-store .ingressplus-attention { box-shadow: 0 0 0 1px var(--ipx-accent), 0 0 6px var(--ipx-accent); }
+      #ingressplus-store .ingressplus-connect { padding: 0 4px; }
 
       @media (max-width: 560px) {
-        .ingressplus-dialog .ingressplus-toolbar { flex-direction: column; align-items: stretch; }
-        .ingressplus-dialog .ingressplus-main { flex-direction: column; height: auto; }
-        .ingressplus-dialog .ingressplus-cats { flex: none; flex-direction: row; overflow-x: auto; overflow-y: hidden; }
-        .ingressplus-dialog .ingressplus-cat { width: auto; white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; }
-        .ingressplus-dialog .ingressplus-cat.active { border-bottom-color: var(--ipx-accent); }
-        .ingressplus-dialog .ingressplus-cat.all { margin-top: 0; margin-left: auto; border-top: none; padding-top: 5px; }
-        .ingressplus-dialog .ingressplus-list { overflow: visible; }
+        #ingressplus-store .ingressplus-toolbar { flex-direction: column; align-items: stretch; }
+        #ingressplus-store .ingressplus-main { flex-direction: column; height: auto; }
+        #ingressplus-store .ingressplus-cats { flex: none; flex-direction: row; overflow-x: auto; overflow-y: hidden; }
+        #ingressplus-store .ingressplus-cat { width: auto; white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; }
+        #ingressplus-store .ingressplus-cat.active { border-bottom-color: var(--ipx-accent); }
+        #ingressplus-store .ingressplus-cat.all { margin-top: 0; margin-left: auto; border-top: none; padding-top: 5px; }
+        #ingressplus-store .ingressplus-list { overflow: visible; }
       }
     `
     document.head.appendChild(style)
@@ -350,6 +475,7 @@
 
   function setup () {
     addStyles()
+    addFactionFilters()
     if (window.IITC && window.IITC.toolbox && window.IITC.toolbox.addButton) {
       window.IITC.toolbox.addButton({ label: 'Ingress Plus', title: 'Ingress Plus plugins', action: openDialog })
     } else {
