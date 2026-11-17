@@ -7,7 +7,7 @@
 // window.plugin.ingressPlus.
 /* global $, Node */
 (function () {
-  const STORE_VERSION = '1.1.1'
+  const STORE_VERSION = '1.1.2'
   const API_VERSION = 1
   const LOG_PREFIX = '[Ingress Plus store]'
 
@@ -349,128 +349,134 @@
     })
   }
 
+  // Layout plugins such as Prime Intel restyle every button and input in
+  // IITC windows with selectors like "body.x .ui-dialog-content button".
+  // The store outranks them without !important: :is() takes the specificity
+  // of its strongest argument, the dialog's id, so every rule here beats
+  // theirs. It also matches the class, because Prime animates a closing
+  // window through a copy with all ids removed, and the copy must keep the
+  // store's styles (without them the faction logo shows at full size).
+  // So the store sets every property those plugins touch, instead of
+  // inheriting whatever the page has.
+  const S = ':is(#ingressplus-store, .ingressplus-dialog)'
+
   const addStyles = () => {
     const style = document.createElement('style')
     style.textContent = `
-      #ingressplus-store { --ipx-accent: #ffce00; --ipx-teal: #20a8b1; --ipx-line: rgba(255,255,255,0.12); }
+      ${S} { --ipx-accent: #ffce00; --ipx-teal: #20a8b1; --ipx-line: rgba(255,255,255,0.12); }
 
-      /* Every rule is scoped to the dialog's id. Layout plugins such as
-         Prime Intel restyle all buttons and inputs in IITC windows with
-         selectors like "body.x .ui-dialog-content button"; an id outranks
-         them without !important. So the store sets every property those
-         plugins touch, instead of inheriting whatever the page has. */
-      #ingressplus-store button {
+      ${S} button {
         margin: 0; padding: 3px 10px; cursor: pointer;
         font: inherit; font-weight: normal; letter-spacing: normal; text-transform: none; line-height: normal;
         background: rgba(8,48,78,0.9); border: 1px solid var(--ipx-accent); border-radius: 2px;
         color: var(--ipx-accent); box-shadow: none; transition: none;
       }
-      #ingressplus-store button:where(:hover) { background: rgba(255,206,0,0.12); }
-      #ingressplus-store input[type="text"], #ingressplus-store input[type="search"] {
+      ${S} button:where(:hover) { background: rgba(255,206,0,0.12); }
+      ${S} input[type="text"], ${S} input[type="search"] {
         margin: 0; font: inherit; letter-spacing: normal; text-transform: none;
         background: rgba(0,0,0,0.3); border: 1px solid var(--ipx-line); border-radius: 2px;
         color: inherit; box-shadow: none; outline: none;
       }
-      #ingressplus-store input[type="text"]:focus, #ingressplus-store input[type="search"]:focus { border-color: var(--ipx-teal); }
-      #ingressplus-store .ingressplus-muted { opacity: 0.7; font-size: 0.9em; }
-      #ingressplus-store .ingressplus-error { color: #ff8a8a; font-size: 0.9em; }
-      #ingressplus-store .ingressplus-pending { color: var(--ipx-accent); font-size: 0.9em; font-weight: bold; }
+      ${S} input[type="text"]:focus, ${S} input[type="search"]:focus { border-color: var(--ipx-teal); }
+      ${S} .ingressplus-muted { opacity: 0.7; font-size: 0.9em; }
+      ${S} .ingressplus-error { color: #ff8a8a; font-size: 0.9em; }
+      ${S} .ingressplus-pending { color: var(--ipx-accent); font-size: 0.9em; font-weight: bold; }
 
-      #ingressplus-store .ingressplus-header {
+      ${S} .ingressplus-header {
         display: flex; align-items: center; gap: 12px;
         padding: 10px 12px; margin-bottom: 10px;
         background: linear-gradient(90deg, rgba(32,168,177,0.28), rgba(32,168,177,0.06));
         border-left: 3px solid var(--ipx-teal); border-radius: 2px;
       }
-      #ingressplus-store .ingressplus-who { flex: 1; min-width: 0; line-height: 1.3; }
-      #ingressplus-store .ingressplus-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ipx-teal); }
-      #ingressplus-store .ingressplus-name { display: flex; align-items: center; gap: 8px; font-size: 1.35em; font-weight: bold; color: var(--ipx-accent); }
-      #ingressplus-store .ingressplus-name > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      #ingressplus-store .ingressplus-faction { flex: none; display: inline-flex; animation: ingressplus-pulse 2.4s ease-in-out infinite; }
-      #ingressplus-store .ingressplus-faction img { display: block; height: 1.3em; width: auto; }
+      ${S} .ingressplus-who { flex: 1; min-width: 0; line-height: 1.3; }
+      ${S} .ingressplus-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ipx-teal); }
+      ${S} .ingressplus-name { display: flex; align-items: center; gap: 8px; font-size: 1.35em; font-weight: bold; color: var(--ipx-accent); }
+      ${S} .ingressplus-name > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      ${S} .ingressplus-faction { flex: none; display: inline-flex; animation: ingressplus-pulse 2.4s ease-in-out infinite; }
+      ${S} .ingressplus-faction img { display: block; height: 1.3em; width: auto; }
       @keyframes ingressplus-pulse {
         0%, 100% { filter: drop-shadow(0 0 1px var(--ipx-faction)); }
         50% { filter: drop-shadow(0 0 6px var(--ipx-faction)) drop-shadow(0 0 2px var(--ipx-faction)); }
       }
-      #ingressplus-store .ingressplus-disconnect { flex: none; opacity: 0.8; }
-      #ingressplus-store .ingressplus-disconnect:hover { opacity: 1; }
+      ${S} .ingressplus-disconnect { flex: none; opacity: 0.8; }
+      ${S} .ingressplus-disconnect:hover { opacity: 1; }
 
-      #ingressplus-store .ingressplus-toolbar { display: flex; gap: 10px; align-items: flex-end; border-bottom: 1px solid var(--ipx-line); margin-bottom: 8px; }
-      #ingressplus-store .ingressplus-tabs { display: flex; gap: 2px; }
-      #ingressplus-store .ingressplus-tab {
+      ${S} .ingressplus-toolbar { display: flex; gap: 10px; align-items: flex-end; border-bottom: 1px solid var(--ipx-line); margin-bottom: 8px; }
+      ${S} .ingressplus-tabs { display: flex; gap: 2px; }
+      ${S} .ingressplus-tab {
         background: transparent; border: 1px solid transparent; border-bottom: none;
         color: inherit; padding: 5px 12px; cursor: pointer; opacity: 0.75; margin: 0; border-radius: 0;
       }
-      #ingressplus-store .ingressplus-tab.active { opacity: 1; color: var(--ipx-accent); border-color: var(--ipx-line); background: rgba(255,255,255,0.05); box-shadow: inset 0 2px 0 var(--ipx-accent); }
-      #ingressplus-store .ingressplus-search { flex: 1; min-width: 120px; margin-bottom: 4px; padding: 4px 6px; box-sizing: border-box; height: auto; }
+      ${S} .ingressplus-tab.active { opacity: 1; color: var(--ipx-accent); border-color: var(--ipx-line); background: rgba(255,255,255,0.05); box-shadow: inset 0 2px 0 var(--ipx-accent); }
+      ${S} .ingressplus-search { flex: 1; min-width: 120px; margin-bottom: 4px; padding: 4px 6px; box-sizing: border-box; height: auto; }
 
-      #ingressplus-store .ingressplus-count { margin-left: 6px; font-size: 0.8em; opacity: 0.7; }
-      #ingressplus-store .ingressplus-main { display: flex; gap: 10px; height: min(50vh, 380px); min-height: 180px; }
-      #ingressplus-store .ingressplus-cats { flex: 0 0 140px; overflow-y: auto; display: flex; flex-direction: column; gap: 1px; }
-      #ingressplus-store .ingressplus-cat {
+      ${S} .ingressplus-count { margin-left: 6px; font-size: 0.8em; opacity: 0.7; }
+      ${S} .ingressplus-main { display: flex; gap: 10px; height: min(50vh, 380px); min-height: 180px; }
+      ${S} .ingressplus-cats { flex: 0 0 140px; overflow-y: auto; display: flex; flex-direction: column; gap: 1px; }
+      ${S} .ingressplus-cat {
         display: flex; justify-content: space-between; align-items: center; gap: 6px;
         width: 100%; text-align: left; margin: 0; padding: 5px 8px;
         background: transparent; border: none; border-left: 2px solid transparent; border-radius: 0; color: inherit; cursor: pointer;
       }
-      #ingressplus-store .ingressplus-cat:hover { background: rgba(255,255,255,0.06); }
-      #ingressplus-store .ingressplus-cat.active { border-left-color: var(--ipx-accent); background: rgba(255,206,0,0.12); color: var(--ipx-accent); }
-      #ingressplus-store .ingressplus-cat.all { margin-top: auto; border-top: 1px solid var(--ipx-line); padding-top: 7px; }
-      #ingressplus-store .ingressplus-list { flex: 1; min-width: 0; overflow-y: auto; padding-right: 4px; }
-      #ingressplus-store .ingressplus-empty { opacity: 0.7; text-align: center; margin-top: 30px; }
+      ${S} .ingressplus-cat:hover { background: rgba(255,255,255,0.06); }
+      ${S} .ingressplus-cat.active { border-left-color: var(--ipx-accent); background: rgba(255,206,0,0.12); color: var(--ipx-accent); }
+      ${S} .ingressplus-cat.all { margin-top: auto; border-top: 1px solid var(--ipx-line); padding-top: 7px; }
+      ${S} .ingressplus-list { flex: 1; min-width: 0; overflow-y: auto; padding-right: 4px; }
+      ${S} .ingressplus-empty { opacity: 0.7; text-align: center; margin-top: 30px; }
 
-      #ingressplus-store .ingressplus-plugin { display: flex; gap: 10px; align-items: flex-start; padding: 7px 6px; border-bottom: 1px solid var(--ipx-line); border-left: 2px solid transparent; }
-      #ingressplus-store .ingressplus-plugin-body { flex: 1; min-width: 0; }
-      #ingressplus-store .ingressplus-icon { flex: none; width: 36px; height: 36px; object-fit: contain; border-radius: 4px; }
-      #ingressplus-store .ingressplus-icon-empty {
+      ${S} .ingressplus-plugin { display: flex; gap: 10px; align-items: flex-start; padding: 7px 6px; border-bottom: 1px solid var(--ipx-line); border-left: 2px solid transparent; }
+      ${S} .ingressplus-plugin-body { flex: 1; min-width: 0; }
+      ${S} .ingressplus-icon { flex: none; width: 36px; height: 36px; object-fit: contain; border-radius: 4px; }
+      ${S} .ingressplus-icon-empty {
         display: flex; align-items: center; justify-content: center;
         background: rgba(32,168,177,0.2); color: var(--ipx-teal); font-weight: bold; font-size: 1.2em;
       }
-      #ingressplus-store .ingressplus-plugin.is-on { border-left-color: var(--ipx-teal); background: rgba(32,168,177,0.07); }
-      #ingressplus-store .ingressplus-plugin-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; cursor: pointer; }
-      #ingressplus-store .ingressplus-desc { opacity: 0.8; font-size: 0.9em; margin-top: 2px; }
-      #ingressplus-store .ingressplus-plugin-body > .ingressplus-muted,
-      #ingressplus-store .ingressplus-plugin-body > .ingressplus-error,
-      #ingressplus-store .ingressplus-plugin-body > .ingressplus-pending { margin-top: 2px; }
+      ${S} .ingressplus-plugin.is-on { border-left-color: var(--ipx-teal); background: rgba(32,168,177,0.07); }
+      ${S} .ingressplus-plugin-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; cursor: pointer; }
+      ${S} .ingressplus-desc { opacity: 0.8; font-size: 0.9em; margin-top: 2px; }
+      ${S} .ingressplus-plugin-body > .ingressplus-muted,
+      ${S} .ingressplus-plugin-body > .ingressplus-error,
+      ${S} .ingressplus-plugin-body > .ingressplus-pending { margin-top: 2px; }
 
-      #ingressplus-store .ingressplus-switch { flex: none; align-self: center; position: relative; display: block; width: 38px; height: 22px; cursor: pointer; }
-      #ingressplus-store .ingressplus-switch input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-      #ingressplus-store .ingressplus-switch-track {
+      ${S} .ingressplus-switch { flex: none; align-self: center; position: relative; display: block; width: 38px; height: 22px; cursor: pointer; }
+      ${S} .ingressplus-switch input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+      ${S} .ingressplus-switch-track {
         position: absolute; inset: 0; border-radius: 11px; pointer-events: none;
         background: rgba(255,255,255,0.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
         transition: background 0.18s, box-shadow 0.18s;
       }
-      #ingressplus-store .ingressplus-switch-track::after {
+      ${S} .ingressplus-switch-track::after {
         content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%;
         background: #cfd8dc; box-shadow: 0 1px 3px rgba(0,0,0,0.5);
         transition: transform 0.18s ease, background 0.18s;
       }
-      #ingressplus-store .ingressplus-switch input:checked + .ingressplus-switch-track { background: var(--ipx-teal); box-shadow: inset 0 0 0 1px var(--ipx-teal), 0 0 8px rgba(32,168,177,0.5); }
-      #ingressplus-store .ingressplus-switch input:checked + .ingressplus-switch-track::after { transform: translateX(16px); background: #fff; }
-      #ingressplus-store .ingressplus-switch:hover .ingressplus-switch-track { box-shadow: inset 0 0 0 1px var(--ipx-accent); }
-      #ingressplus-store .ingressplus-switch input:focus-visible + .ingressplus-switch-track { outline: 2px solid var(--ipx-accent); outline-offset: 2px; }
+      ${S} .ingressplus-switch input:checked + .ingressplus-switch-track { background: var(--ipx-teal); box-shadow: inset 0 0 0 1px var(--ipx-teal), 0 0 8px rgba(32,168,177,0.5); }
+      ${S} .ingressplus-switch input:checked + .ingressplus-switch-track::after { transform: translateX(16px); background: #fff; }
+      ${S} .ingressplus-switch:hover .ingressplus-switch-track { box-shadow: inset 0 0 0 1px var(--ipx-accent); }
+      ${S} .ingressplus-switch input:focus-visible + .ingressplus-switch-track { outline: 2px solid var(--ipx-accent); outline-offset: 2px; }
       @media (prefers-reduced-motion: reduce) {
-        #ingressplus-store .ingressplus-switch-track, #ingressplus-store .ingressplus-switch-track::after { transition: none; }
-        #ingressplus-store .ingressplus-faction { animation: none; filter: drop-shadow(0 0 3px var(--ipx-faction)); }
+        ${S} .ingressplus-switch-track, ${S} .ingressplus-switch-track::after { transition: none; }
+        ${S} .ingressplus-faction { animation: none; filter: drop-shadow(0 0 3px var(--ipx-faction)); }
       }
-      #ingressplus-store .ingressplus-chip { font-size: 0.75em; padding: 0 6px; border: 1px solid var(--ipx-line); border-radius: 8px; opacity: 0.8; }
+      ${S} .ingressplus-chip { font-size: 0.75em; padding: 0 6px; border: 1px solid var(--ipx-line); border-radius: 8px; opacity: 0.8; }
 
-      #ingressplus-store .ingressplus-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--ipx-line); }
-      #ingressplus-store .ingressplus-spacer { flex: 1; }
-      #ingressplus-store .ingressplus-home { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
-      #ingressplus-store .ingressplus-home img { width: 22px; height: 22px; }
-      #ingressplus-store .ingressplus-home:hover span { text-decoration: underline; }
-      #ingressplus-store .ingressplus-attention { box-shadow: 0 0 0 1px var(--ipx-accent), 0 0 6px var(--ipx-accent); }
-      #ingressplus-store .ingressplus-connect { padding: 0 4px; }
-      #ingressplus-store .ingressplus-link { color: var(--ipx-accent); text-decoration: underline; word-break: break-all; }
+      ${S} .ingressplus-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--ipx-line); }
+      ${S} .ingressplus-spacer { flex: 1; }
+      ${S} .ingressplus-home { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+      ${S} .ingressplus-home img { width: 22px; height: 22px; }
+      ${S} .ingressplus-home:hover span { text-decoration: underline; }
+      ${S} .ingressplus-attention { box-shadow: 0 0 0 1px var(--ipx-accent), 0 0 6px var(--ipx-accent); }
+      ${S} .ingressplus-connect { padding: 0 4px; }
+      ${S} .ingressplus-link { color: var(--ipx-accent); text-decoration: underline; word-break: break-all; }
 
       @media (max-width: 560px) {
-        #ingressplus-store .ingressplus-toolbar { flex-direction: column; align-items: stretch; }
-        #ingressplus-store .ingressplus-main { flex-direction: column; height: auto; }
-        #ingressplus-store .ingressplus-cats { flex: none; flex-direction: row; overflow-x: auto; overflow-y: hidden; }
-        #ingressplus-store .ingressplus-cat { width: auto; white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; }
-        #ingressplus-store .ingressplus-cat.active { border-bottom-color: var(--ipx-accent); }
-        #ingressplus-store .ingressplus-cat.all { margin-top: 0; margin-left: auto; border-top: none; padding-top: 5px; }
-        #ingressplus-store .ingressplus-list { overflow: visible; }
+        ${S} .ingressplus-toolbar { flex-direction: column; align-items: stretch; }
+        ${S} .ingressplus-main { flex-direction: column; height: auto; }
+        ${S} .ingressplus-cats { flex: none; flex-direction: row; overflow-x: auto; overflow-y: hidden; }
+        ${S} .ingressplus-cat { width: auto; white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; }
+        ${S} .ingressplus-cat.active { border-bottom-color: var(--ipx-accent); }
+        ${S} .ingressplus-cat.all { margin-top: 0; margin-left: auto; border-top: none; padding-top: 5px; }
+        ${S} .ingressplus-list { overflow: visible; }
       }
     `
     document.head.appendChild(style)
