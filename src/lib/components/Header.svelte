@@ -5,10 +5,10 @@
   import { afterNavigate } from '$app/navigation'
   import { resolve } from '$app/paths'
   import { pb } from '$lib/pocketbase'
-  import { authData, freshLogin, ownedBadges } from '$lib/stores'
+  import { authData, ownedBadges } from '$lib/stores'
   import { featureFlags } from '$lib/featureFlags'
   import { refreshOwnedBadges } from '$lib/badges'
-  import { updateOwnUser } from '$lib/user'
+  import { loginWithPopup, loginWithRedirect, prefersRedirect } from '$lib/auth'
   import { toast } from '@zerodevx/svelte-toast'
 
   let menuOpen = $state(false)
@@ -31,34 +31,24 @@
 
   const login = async () => {
     menuOpen = false
-    // Opened synchronously inside the click so popup blockers allow it; the
-    // OAuth URL only exists once the SDK hands it over in urlCallback.
-    const loginWindow = window.open('', '_blank')
-    let user
     try {
-      user = await pb.collection('users').authWithOAuth2({
-        provider: 'google',
-        urlCallback: (url) => {
-          loginWindow.location.href = url
-        }
-      })
+      if (prefersRedirect()) {
+        await loginWithRedirect()
+        return
+      }
+      // Opened synchronously inside the click so popup blockers allow it.
+      // null means the browser refused (blocked popups, in-app browsers):
+      // fall back to the redirect flow instead of failing.
+      const loginWindow = window.open('', '_blank')
+      if (!loginWindow) {
+        await loginWithRedirect()
+        return
+      }
+      await loginWithPopup(loginWindow)
     } catch (err) {
-      // A declined or failed Google prompt used to leave the blank popup open
-      // forever and the rejection unhandled.
-      loginWindow?.close()
       console.error('Login failed:', err)
       toast.push('Login was cancelled or failed. Please try again.', { classes: ['errorToast'] })
-      return
     }
-
-    // Mirror the Google profile onto the record. Best-effort: not worth
-    // failing a successful login over.
-    updateOwnUser({ avatar: user.meta.avatarUrl, display_name: user.meta.name })
-      .catch(err => console.error('Failed to sync the Google profile:', err))
-
-    freshLogin.set(true)
-    authData.set(pb.authStore)
-    await refreshOwnedBadges()
   }
 
   const openTelegram = () => {
