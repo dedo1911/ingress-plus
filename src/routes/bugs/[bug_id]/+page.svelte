@@ -4,11 +4,11 @@
   import Time, { dayjs } from 'svelte-time'
   import { Carta, CartaViewer, MarkdownEditor } from 'carta-md'
   import { toast } from '@zerodevx/svelte-toast'
-  import { page } from '$app/stores'
-  import { pb } from '$lib/pocketbase'
-  import { authData } from '$lib/stores'
-  import AgentName from '$lib/components/AgentName.svelte'
-  import Comment from '$lib/components/Comment.svelte'
+  import { page } from '$app/state'
+  import { pb } from '#lib/pocketbase/index.js'
+  import { authData } from '#lib/stores/index.js'
+  import AgentName from '#lib/components/AgentName.svelte'
+  import Comment from '#lib/components/Comment.svelte'
   import BugAttachment from '../../../lib/components/BugAttachment.svelte'
 
   const { data } = $props()
@@ -18,10 +18,10 @@
 
   const carta = new Carta({})
 
-  const reloadData = async (pageData) => {
+  const reloadData = async (bugId) => {
     report = await pb
       .collection('bug_reports_public')
-      .getFirstListItem(`id="${pageData.params.bug_id}"`, {
+      .getFirstListItem(`id="${bugId}"`, {
         expand: 'status',
       })
     await loadComments()
@@ -51,7 +51,7 @@
 
   onMount(loadComments)
 
-  $effect(() => reloadData($page))
+  $effect(() => { reloadData(page.params.bug_id) })
 </script>
 
 <svelte:head>

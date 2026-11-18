@@ -3,7 +3,7 @@
   import { Carta, CartaViewer } from 'carta-md'
   import Time from 'svelte-time'
 
-  import AgentName from '$lib/components/AgentName.svelte'
+  import AgentName from '#lib/components/AgentName.svelte'
 
   const { comment } = $props()
   const carta = new Carta({})

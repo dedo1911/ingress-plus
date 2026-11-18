@@ -1,7 +1,7 @@
 <script>
   import { toast } from '@zerodevx/svelte-toast'
-  import { badgeSize } from '$lib/stores'
-  import { generateId } from '$lib/utils'
+  import { badgeSize } from '#lib/stores/index.js'
+  import { generateId } from '#lib/utils.js'
 
   // level 2 is a top-level category, 3 a subcategory. `anchor` turns the title
   // into a copyable #link (badges page only - profiles have no anchors).

@@ -27,9 +27,10 @@
       if (itemsPerPage !== '20') params.set('n', itemsPerPage)
       if (page > 1) params.set('p', page)
       const queryString = params.toString()
-      // replaceState: typing in the search box must not leave one history
-      // entry per keystroke; keepFocus for the same reason.
-      return goto(resolve(`/media${queryString ? `?${queryString}` : ''}`), { replaceState: true, keepFocus: true, noScroll: true })
+      // replace: typing in the search box must not leave one history
+      // entry per keystroke; reset: false keeps focus and scroll for the same
+      // reason.
+      return goto(resolve(`/media${queryString ? `?${queryString}` : ''}`), { replace: true, reset: false })
     }
 
     const executeSearch = () => navigate(1)

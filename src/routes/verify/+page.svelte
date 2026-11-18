@@ -1,9 +1,9 @@
 <script>
     import { goto } from '$app/navigation'
     import { resolve } from '$app/paths'
-    import { browser } from '$app/environment'
-    import { authData } from '$lib/stores'
-    import { featureFlags, featureFlagsLoaded } from '$lib/featureFlags'
+    import { browser } from '$app/env'
+    import { authData } from '#lib/stores/index.js'
+    import { featureFlags, featureFlagsLoaded } from '#lib/featureFlags.js'
 
     const username = $derived($authData?.baseModel?.username || 'NONE')
     const faction = $derived($authData?.baseModel?.faction || 'NOT SET')

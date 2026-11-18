@@ -1,5 +1,5 @@
-import { throwLoadError } from '$lib/load'
-import { pb } from '$lib/pocketbase'
+import { throwLoadError } from '#lib/load.js'
+import { pb } from '#lib/pocketbase/index.js'
 import sortBy from 'lodash.sortby'
 
 export async function load ({ fetch }) {

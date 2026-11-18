@@ -1,7 +1,7 @@
 <script>
   import { resolve } from '$app/paths'
-  import { pb } from '$lib/pocketbase'
-  import zalgo from '$lib/zalgo'
+  import { pb } from '#lib/pocketbase/index.js'
+  import zalgo from '#lib/zalgo/index.js'
 
   let {
     id = null,

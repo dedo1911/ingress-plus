@@ -2,7 +2,7 @@
   import { onMount } from 'svelte'
   import { resolve } from '$app/paths'
   import 'leaflet/dist/leaflet.css'
-  import { authData } from '$lib/stores'
+  import { authData } from '#lib/stores/index.js'
 
   let mapElement
   let map

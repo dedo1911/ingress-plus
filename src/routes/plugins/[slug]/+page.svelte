@@ -3,10 +3,10 @@
   import { resolve } from '$app/paths'
   import { CartaViewer } from 'carta-md'
   import Time from 'svelte-time'
-  import { authData } from '$lib/stores'
-  import { featureFlags } from '$lib/featureFlags'
-  import { getPlugin, pluginCarta, describeAccess, STATUS_LABELS, VERSION_STATUS_LABELS, SIDELOADER_URL } from '$lib/plugins'
-  import Callout from '$lib/components/Callout.svelte'
+  import { authData } from '#lib/stores/index.js'
+  import { featureFlags } from '#lib/featureFlags.js'
+  import { getPlugin, pluginCarta, describeAccess, STATUS_LABELS, VERSION_STATUS_LABELS, SIDELOADER_URL } from '#lib/plugins.js'
+  import Callout from '#lib/components/Callout.svelte'
 
   const carta = pluginCarta()
 

@@ -1,10 +1,10 @@
 <script>
   import { slide } from 'svelte/transition'
   import sortBy from 'lodash.sortby'
-  import { badgeSize } from '$lib/stores'
-  import AgentName from '$lib/components/AgentName.svelte'
-  import ProfileBadge from '$lib/components/ProfileBadge.svelte'
-  import ProfileGroups from '$lib/components/ProfileGroups.svelte'
+  import { badgeSize } from '#lib/stores/index.js'
+  import AgentName from '#lib/components/AgentName.svelte'
+  import ProfileBadge from '#lib/components/ProfileBadge.svelte'
+  import ProfileGroups from '#lib/components/ProfileGroups.svelte'
 
   const { data } = $props()
   const publicUser = $derived(data.publicUser)

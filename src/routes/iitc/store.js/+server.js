@@ -1,4 +1,4 @@
-import store from '$lib/iitc/store.js?raw'
+import store from '#lib/iitc/store.js?raw'
 
 // The IITC store UI, fetched and injected by the sideloader userscript from
 // https://intel.ingress.com. It's public code with no credentials involved,

@@ -1,6 +1,6 @@
 <script>
-  import { badgeSize } from '$lib/stores'
-  import Badge from '$lib/components/Badge.svelte'
+  import { badgeSize } from '#lib/stores/index.js'
+  import Badge from '#lib/components/Badge.svelte'
 
   const { category, width } = $props()
 

@@ -1,13 +1,13 @@
 <script>
   import sortBy from 'lodash.sortby'
   import { goto } from '$app/navigation'
-  import { browser } from '$app/environment'
+  import { browser } from '$app/env'
   import { resolve } from '$app/paths'
-  import { badgeSize, authData, ownedBadges } from '$lib/stores'
-  import { featureFlags } from '$lib/featureFlags'
-  import AgentName from '$lib/components/AgentName.svelte'
-  import ProfileBadge from '$lib/components/ProfileBadge.svelte'
-  import ProfileGroups from '$lib/components/ProfileGroups.svelte'
+  import { badgeSize, authData, ownedBadges } from '#lib/stores/index.js'
+  import { featureFlags } from '#lib/featureFlags.js'
+  import AgentName from '#lib/components/AgentName.svelte'
+  import ProfileBadge from '#lib/components/ProfileBadge.svelte'
+  import ProfileGroups from '#lib/components/ProfileGroups.svelte'
 
   let width = $state(1)
 

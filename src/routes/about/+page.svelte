@@ -1,5 +1,5 @@
 <script>
-    import AgentName from '$lib/components/AgentName.svelte'
+    import AgentName from '#lib/components/AgentName.svelte'
 </script>
 
 <svelte:head>

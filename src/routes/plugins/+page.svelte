@@ -1,9 +1,9 @@
 <script>
   import { resolve } from '$app/paths'
-  import { authData } from '$lib/stores'
-  import { featureFlags, featureFlagsLoaded } from '$lib/featureFlags'
-  import { listPlugins, SIDELOADER_URL } from '$lib/plugins'
-  import Callout from '$lib/components/Callout.svelte'
+  import { authData } from '#lib/stores/index.js'
+  import { featureFlags, featureFlagsLoaded } from '#lib/featureFlags.js'
+  import { listPlugins, SIDELOADER_URL } from '#lib/plugins.js'
+  import Callout from '#lib/components/Callout.svelte'
 
   const OTHER = 'Other'
 

@@ -16,14 +16,15 @@ Package manager is **yarn** (yarn.lock is committed; `engine-strict=true` in `.n
 - `yarn lint` — ESLint over the repo (config: `.eslintrc.cjs`, extends `eslint:recommended`, `standard`, `plugin:svelte/recommended`; `svelte/no-at-html-tags` is disabled because templates use `{@html ...}` for rendered markdown).
 - `yarn commit` — commitizen with conventional-changelog. The repo expects Conventional Commits (`feat:`, `fix:`, `feat(scope): ...`).
 
-There is **no test suite** and **no typecheck script**; don't invent one. The project is plain JS + Svelte (no TypeScript in `src/`, although `svelte.config.ts` exists alongside the identical `svelte.config.js` — `vite.config.js` only references the `.js` one).
+There is **no test suite** and **no typecheck script**; don't invent one. The project is plain JS + Svelte (no TypeScript in `src/`).
 
 ## Architecture
 
 ### Stack
 
-- **SvelteKit 2** + **Svelte 5** (runes). New code uses `$state`, `$props`, `$derived`, snippets (`{#snippet}` / `{@render}`). Don't fall back to Svelte 4 reactivity (`$:`, `export let`) when touching components that already use runes.
+- **SvelteKit 3** + **Svelte 5** (runes). New code uses `$state`, `$props`, `$derived`, snippets (`{#snippet}` / `{@render}`). Don't fall back to Svelte 4 reactivity (`$:`, `export let`) when touching components that already use runes.
 - **`@sveltejs/adapter-node`** — the app ships as a Node server (see `Dockerfile`: built artefact runs on distroless `nodejs24`).
+- SvelteKit 3 conventions: config (adapter, preprocess) lives in the `sveltekit({...})` call in `vite.config.js`, there is no `svelte.config.js`. Import from `#lib/...` with the file extension (`#lib/pocketbase/index.js`, `#lib/utils.js`), declared in `package.json` `imports`; `$lib` no longer exists. Use `$app/state` (not `$app/stores`) and `$app/env` (not `$app/environment`). Server env vars are declared in `src/env.js` with `defineEnvVars` and read from `$app/env/private`. `goto` options are `replace` and `reset: false` (no `replaceState`/`keepFocus`/`noScroll`), and `goto` rejects paths that match no route.
 - **PocketBase JS SDK** (`pocketbase` npm package). The single shared client lives in [src/lib/pocketbase/index.js](src/lib/pocketbase/index.js) — `new PocketBase('/')`. All collection access goes through this `pb` instance; there is no separate API layer.
 - **carta-md** for the markdown editor; **isomorphic-dompurify** wraps untrusted HTML; **@zerodevx/svelte-toast** for toasts; **svelte-multiselect** + **svelte-time** + **lodash.sortby** as smaller helpers.
 - **Sass** for styles. Global CSS is `src/style.css`; editor styling is `src/lib/styles/editor.scss`. Both are imported once from the root layout.
@@ -61,7 +62,7 @@ Standard SvelteKit file-based routing under [src/routes/](src/routes/). Top-leve
 
 ### Deployment
 
-`Dockerfile` is a two-stage build: `node:24` for `yarn build`, then `gcr.io/distroless/nodejs24-debian12` running the adapter-node output as `index.js` under uid 65532. No env vars are wired in — the production deployment serves PocketBase on the same origin so the relative `/api` path resolves correctly.
+`Dockerfile` is a two-stage build: `node:24` for `yarn build`, then `gcr.io/distroless/nodejs24-debian12` running the adapter-node output as `index.js` under uid 65532. The production deployment serves PocketBase on the same origin so the relative `/api` path resolves correctly. The kube manifest sets `ORIGIN=https://ingress.plus` (adapter-node assumes `https` with the `Host` header otherwise, so SSR self-fetches fail in a local `node build` run without it) and `PB_INTERNAL_URL` (in-cluster backend for server-side reads).
 
 ### IITC plugin store
 

@@ -2,21 +2,24 @@
   import { onMount } from 'svelte'
   import { goto } from '$app/navigation'
   import { page } from '$app/state'
-  import { completeRedirectLogin } from '$lib/auth'
-  import Callout from '$lib/components/Callout.svelte'
+  import { completeRedirectLogin } from '#lib/auth.js'
+  import Callout from '#lib/components/Callout.svelte'
 
   // Google sends the agent back here after the redirect login (see
-  // loginWithRedirect in $lib/auth).
+  // loginWithRedirect in #lib/auth).
   let error = $state('')
   let returnTo = $state('/')
 
   onMount(async () => {
     try {
       const target = await completeRedirectLogin(page.url.searchParams)
-      // replaceState: the callback URL holds a used, single-use code, so it
-      // shouldn't stay in history for the back button.
+      // replace: the callback URL holds a used, single-use code, so it
+      // shouldn't stay in history for the back button. goto rejects a path
+      // that matches no route (sign-in started from a 404 page): the login
+      // already worked, so fall back to a full navigation instead of
+      // reporting a failure.
       // eslint-disable-next-line svelte/no-navigation-without-resolve -- same-origin path saved before the redirect
-      await goto(target, { replaceState: true })
+      await goto(target, { replace: true }).catch(() => window.location.replace(target))
     } catch (err) {
       console.error('Login failed:', err)
       returnTo = err?.returnTo || '/'

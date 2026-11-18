@@ -1,16 +1,16 @@
 <script>
   import { onMount } from 'svelte'
   import { get } from 'svelte/store'
-  import { page } from '$app/stores'
+  import { page } from '$app/state'
   import { SvelteToast } from '@zerodevx/svelte-toast'
-  import { authData, freshLogin, siteSettings, ONBOARDING_DONE_STATES } from '$lib/stores'
-  import Header from '$lib/components/Header.svelte'
-  import Footer from '$lib/components/Footer.svelte'
-  import LoadingBar from '$lib/components/LoadingBar.svelte'
-  import OnboardingModal from '$lib/components/OnboardingModal.svelte'
+  import { authData, freshLogin, siteSettings, ONBOARDING_DONE_STATES } from '#lib/stores/index.js'
+  import Header from '#lib/components/Header.svelte'
+  import Footer from '#lib/components/Footer.svelte'
+  import LoadingBar from '#lib/components/LoadingBar.svelte'
+  import OnboardingModal from '#lib/components/OnboardingModal.svelte'
 
   import '../style.css'
-  import '$lib/styles/editor.scss'
+  import '#lib/styles/editor.scss'
 
   const { children } = $props()
 
@@ -54,7 +54,7 @@
     const wasFreshLogin = get(freshLogin)
     freshLogin.set(false)
 
-    if ($page.url.pathname === '/onboarding') return
+    if (page.url.pathname === '/onboarding') return
 
     const state = $authData.baseModel?.onboardingState
     if (ONBOARDING_DONE_STATES.includes(state)) return

@@ -1,10 +1,10 @@
 <script>
   import { onMount } from 'svelte'
   import { page } from '$app/state'
-  import { pb } from '$lib/pocketbase'
-  import { authData } from '$lib/stores'
-  import { featureFlags, featureFlagsLoaded } from '$lib/featureFlags'
-  import Callout from '$lib/components/Callout.svelte'
+  import { pb } from '#lib/pocketbase/index.js'
+  import { authData } from '#lib/stores/index.js'
+  import { featureFlags, featureFlagsLoaded } from '#lib/featureFlags.js'
+  import Callout from '#lib/components/Callout.svelte'
 
   // Opened as a popup by the sideloader on intel.ingress.com. The token goes
   // back to that window only: postMessage with an explicit target origin

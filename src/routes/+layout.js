@@ -1,4 +1,4 @@
-import { featureFlags, featureFlagsLoaded } from '$lib/featureFlags'
+import { featureFlags, featureFlagsLoaded } from '#lib/featureFlags.js'
 
 export async function load ({ data }) {
   // The fetch itself happens in +layout.server.js; this only mirrors the result

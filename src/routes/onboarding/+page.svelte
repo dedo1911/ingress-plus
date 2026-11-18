@@ -1,11 +1,11 @@
 <script>
-  import { browser } from '$app/environment'
+  import { browser } from '$app/env'
   import { goto } from '$app/navigation'
   import { resolve } from '$app/paths'
-  import { authData, ONBOARDING_DONE_STATES } from '$lib/stores'
-  import { pb } from '$lib/pocketbase'
-  import { refreshOwnedBadges } from '$lib/badges'
-  import { updateOwnUser, usernameErrorMessage } from '$lib/user'
+  import { authData, ONBOARDING_DONE_STATES } from '#lib/stores/index.js'
+  import { pb } from '#lib/pocketbase/index.js'
+  import { refreshOwnedBadges } from '#lib/badges.js'
+  import { updateOwnUser, usernameErrorMessage } from '#lib/user.js'
   import { toast } from '@zerodevx/svelte-toast'
 
   const ONBOARDING_BADGE_ID = 'onl0wktktek3bn8'

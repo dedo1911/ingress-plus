@@ -1,7 +1,7 @@
-import { pb } from '$lib/pocketbase'
-import { authData, freshLogin } from '$lib/stores'
-import { refreshOwnedBadges } from '$lib/badges'
-import { updateOwnUser } from '$lib/user'
+import { pb } from '#lib/pocketbase/index.js'
+import { authData, freshLogin } from '#lib/stores/index.js'
+import { refreshOwnedBadges } from '#lib/badges.js'
+import { updateOwnUser } from '#lib/user.js'
 
 const PROVIDER = 'google'
 const PENDING_KEY = 'oauth2:pending'

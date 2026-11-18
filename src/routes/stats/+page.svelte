@@ -1,9 +1,9 @@
 <script>
   import Time, { dayjs } from 'svelte-time'
   import { resolve } from '$app/paths'
-  import { pb } from '$lib/pocketbase'
-  import AgentName from '$lib/components/AgentName.svelte'
-  import { formatNumber } from '$lib/utils.js'
+  import { pb } from '#lib/pocketbase/index.js'
+  import AgentName from '#lib/components/AgentName.svelte'
+  import { formatNumber } from '#lib/utils.js'
 
   const { data } = $props()
   const s = $derived(data.statistics)

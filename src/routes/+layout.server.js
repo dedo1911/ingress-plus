@@ -1,4 +1,4 @@
-import { createServerClient } from '$lib/server/pocketbase'
+import { createServerClient } from '#lib/server/pocketbase.js'
 
 // Every page render used to re-read the flags. They are eventually-consistent
 // by nature (an admin toggle is a deliberate act, not a per-request signal),
@@ -11,7 +11,7 @@ let cachedAt = 0
 export async function load () {
   if (cachedFlags && Date.now() - cachedAt < FLAGS_TTL_MS) return { featureFlags: cachedFlags }
 
-  // See $lib/server/pocketbase for why this is in-cluster and per request.
+  // See #lib/server/pocketbase for why this is in-cluster and per request.
   const pb = createServerClient()
 
   try {
@@ -20,7 +20,7 @@ export async function load () {
     cachedAt = Date.now()
     return { featureFlags: cachedFlags }
   } catch (err) {
-    // Fall back to the defaults in $lib/featureFlags rather than failing the
+    // Fall back to the defaults in #lib/featureFlags rather than failing the
     // whole app: a flag we cannot read is treated as disabled.
     console.error('Failed to load feature flags:', err)
     return { featureFlags: null }

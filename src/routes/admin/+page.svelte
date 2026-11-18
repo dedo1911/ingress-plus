@@ -1,14 +1,14 @@
 <script>
   import { tick } from 'svelte'
-  import { browser } from '$app/environment'
-  import { pbAdmin } from '$lib/pocketbase/admin.js'
-  import { pb } from '$lib/pocketbase/index.js'
-  import { authData } from '$lib/stores'
+  import { browser } from '$app/env'
+  import { pbAdmin } from '#lib/pocketbase/admin.js'
+  import { pb } from '#lib/pocketbase/index.js'
+  import { authData } from '#lib/stores/index.js'
   import { resolve } from '$app/paths'
   import { toast } from '@zerodevx/svelte-toast'
-  import Callout from '$lib/components/Callout.svelte'
-  import Modal from '$lib/components/Modal.svelte'
-  import AdminPlugins from '$lib/components/plugins/AdminPlugins.svelte'
+  import Callout from '#lib/components/Callout.svelte'
+  import Modal from '#lib/components/Modal.svelte'
+  import AdminPlugins from '#lib/components/plugins/AdminPlugins.svelte'
 
   // pbAdmin.authStore is PocketBase's own store, not a Svelte one - it has
   // to be mirrored into local state via onChange to react to it here.
@@ -62,7 +62,7 @@
   const switchTab = (id) => { activeTab = id }
 
   // Feature flags: toggles existing feature_flags records only. Creating a
-  // new flag name here wouldn't do anything - $lib/featureFlags.js and
+  // new flag name here wouldn't do anything - #lib/featureFlags.js and
   // +layout.js only react to the specific names the app code already
   // checks for, so authoring a new flag is a code change, not an admin
   // panel job.

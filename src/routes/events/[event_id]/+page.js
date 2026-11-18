@@ -1,5 +1,5 @@
-import { throwLoadError } from '$lib/load'
-import { pb } from '$lib/pocketbase'
+import { throwLoadError } from '#lib/load.js'
+import { pb } from '#lib/pocketbase/index.js'
 
 export async function load ({ fetch, params }) {
   try {

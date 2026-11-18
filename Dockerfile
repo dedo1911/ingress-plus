@@ -7,7 +7,6 @@ COPY yarn.lock .
 RUN yarn install --frozen-lockfile --ignore-scripts
 COPY src src
 COPY static static
-COPY svelte.config.js .
 COPY vite.config.js .
 RUN yarn build
 

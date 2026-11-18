@@ -1,7 +1,7 @@
 <script>
-  import { pb } from '$lib/pocketbase'
-  import { badgeSize } from '$lib/stores'
-  import { thumbSize } from '$lib/utils'
+  import { pb } from '#lib/pocketbase/index.js'
+  import { badgeSize } from '#lib/stores/index.js'
+  import { thumbSize } from '#lib/utils.js'
 
   // `owned` is a user_badges record expanded with badge,badge.category.
   const { owned } = $props()

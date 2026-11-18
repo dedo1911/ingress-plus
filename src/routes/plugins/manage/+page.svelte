@@ -2,10 +2,10 @@
   import { goto } from '$app/navigation'
   import { resolve } from '$app/paths'
   import { toast } from '@zerodevx/svelte-toast'
-  import { pb } from '$lib/pocketbase'
-  import { authData } from '$lib/stores'
-  import { featureFlags } from '$lib/featureFlags'
-  import { STATUS_LABELS } from '$lib/plugins'
+  import { pb } from '#lib/pocketbase/index.js'
+  import { authData } from '#lib/stores/index.js'
+  import { featureFlags } from '#lib/featureFlags.js'
+  import { STATUS_LABELS } from '#lib/plugins.js'
 
   // The collection's list rule already limits this to the agent's own plugins.
   let plugins = $state(null)

@@ -1,4 +1,6 @@
+import adapter from '@sveltejs/adapter-node'
 import { sveltekit } from '@sveltejs/kit/vite'
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
@@ -18,5 +20,11 @@ export default defineConfig({
       },
     },
   },
-  plugins: [sveltekit()]
+  plugins: [
+    // SvelteKit 3 reads its config from here; svelte.config.js is gone.
+    sveltekit({
+      preprocess: vitePreprocess(),
+      adapter: adapter()
+    })
+  ]
 })

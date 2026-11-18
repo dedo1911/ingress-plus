@@ -3,10 +3,10 @@
   import { SvelteSet } from 'svelte/reactivity'
   import { tick } from 'svelte'
   import { resolve } from '$app/paths'
-  import { badgeSize, siteSettings, authData } from '$lib/stores'
-  import Category from '$lib/components/Category.svelte'
-  import CategoryGroup from '$lib/components/CategoryGroup.svelte'
-  import { nestCategories } from '$lib/categories'
+  import { badgeSize, siteSettings, authData } from '#lib/stores/index.js'
+  import Category from '#lib/components/Category.svelte'
+  import CategoryGroup from '#lib/components/CategoryGroup.svelte'
+  import { nestCategories } from '#lib/categories.js'
   import { onMount } from 'svelte'
 
   const { data } = $props()

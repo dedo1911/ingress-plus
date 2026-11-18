@@ -1,5 +1,5 @@
 <script>
-  import { pb } from '$lib/pocketbase'
+  import { pb } from '#lib/pocketbase/index.js'
 
   // expandTiers: when a badge has multiple tiers, show every tier icon (grouped
   // under that badge's own single title) instead of just its highest one. Always

@@ -1,6 +1,6 @@
 <script>
   import { resolve } from '$app/paths'
-  import { featureFlags } from '$lib/featureFlags'
+  import { featureFlags } from '#lib/featureFlags.js'
 </script>
 
 <svelte:head>

@@ -1,8 +1,8 @@
 <script>
   import { slide } from 'svelte/transition'
-  import { pb } from '$lib/pocketbase'
-  import { authData, ownedBadges, ownedBadgesByBadge, badgeSize } from '$lib/stores'
-  import Modal from '$lib/components/Modal.svelte'
+  import { pb } from '#lib/pocketbase/index.js'
+  import { authData, ownedBadges, ownedBadgesByBadge, badgeSize } from '#lib/stores/index.js'
+  import Modal from '#lib/components/Modal.svelte'
   import Time, { dayjs } from 'svelte-time'
 
   let {

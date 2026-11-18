@@ -1,5 +1,4 @@
-import { json } from '@sveltejs/kit'
-import { guardImportRequest } from '$lib/server/importGuard'
+import { guardImportRequest } from '#lib/server/importGuard.js'
 
 const AGENT_STATS_BASE = 'https://api.agent-stats.com'
 
@@ -13,7 +12,7 @@ export async function POST ({ request, fetch }) {
   if (guard instanceof Response) return guard
   const { apiKey } = await request.json()
   if (!apiKey || typeof apiKey !== 'string') {
-    return json({ error: 'Missing API key.' }, { status: 400 })
+    return Response.json({ error: 'Missing API key.' }, { status: 400 })
   }
 
   const headers = { 'AS-Key': apiKey }
@@ -26,7 +25,7 @@ export async function POST ({ request, fetch }) {
     ])
   } catch (err) {
     console.error(err)
-    return json({ error: 'Could not reach Agent Stats. Please try again later.' }, { status: 502 })
+    return Response.json({ error: 'Could not reach Agent Stats. Please try again later.' }, { status: 502 })
   }
 
   const [medalsText, progressText] = await Promise.all([medalsRes.text(), progressRes.text()])
@@ -36,8 +35,8 @@ export async function POST ({ request, fetch }) {
     medals = JSON.parse(medalsText)
     progress = JSON.parse(progressText)
   } catch {
-    return json({ error: 'Invalid Agent Stats API key.' }, { status: 401 })
+    return Response.json({ error: 'Invalid Agent Stats API key.' }, { status: 401 })
   }
 
-  return json({ medals, progress })
+  return Response.json({ medals, progress })
 }

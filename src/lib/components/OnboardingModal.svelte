@@ -2,9 +2,9 @@
   import { goto } from '$app/navigation'
   import { resolve } from '$app/paths'
   import { toast } from '@zerodevx/svelte-toast'
-  import { authData } from '$lib/stores'
-  import { updateOwnUser } from '$lib/user'
-  import Modal from '$lib/components/Modal.svelte'
+  import { authData } from '#lib/stores/index.js'
+  import { updateOwnUser } from '#lib/user.js'
+  import Modal from '#lib/components/Modal.svelte'
 
   let { showModal = $bindable() } = $props()
 

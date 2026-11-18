@@ -1,18 +1,18 @@
 <script>
-  import { browser } from '$app/environment'
+  import { browser } from '$app/env'
   import { goto } from '$app/navigation'
   import { resolve } from '$app/paths'
   import { slide } from 'svelte/transition'
   import { toast } from '@zerodevx/svelte-toast'
-  import { pb } from '$lib/pocketbase'
-  import { authData, ownedBadges } from '$lib/stores'
-  import { updateOwnUser } from '$lib/user'
-  import { parseTextExport } from '$lib/statImport/textExport.js'
-  import { matchBadgesToStats } from '$lib/statImport/matchBadges.js'
-  import { fetchAgentStats } from '$lib/statImport/agentStats.js'
-  import { fetchTheGridStats } from '$lib/statImport/theGrid.js'
-  import { fetchStatsTrackerProStats } from '$lib/statImport/statsTrackerPro.js'
-  import Callout from '$lib/components/Callout.svelte'
+  import { pb } from '#lib/pocketbase/index.js'
+  import { authData, ownedBadges } from '#lib/stores/index.js'
+  import { updateOwnUser } from '#lib/user.js'
+  import { parseTextExport } from '#lib/statImport/textExport.js'
+  import { matchBadgesToStats } from '#lib/statImport/matchBadges.js'
+  import { fetchAgentStats } from '#lib/statImport/agentStats.js'
+  import { fetchTheGridStats } from '#lib/statImport/theGrid.js'
+  import { fetchStatsTrackerProStats } from '#lib/statImport/statsTrackerPro.js'
+  import Callout from '#lib/components/Callout.svelte'
 
   const { data } = $props()
   const { badges, theGridStatMatches, statsTrackerProStatMatches } = data

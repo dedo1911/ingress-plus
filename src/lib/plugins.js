@@ -1,6 +1,6 @@
 import { Carta } from 'carta-md'
 import DOMPurify from 'isomorphic-dompurify'
-import { pb } from '$lib/pocketbase'
+import { pb } from '#lib/pocketbase/index.js'
 
 // The sideloader userscript, served from static/.
 export const SIDELOADER_URL = '/ingress-plus.user.js'

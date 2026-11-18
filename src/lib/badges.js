@@ -1,5 +1,5 @@
-import { pb } from '$lib/pocketbase'
-import { ownedBadges } from '$lib/stores'
+import { pb } from '#lib/pocketbase/index.js'
+import { ownedBadges } from '#lib/stores/index.js'
 
 // Shared by anything that can change the signed-in Agent's owned badges
 // (Header's login/mount, onboarding's badge award) so ownedBadges - and

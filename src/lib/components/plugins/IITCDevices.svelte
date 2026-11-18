@@ -3,7 +3,7 @@
   import Time from 'svelte-time'
   import { toast } from '@zerodevx/svelte-toast'
   import { resolve } from '$app/paths'
-  import { pb } from '$lib/pocketbase'
+  import { pb } from '#lib/pocketbase/index.js'
 
   // The IITC sideloaders connected to this account. Revoking deletes the
   // token record; the device has to go through /iitc/connect again.

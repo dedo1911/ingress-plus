@@ -5,13 +5,13 @@
   import { MarkdownEditor } from 'carta-md'
   import Time from 'svelte-time'
   import { toast } from '@zerodevx/svelte-toast'
-  import { pb } from '$lib/pocketbase'
-  import { authData } from '$lib/stores'
-  import { featureFlags } from '$lib/featureFlags'
-  import { pluginCarta, STATUS_LABELS, VERSION_STATUS_LABELS } from '$lib/plugins'
-  import AccessRulesEditor from '$lib/components/plugins/AccessRulesEditor.svelte'
-  import Callout from '$lib/components/Callout.svelte'
-  import Modal from '$lib/components/Modal.svelte'
+  import { pb } from '#lib/pocketbase/index.js'
+  import { authData } from '#lib/stores/index.js'
+  import { featureFlags } from '#lib/featureFlags.js'
+  import { pluginCarta, STATUS_LABELS, VERSION_STATUS_LABELS } from '#lib/plugins.js'
+  import AccessRulesEditor from '#lib/components/plugins/AccessRulesEditor.svelte'
+  import Callout from '#lib/components/Callout.svelte'
+  import Modal from '#lib/components/Modal.svelte'
 
   const carta = pluginCarta()
 

@@ -6,7 +6,7 @@
   // Since v3 only the default style ships with the main entry: npm users have
   // to import any other button style they use.
   import 'add-to-calendar-button/styles/text'
-  import { stripHtml } from '$lib/utils.js'
+  import { stripHtml } from '#lib/utils.js'
 
   const { event } = $props()
 </script>

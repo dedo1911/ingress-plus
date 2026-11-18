@@ -1,5 +1,5 @@
-import { throwLoadError } from '$lib/load'
-import { pb } from '$lib/pocketbase'
+import { throwLoadError } from '#lib/load.js'
+import { pb } from '#lib/pocketbase/index.js'
 
 // Only the fetch lives here: the times are re-read in the agent's own
 // timezone, which is a browser-side decision the page makes from this data.

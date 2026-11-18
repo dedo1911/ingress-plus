@@ -4,11 +4,11 @@
 
   import { afterNavigate } from '$app/navigation'
   import { resolve } from '$app/paths'
-  import { pb } from '$lib/pocketbase'
-  import { authData, ownedBadges } from '$lib/stores'
-  import { featureFlags } from '$lib/featureFlags'
-  import { refreshOwnedBadges } from '$lib/badges'
-  import { loginWithPopup, loginWithRedirect, prefersRedirect } from '$lib/auth'
+  import { pb } from '#lib/pocketbase/index.js'
+  import { authData, ownedBadges } from '#lib/stores/index.js'
+  import { featureFlags } from '#lib/featureFlags.js'
+  import { refreshOwnedBadges } from '#lib/badges.js'
+  import { loginWithPopup, loginWithRedirect, prefersRedirect } from '#lib/auth.js'
   import { toast } from '@zerodevx/svelte-toast'
 
   let menuOpen = $state(false)

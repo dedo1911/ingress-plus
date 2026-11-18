@@ -1,5 +1,5 @@
-import { throwLoadError } from '$lib/load'
-import { pb } from '$lib/pocketbase'
+import { throwLoadError } from '#lib/load.js'
+import { pb } from '#lib/pocketbase/index.js'
 
 const DEFAULT_SORT = '-released_at'
 const DEFAULT_PER_PAGE = 20

@@ -2,12 +2,12 @@
   import { toast } from '@zerodevx/svelte-toast'
   import { Carta, MarkdownEditor } from 'carta-md'
   import DOMPurify from 'isomorphic-dompurify'
-  import { pb } from '$lib/pocketbase'
+  import { pb } from '#lib/pocketbase/index.js'
   import { goto } from '$app/navigation'
   import { resolve } from '$app/paths'
-  import { browser } from '$app/environment'
-  import { authData } from '$lib/stores'
-  import { featureFlags } from '$lib/featureFlags'
+  import { browser } from '$app/env'
+  import { authData } from '#lib/stores/index.js'
+  import { featureFlags } from '#lib/featureFlags.js'
 
   let title = $state('')
   let ingressVersion = $state('')

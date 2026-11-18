@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit'
-import { pb } from '$lib/pocketbase'
+import { pb } from '#lib/pocketbase/index.js'
 
 export async function load ({ fetch, params }) {
   try {

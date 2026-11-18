@@ -2,9 +2,9 @@
   import { onMount } from 'svelte'
   import Time from 'svelte-time'
   import { toast } from '@zerodevx/svelte-toast'
-  import { pbAdmin } from '$lib/pocketbase/admin.js'
-  import { STATUS_LABELS, describeAccess } from '$lib/plugins'
-  import Callout from '$lib/components/Callout.svelte'
+  import { pbAdmin } from '#lib/pocketbase/admin.js'
+  import { STATUS_LABELS, describeAccess } from '#lib/plugins.js'
+  import Callout from '#lib/components/Callout.svelte'
 
   // Review queue for the IITC plugin store. Approving or rejecting a version
   // is just a status change on the record; the backend hooks then update the

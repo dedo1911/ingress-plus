@@ -1,5 +1,5 @@
-import { throwLoadError } from '$lib/load'
-import { pb } from '$lib/pocketbase'
+import { throwLoadError } from '#lib/load.js'
+import { pb } from '#lib/pocketbase/index.js'
 
 const TIERS = [2500, 7000, 15000, 32000, 90000, 200000]
 

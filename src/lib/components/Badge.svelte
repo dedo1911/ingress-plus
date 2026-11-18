@@ -1,8 +1,8 @@
 <script>
-  import { pb } from '$lib/pocketbase'
-  import { thumbSize } from '$lib/utils'
-  import { authData, ownedBadgesByBadge, badgeSize, siteSettings } from '$lib/stores'
-  import BadgeModal from '$lib/components/BadgeModal.svelte'
+  import { pb } from '#lib/pocketbase/index.js'
+  import { thumbSize } from '#lib/utils.js'
+  import { authData, ownedBadgesByBadge, badgeSize, siteSettings } from '#lib/stores/index.js'
+  import BadgeModal from '#lib/components/BadgeModal.svelte'
 
   const { category, index } = $props()
 

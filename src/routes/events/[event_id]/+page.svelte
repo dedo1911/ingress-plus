@@ -1,7 +1,7 @@
 <script>
-  import { pb } from '$lib/pocketbase'
-  import AddToCalendarButton from '$lib/components/AddToCalendarButton.svelte'
-  import EventBadges from '$lib/components/EventBadges.svelte'
+  import { pb } from '#lib/pocketbase/index.js'
+  import AddToCalendarButton from '#lib/components/AddToCalendarButton.svelte'
+  import EventBadges from '#lib/components/EventBadges.svelte'
   import Time, { dayjs } from 'svelte-time'
   import utc from 'dayjs/plugin/utc'
   import timezone from 'dayjs/plugin/timezone'

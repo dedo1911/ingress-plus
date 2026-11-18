@@ -1,7 +1,7 @@
 <script>
   import Time, { dayjs } from 'svelte-time'
   import { resolve } from '$app/paths'
-  import AgentName from '$lib/components/AgentName.svelte'
+  import AgentName from '#lib/components/AgentName.svelte'
   import DOMPurify from 'isomorphic-dompurify'
 
   const { data } = $props()

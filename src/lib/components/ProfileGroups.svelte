@@ -1,9 +1,9 @@
 <script>
   import { SvelteSet } from 'svelte/reactivity'
-  import { badgeSize } from '$lib/stores'
-  import { nestCategories } from '$lib/categories'
-  import CategoryGroup from '$lib/components/CategoryGroup.svelte'
-  import ProfileBadge from '$lib/components/ProfileBadge.svelte'
+  import { badgeSize } from '#lib/stores/index.js'
+  import { nestCategories } from '#lib/categories.js'
+  import CategoryGroup from '#lib/components/CategoryGroup.svelte'
+  import ProfileBadge from '#lib/components/ProfileBadge.svelte'
 
   // `badges` is a list of user_badges records, already sorted by category and
   // badge, expanded with badge,badge.category,badge.category.parent.

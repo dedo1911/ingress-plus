@@ -1,5 +1,5 @@
 <script>
-  import { serverAddress } from '$lib/pocketbase'
+  import { serverAddress } from '#lib/pocketbase/index.js'
   import Modal from './Modal.svelte'
 
   const { attachment, report } = $props()

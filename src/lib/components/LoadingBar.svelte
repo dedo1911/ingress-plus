@@ -1,7 +1,7 @@
 <script>
   import { onDestroy } from 'svelte'
   import { navigating } from '$app/state'
-  import { isLoading } from '$lib/stores'
+  import { isLoading } from '#lib/stores/index.js'
 
   // Wait a moment before showing: most PocketBase calls finish quickly and a
   // bar that flashes for 80ms reads as a glitch rather than as feedback.

@@ -1,5 +1,5 @@
-import { pb } from '$lib/pocketbase'
-import { authData } from '$lib/stores'
+import { pb } from '#lib/pocketbase/index.js'
+import { authData } from '#lib/stores/index.js'
 
 // Update the signed-in Agent's own users record.
 //

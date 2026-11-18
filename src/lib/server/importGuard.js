@@ -1,5 +1,4 @@
-import { json } from '@sveltejs/kit'
-import { createServerClient } from '$lib/server/pocketbase'
+import { createServerClient } from '#lib/server/pocketbase.js'
 
 // The stat-import proxies forward third-party API keys upstream from our own
 // IP. The page is auth-gated but the endpoints weren't, which made them a
@@ -25,7 +24,7 @@ const isRateLimited = (userId) => {
 // Resolves to the caller's user id, or to a ready-made error Response.
 export async function guardImportRequest (request) {
   const token = request.headers.get('authorization')
-  if (!token) return json({ error: 'You need to be logged in to import stats.' }, { status: 401 })
+  if (!token) return Response.json({ error: 'You need to be logged in to import stats.' }, { status: 401 })
 
   const pb = createServerClient()
   pb.authStore.save(token, null)
@@ -33,11 +32,11 @@ export async function guardImportRequest (request) {
   try {
     userId = (await pb.collection('users').authRefresh()).record.id
   } catch {
-    return json({ error: 'Your session has expired. Please log in again.' }, { status: 401 })
+    return Response.json({ error: 'Your session has expired. Please log in again.' }, { status: 401 })
   }
 
   if (isRateLimited(userId)) {
-    return json({ error: 'Too many imports in a row. Please wait a minute and try again.' }, { status: 429 })
+    return Response.json({ error: 'Too many imports in a row. Please wait a minute and try again.' }, { status: 429 })
   }
 
   return userId

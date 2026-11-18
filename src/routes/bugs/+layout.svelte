@@ -1,8 +1,8 @@
 <script>
     import { goto } from '$app/navigation'
     import { resolve } from '$app/paths'
-    import { browser } from '$app/environment'
-    import { featureFlags, featureFlagsLoaded } from '$lib/featureFlags'
+    import { browser } from '$app/env'
+    import { featureFlags, featureFlagsLoaded } from '#lib/featureFlags.js'
 
     const { children } = $props()
 

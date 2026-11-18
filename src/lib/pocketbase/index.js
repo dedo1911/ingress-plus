@@ -1,6 +1,6 @@
 import PocketBase from 'pocketbase'
-import { browser } from '$app/environment'
-import { pendingRequests } from '$lib/stores'
+import { browser } from '$app/env'
+import { pendingRequests } from '#lib/stores/index.js'
 
 export const serverAddress = ''
 

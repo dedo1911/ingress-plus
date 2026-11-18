@@ -1,5 +1,5 @@
 <script>
-  import Callout from '$lib/components/Callout.svelte'
+  import Callout from '#lib/components/Callout.svelte'
 
   const ISSUE_URL = 'https://github.com/dedo1911/ingress-plus/issues/new?template=cmu-calculator---suggest-currency.md'
 

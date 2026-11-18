@@ -1,11 +1,11 @@
 <script>
-  import { authData } from '$lib/stores'
-  import { featureFlags } from '$lib/featureFlags'
-  import { updateOwnUser, usernameErrorMessage } from '$lib/user'
+  import { authData } from '#lib/stores/index.js'
+  import { featureFlags } from '#lib/featureFlags.js'
+  import { updateOwnUser, usernameErrorMessage } from '#lib/user.js'
   import { toast } from '@zerodevx/svelte-toast'
-  import AgentName from '$lib/components/AgentName.svelte'
-  import IITCDevices from '$lib/components/plugins/IITCDevices.svelte'
-  import { browser } from '$app/environment'
+  import AgentName from '#lib/components/AgentName.svelte'
+  import IITCDevices from '#lib/components/plugins/IITCDevices.svelte'
+  import { browser } from '$app/env'
   import { goto } from '$app/navigation'
   import { resolve } from '$app/paths'
 

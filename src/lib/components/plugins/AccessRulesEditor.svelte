@@ -1,7 +1,7 @@
 <script>
   import { untrack } from 'svelte'
-  import { pb } from '$lib/pocketbase'
-  import { ACCESS_RULE_TYPES, FACTION_OPTIONS } from '$lib/plugins'
+  import { pb } from '#lib/pocketbase/index.js'
+  import { ACCESS_RULE_TYPES, FACTION_OPTIONS } from '#lib/plugins.js'
 
   // Edits a plugin's access JSON ({ rules: [...] }), the same rule shape the
   // email campaign targeting uses. Rules are OR'd; the author always has
