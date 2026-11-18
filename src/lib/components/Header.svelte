@@ -56,6 +56,15 @@
     window.location.href = 'https://t.me/Ingress_Plus'
   }
 
+  // Since SDK 0.29 a 401 (expired or revoked token) clears pb.authStore by
+  // itself. authData holds that same store object, so nothing would notice
+  // and the header would stay signed in: follow the store instead.
+  onMount(() => pb.authStore.onChange((token) => {
+    if (token) return
+    authData.set({ isValid: false })
+    ownedBadges.set([])
+  }))
+
   onMount(async () => {
     if (!pb.authStore.isValid) {
       // authData starts as { isValid: null } ("unknown"); pages that redirect
