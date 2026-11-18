@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name IITC Plugin: Ingress Plus
 // @category Misc
-// @version 2.0.0
+// @version 2.1.0
 // @namespace https://ingress.plus
 // @downloadURL https://ingress.plus/ingress-plus.user.js
 // @updateURL https://ingress.plus/ingress-plus.user.js
@@ -15,6 +15,9 @@
 // @grant none
 // ==/UserScript==
 
+//
+//  Changelog 2.1.0
+//    Plugins download gzipped, and the store serves them without comments
 //
 //  Changelog 2.0.0
 //    The store UI is no longer part of this script: it is loaded from
@@ -142,6 +145,11 @@ function wrapper (pluginInfo) {
   const fromB64 = (s) => Uint8Array.from(atob(s), c => c.charCodeAt(0))
   const toB64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)))
 
+  // The server gzips the code before encrypting it (ciphertext doesn't
+  // compress in transit), but only when asked, so browsers without
+  // DecompressionStream still get plain code.
+  const canGunzip = typeof DecompressionStream === 'function'
+
   const fetchPluginCode = async (plugin, version) => {
     const curve = { name: 'ECDH', namedCurve: 'P-256' }
     const pair = await crypto.subtle.generateKey(curve, false, ['deriveBits'])
@@ -149,7 +157,7 @@ function wrapper (pluginInfo) {
 
     const sealed = await api(`/api/iitc/plugins/${encodeURIComponent(plugin.slug)}/load`, {
       method: 'POST',
-      body: JSON.stringify({ clientPub: toB64(clientPub), version: version || '' })
+      body: JSON.stringify({ clientPub: toB64(clientPub), version: version || '', encodings: canGunzip ? ['gzip'] : [] })
     })
 
     const serverPub = await crypto.subtle.importKey('raw', fromB64(sealed.serverPub), curve, false, [])
@@ -160,7 +168,11 @@ function wrapper (pluginInfo) {
       hkdf, { name: 'AES-GCM', length: 256 }, false, ['decrypt'])
     const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: fromB64(sealed.iv) }, key, fromB64(sealed.ciphertext))
 
-    return { code: new TextDecoder().decode(plain), version: sealed.version, dev: sealed.dev }
+    const code = sealed.encoding === 'gzip'
+      ? await new Response(new Blob([plain]).stream().pipeThrough(new DecompressionStream('gzip'))).text()
+      : new TextDecoder().decode(plain)
+
+    return { code, version: sealed.version, dev: sealed.dev }
   }
 
   // ---- loading ----------------------------------------------------------
