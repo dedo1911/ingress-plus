@@ -115,8 +115,10 @@
       body.append('version', newVersion.trim())
       body.append('changelog', changelog)
       body.append('file', file)
-      await pb.collection('iitc_plugin_versions').create(body)
-      toast.push(`Version ${newVersion} uploaded. It is now waiting for review.`, { classes: ['successToast'] })
+      const created = await pb.collection('iitc_plugin_versions').create(body)
+      // Admins' uploads are approved on the spot by the backend.
+      const next = created.status === 'approved' ? 'It is live now.' : 'It is now waiting for review.'
+      toast.push(`Version ${created.version} uploaded. ${next}`, { classes: ['successToast'] })
       newVersion = ''
       changelog = ''
       fileInput.value = ''
