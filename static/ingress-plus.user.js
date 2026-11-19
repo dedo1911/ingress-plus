@@ -17,7 +17,8 @@
 
 //
 //  Changelog 2.3.0
-//    Plugins download all at once on start, then run in the usual order
+//    One request on start brings the plugin list and every enabled plugin,
+//    which then run in the usual order
 //
 //  Changelog 2.2.0
 //    Shares its API helper with the store, for the plugin changelogs
@@ -134,17 +135,18 @@ function wrapper (pluginInfo) {
       throw new AuthError('Your Ingress Plus connection expired or was revoked. Connect again from the toolbox.')
     }
     const body = await res.json().catch(() => ({}))
-    if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`)
+    if (!res.ok) throw Object.assign(new Error(body.error || `HTTP ${res.status}`), { status: res.status })
     return body
   }
 
-  const fetchCatalog = async () => {
-    const { plugins } = await api('/api/iitc/plugins')
+  const setCatalog = (plugins) => {
     self.catalog = plugins
     write('catalog', plugins)
     emit()
     return plugins
   }
+
+  const fetchCatalog = async () => setCatalog((await api('/api/iitc/plugins')).plugins)
 
   // ---- crypto (see ingress-plus-backend internal/iitc/crypto.go) --------
 
@@ -156,16 +158,27 @@ function wrapper (pluginInfo) {
   // DecompressionStream still get plain code.
   const canGunzip = typeof DecompressionStream === 'function'
 
-  const fetchPluginCode = async (plugin, version) => {
-    const curve = { name: 'ECDH', namedCurve: 'P-256' }
-    const pair = await crypto.subtle.generateKey(curve, false, ['deriveBits'])
-    const clientPub = await crypto.subtle.exportKey('raw', pair.publicKey)
+  const curve = { name: 'ECDH', namedCurve: 'P-256' }
+  const encodings = canGunzip ? ['gzip'] : []
 
+  // A fresh key pair per request. The server seals every plugin with its
+  // own key, so one pair can open all the plugins of a /boot answer.
+  const newKeyPair = async () => {
+    const pair = await crypto.subtle.generateKey(curve, false, ['deriveBits'])
+    pair.clientPub = toB64(await crypto.subtle.exportKey('raw', pair.publicKey))
+    return pair
+  }
+
+  const fetchPluginCode = async (plugin, version) => {
+    const pair = await newKeyPair()
     const sealed = await api(`/api/iitc/plugins/${encodeURIComponent(plugin.slug)}/load`, {
       method: 'POST',
-      body: JSON.stringify({ clientPub: toB64(clientPub), version: version || '', encodings: canGunzip ? ['gzip'] : [] })
+      body: JSON.stringify({ clientPub: pair.clientPub, version: version || '', encodings })
     })
+    return openSealed(pair, sealed)
+  }
 
+  const openSealed = async (pair, sealed) => {
     const serverPub = await crypto.subtle.importKey('raw', fromB64(sealed.serverPub), curve, false, [])
     const secret = await crypto.subtle.deriveBits({ name: 'ECDH', public: serverPub }, pair.privateKey, 256)
     const hkdf = await crypto.subtle.importKey('raw', secret, 'HKDF', false, ['deriveKey'])
@@ -195,12 +208,13 @@ function wrapper (pluginInfo) {
 
   const loading = {} // slug -> promise, so the startup load and a click never inject twice
 
-  // after is a promise the injection waits for, so plugins downloaded in
-  // parallel still run in order. The download itself starts right away.
-  const loadPlugin = (plugin, after) => {
+  // after is a promise the injection waits for, so plugins downloaded
+  // together still run in order. download is the code when it's already on
+  // its way (from /boot); otherwise the download starts right away.
+  const loadPlugin = (plugin, after, download) => {
     if (self.loaded[plugin.slug]) return Promise.resolve()
     if (!loading[plugin.slug]) {
-      loading[plugin.slug] = doLoadPlugin(plugin, after).finally(() => {
+      loading[plugin.slug] = doLoadPlugin(plugin, after, download).finally(() => {
         delete loading[plugin.slug]
         emit()
       })
@@ -209,9 +223,11 @@ function wrapper (pluginInfo) {
     return loading[plugin.slug]
   }
 
-  const doLoadPlugin = async (plugin, after) => {
-    const dev = plugin.isAuthor && plugin.devVersion && useDev().has(plugin.slug)
-    const download = fetchPluginCode(plugin, dev ? plugin.devVersion : '')
+  const doLoadPlugin = async (plugin, after, download) => {
+    if (!download) {
+      const dev = plugin.isAuthor && plugin.devVersion && useDev().has(plugin.slug)
+      download = fetchPluginCode(plugin, dev ? plugin.devVersion : '')
+    }
     download.catch(() => {}) // handled below, once it's this plugin's turn
     await after
     try {
@@ -229,24 +245,53 @@ function wrapper (pluginInfo) {
   // Started as soon as the sideloader is injected rather than in setup(),
   // so most plugins arrive while IITC is still booting and get set up
   // together with the built-in ones.
+  // One /boot request brings the catalog and the code of every enabled
+  // plugin, so startup waits a single round trip. Backends without /boot
+  // get the catalog first and then one /load per plugin.
+  const boot = async (wanted) => {
+    const pair = await newKeyPair()
+    const dev = useDev()
+    const answer = await api('/api/iitc/boot', {
+      method: 'POST',
+      body: JSON.stringify({
+        clientPub: pair.clientPub,
+        encodings,
+        plugins: [...wanted].map(slug => ({ slug, dev: dev.has(slug) }))
+      })
+    })
+    const downloads = {}
+    for (const load of answer.loads || []) {
+      downloads[load.slug] = load.error ? Promise.reject(new Error(load.error)) : openSealed(pair, load)
+      // Plugins no longer in the catalog are never awaited.
+      downloads[load.slug].catch(() => {})
+    }
+    return { catalog: setCatalog(answer.plugins), downloads }
+  }
+
   const loadEnabled = async () => {
     if (!read('token', null)) return
+    const wanted = enabled()
     let catalog
+    let downloads = {}
     try {
-      catalog = await fetchCatalog()
+      try {
+        ({ catalog, downloads } = await boot(wanted))
+      } catch (e) {
+        if (e.status !== 404) throw e
+        catalog = await fetchCatalog()
+      }
     } catch (e) {
       console.error(LOG_PREFIX, 'could not fetch the plugin list:', e)
       if (e instanceof AuthError) notify(e.message)
       return
     }
-    const wanted = enabled()
-    // Downloaded in parallel, but injected one after the other in catalog
-    // order, so plugins that depend on another one being defined first
-    // behave the same on every load. A plugin that fails doesn't hold up
-    // the ones after it (loadPlugin never rejects).
+    // Injected one after the other in catalog order, so plugins that depend
+    // on another one being defined first behave the same on every load. A
+    // plugin that fails doesn't hold up the ones after it (loadPlugin never
+    // rejects).
     let previous = Promise.resolve()
     for (const plugin of catalog) {
-      if (wanted.has(plugin.slug)) previous = loadPlugin(plugin, previous)
+      if (wanted.has(plugin.slug)) previous = loadPlugin(plugin, previous, downloads[plugin.slug])
     }
     await previous
     // Forget plugins the agent no longer has access to.
