@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name IITC Plugin: Ingress Plus
 // @category Misc
-// @version 2.4.0
+// @version 2.4.1
 // @namespace https://ingress.plus
 // @downloadURL https://ingress.plus/ingress-plus.user.js
-// @updateURL https://ingress.plus/ingress-plus.user.js
+// @updateURL https://ingress.plus/ingress-plus.meta.js
 // @homepageURL https://ingress.plus/plugins
 // @description Connect IITC to your Ingress Plus account and load the plugins from the Ingress Plus store that are available to you.
 // @icon https://ingress.plus/icons/icon_ingressplus_32.png
@@ -15,6 +15,9 @@
 // @grant none
 // ==/UserScript==
 
+//
+//  Changelog 2.4.1
+//    Update checks download only the small ingress-plus.meta.js
 //
 //  Changelog 2.4.0
 //    One request on start brings the plugin list and every enabled plugin,
@@ -43,6 +46,8 @@
 //    First release: connect to Ingress Plus, pick plugins from the store, load them on every IITC start
 //
 
+/* global $, GM_info */
+/* eslint camelcase: ["error", { "allow": ["GM_info"] }] */
 function wrapper (pluginInfo) {
   // Overridable for testing against a staging or local backend:
   //   localStorage.setItem('ingressPlus:baseUrl', 'http://localhost:8090')

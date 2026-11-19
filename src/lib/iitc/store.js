@@ -1,6 +1,6 @@
 // Ingress Plus store for IITC.
 //
-// Not a userscript: the sideloader (static/ingress-plus.user.js) fetches
+// Not a userscript: the sideloader (src/lib/iitc/ingress-plus.user.js) fetches
 // this file from /iitc/store.js on every IITC start and injects it into the
 // page, so the store UI can change without agents updating the userscript.
 // Everything it does goes through the API the sideloader exposes on
