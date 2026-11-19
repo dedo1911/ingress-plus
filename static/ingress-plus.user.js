@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name IITC Plugin: Ingress Plus
 // @category Misc
-// @version 2.2.0
+// @version 2.3.0
 // @namespace https://ingress.plus
 // @downloadURL https://ingress.plus/ingress-plus.user.js
 // @updateURL https://ingress.plus/ingress-plus.user.js
@@ -15,6 +15,9 @@
 // @grant none
 // ==/UserScript==
 
+//
+//  Changelog 2.3.0
+//    Plugins download all at once on start, then run in the usual order
 //
 //  Changelog 2.2.0
 //    Shares its API helper with the store, for the plugin changelogs
@@ -192,10 +195,12 @@ function wrapper (pluginInfo) {
 
   const loading = {} // slug -> promise, so the startup load and a click never inject twice
 
-  const loadPlugin = (plugin) => {
+  // after is a promise the injection waits for, so plugins downloaded in
+  // parallel still run in order. The download itself starts right away.
+  const loadPlugin = (plugin, after) => {
     if (self.loaded[plugin.slug]) return Promise.resolve()
     if (!loading[plugin.slug]) {
-      loading[plugin.slug] = doLoadPlugin(plugin).finally(() => {
+      loading[plugin.slug] = doLoadPlugin(plugin, after).finally(() => {
         delete loading[plugin.slug]
         emit()
       })
@@ -204,10 +209,13 @@ function wrapper (pluginInfo) {
     return loading[plugin.slug]
   }
 
-  const doLoadPlugin = async (plugin) => {
+  const doLoadPlugin = async (plugin, after) => {
     const dev = plugin.isAuthor && plugin.devVersion && useDev().has(plugin.slug)
+    const download = fetchPluginCode(plugin, dev ? plugin.devVersion : '')
+    download.catch(() => {}) // handled below, once it's this plugin's turn
+    await after
     try {
-      const result = await fetchPluginCode(plugin, dev ? plugin.devVersion : '')
+      const result = await download
       inject(`${plugin.slug}.user`, result.code)
       self.loaded[plugin.slug] = { version: result.version, dev: result.dev }
       delete self.failed[plugin.slug]
@@ -232,11 +240,15 @@ function wrapper (pluginInfo) {
       return
     }
     const wanted = enabled()
-    // Sequential, in catalog order, so plugins that depend on another one
-    // being defined first behave the same on every load.
+    // Downloaded in parallel, but injected one after the other in catalog
+    // order, so plugins that depend on another one being defined first
+    // behave the same on every load. A plugin that fails doesn't hold up
+    // the ones after it (loadPlugin never rejects).
+    let previous = Promise.resolve()
     for (const plugin of catalog) {
-      if (wanted.has(plugin.slug)) await loadPlugin(plugin)
+      if (wanted.has(plugin.slug)) previous = loadPlugin(plugin, previous)
     }
+    await previous
     // Forget plugins the agent no longer has access to.
     const available = new Set(catalog.map(p => p.slug))
     write('enabled', [...wanted].filter(s => available.has(s)))
