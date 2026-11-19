@@ -7,7 +7,7 @@
 // window.plugin.ingressPlus.
 /* global $, Node */
 (function () {
-  const STORE_VERSION = '1.1.2'
+  const STORE_VERSION = '1.2.0'
   const API_VERSION = 1
   const LOG_PREFIX = '[Ingress Plus store]'
 
@@ -102,14 +102,24 @@
     if (ip.isLoading(plugin.slug)) status = el('div', { class: 'ingressplus-muted' }, 'Loading…')
     else if (changed && !isOn) status = el('div', { class: 'ingressplus-pending' }, 'Will stop after a reload.')
 
-    // The title is a label for the switch, so clicking the name toggles too.
+    // The name is a label for the switch, so clicking it toggles too. The
+    // version opens the changelog.
     const toggleId = 'ingressplus-toggle-' + plugin.slug
     return el('div', { class: 'ingressplus-plugin' + (isOn ? ' is-on' : '') },
       pluginIcon(plugin),
       el('div', { class: 'ingressplus-plugin-body' },
-        el('label', { class: 'ingressplus-plugin-title', for: toggleId },
-          el('b', {}, plugin.name),
-          el('span', { class: 'ingressplus-muted' }, version ? `v${version}` : '', plugin.author ? ` by ${plugin.author}` : ''),
+        el('div', { class: 'ingressplus-plugin-title' },
+          el('label', { for: toggleId }, el('b', {}, plugin.name)),
+          version
+            ? el('button', {
+              type: 'button',
+              class: 'ingressplus-version',
+              title: 'Show changelog',
+              'aria-label': `Show the changelog of ${plugin.name}`,
+              onclick: () => openChangelog(plugin)
+            }, `v${version}`)
+            : null,
+          plugin.author ? el('span', { class: 'ingressplus-muted' }, `by ${plugin.author}`) : null,
           ui.category === ALL ? el('span', { class: 'ingressplus-chip' }, categoryOf(plugin)) : null
         ),
         description ? el('div', { class: 'ingressplus-desc' }, description) : null,
@@ -349,6 +359,173 @@
     })
   }
 
+  // ---- changelog --------------------------------------------------------
+
+  // Sideloader 2.2.0 and newer expose their API helper. Older ones don't, so
+  // the store makes the call itself with the token they keep.
+  const apiGet = async (path) => {
+    if (typeof ip.api === 'function') return ip.api(path)
+    let token = null
+    try { token = JSON.parse(localStorage.getItem('ingressPlus:token')) } catch (e) {}
+    if (!token) throw new Error('Not connected')
+    const res = await fetch(ip.baseUrl() + path, { headers: { Authorization: 'Bearer ' + token }, cache: 'no-store' })
+    const body = await res.json().catch(() => ({}))
+    if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`)
+    return body
+  }
+
+  // Version history per plugin, fetched once per published version.
+  const details = {}
+  const fetchDetail = (plugin) => {
+    const key = `${plugin.slug}@${plugin.version || ''}@${plugin.devVersion || ''}`
+    if (!details[key]) {
+      details[key] = apiGet(`/api/iitc/plugins/${encodeURIComponent(plugin.slug)}`)
+      details[key].catch(() => { delete details[key] })
+    }
+    return details[key]
+  }
+
+  // Versions follow semver (the backend checks it on upload). A suffix sorts
+  // before the plain release, which is right for -beta and close enough for
+  // the rare +build.
+  const parseVersion = (v) => {
+    const m = /^(\d+)\.(\d+)\.(\d+)(?:[-.+](.+))?$/.exec(v || '')
+    return m ? { nums: [+m[1], +m[2], +m[3]], suffix: m[4] || '' } : null
+  }
+  const compareVersions = (a, b) => {
+    const pa = parseVersion(a)
+    const pb = parseVersion(b)
+    if (!pa || !pb) return String(a).localeCompare(String(b), undefined, { numeric: true })
+    for (let i = 0; i < 3; i++) {
+      if (pa.nums[i] !== pb.nums[i]) return pa.nums[i] - pb.nums[i]
+    }
+    if (pa.suffix === pb.suffix) return 0
+    if (!pa.suffix) return 1
+    if (!pb.suffix) return -1
+    return pa.suffix.localeCompare(pb.suffix, undefined, { numeric: true })
+  }
+
+  const STATUS_LABELS = { pending: 'pending review', rejected: 'rejected' }
+
+  const versionList = (versions) => {
+    if (versions.length === 0) return el('p', { class: 'ingressplus-muted' }, 'No versions to show.')
+    return el('ol', { class: 'ingressplus-versions' },
+      versions.map(v => el('li', {},
+        el('div', { class: 'ingressplus-version-head' },
+          el('b', {}, `v${v.version}`),
+          el('span', { class: 'ingressplus-muted' }, (v.created || '').slice(0, 10)),
+          v.status && STATUS_LABELS[v.status] ? el('span', { class: 'ingressplus-chip' }, STATUS_LABELS[v.status]) : null
+        ),
+        (v.changelog || '').trim()
+          ? el('div', { class: 'ingressplus-changelog' }, v.changelog.trim())
+          : el('div', { class: 'ingressplus-muted' }, 'No changelog for this version.')
+      )))
+  }
+
+  const newestFirst = (versions) => [...versions].sort((a, b) => compareVersions(b.version, a.version))
+
+  // Fills holder once the history arrives. pick narrows the version list.
+  const fillChangelog = (holder, plugin, pick = (v) => v) => {
+    holder.replaceChildren(el('p', { class: 'ingressplus-muted' }, 'Loading changelog…'))
+    fetchDetail(plugin)
+      .then(detail => holder.replaceChildren(versionList(newestFirst(pick(detail.versions || [])))))
+      .catch(e => holder.replaceChildren(el('p', { class: 'ingressplus-error' }, `Could not load the changelog: ${e.message}`)))
+  }
+
+  const openChangelog = (plugin) => {
+    const holder = el('div', { class: 'ingressplus-changelog-list' })
+    fillChangelog(holder, plugin)
+    window.dialog({
+      html: el('div', { class: 'ingressplus-dialog ingressplus-changelog-dialog' }, holder),
+      title: `${plugin.name} changelog`,
+      id: 'ingress-plus-changelog',
+      width: 480
+    })
+  }
+
+  // ---- what's new after an update ---------------------------------------
+
+  // The version of each plugin that was loaded last time, so a newer one can
+  // say what changed. Only reviewed versions count: an author trying their
+  // pending upload shouldn't be told about it later.
+  const SEEN_KEY = 'ingressPlus:seenVersions'
+  const readSeen = () => {
+    try { return JSON.parse(localStorage.getItem(SEEN_KEY)) || {} } catch (e) { return {} }
+  }
+  const writeSeen = (seen) => {
+    try { localStorage.setItem(SEEN_KEY, JSON.stringify(seen)) } catch (e) { console.warn(LOG_PREFIX, 'could not save the loaded versions:', e) }
+  }
+
+  const updates = {} // slug -> { from, to }, waiting for the popup
+  let booted = false
+  let updatesTimer = null
+
+  const checkUpdates = () => {
+    const seen = readSeen()
+    let dirty = false
+    for (const [slug, loaded] of Object.entries(ip.loaded)) {
+      if (loaded.dev || !loaded.version || updates[slug] || seen[slug] === loaded.version) continue
+      if (seen[slug] && compareVersions(loaded.version, seen[slug]) > 0) {
+        updates[slug] = { from: seen[slug], to: loaded.version }
+      } else {
+        // First load, or a version that was pulled: nothing to announce.
+        seen[slug] = loaded.version
+        dirty = true
+      }
+    }
+    if (dirty) writeSeen(seen)
+    if (booted && Object.keys(updates).length) {
+      // Wait for the startup loads to settle, so one popup covers them all.
+      clearTimeout(updatesTimer)
+      updatesTimer = setTimeout(showUpdates, 1500)
+    }
+  }
+
+  const showUpdates = () => {
+    if (catalog().some(p => ip.isLoading(p.slug))) {
+      updatesTimer = setTimeout(showUpdates, 1500)
+      return
+    }
+    const slugs = Object.keys(updates)
+    if (slugs.length === 0) return
+    const seen = readSeen()
+    const items = []
+    for (const slug of slugs) {
+      const { from, to } = updates[slug]
+      delete updates[slug]
+      seen[slug] = to
+      const plugin = catalog().find(p => p.slug === slug)
+      if (plugin) items.push({ plugin, from, to })
+    }
+    writeSeen(seen)
+    if (items.length === 0) return
+
+    items.sort((a, b) => a.plugin.name.localeCompare(b.plugin.name))
+    const sections = items.map(({ plugin, from, to }, i) => {
+      const holder = el('div', { class: 'ingressplus-changelog-list' })
+      fillChangelog(holder, plugin, (versions) => versions.filter(v =>
+        (!v.status || v.status === 'approved') &&
+        compareVersions(v.version, from) > 0 && compareVersions(v.version, to) <= 0))
+      return el('details', { class: 'ingressplus-update', name: 'ingressplus-updates', open: i === 0 },
+        el('summary', {},
+          pluginIcon(plugin),
+          el('b', {}, plugin.name),
+          el('span', { class: 'ingressplus-muted' }, `v${from} → v${to}`)),
+        holder)
+    })
+
+    window.dialog({
+      html: el('div', { class: 'ingressplus-dialog ingressplus-changelog-dialog' },
+        el('p', {}, items.length === 1
+          ? 'A plugin you use was updated since you last opened IITC.'
+          : `${items.length} plugins you use were updated since you last opened IITC.`),
+        sections),
+      title: 'Ingress Plus: plugins updated',
+      id: 'ingress-plus-updates',
+      width: 520
+    })
+  }
+
   // Layout plugins such as Prime Intel restyle every button and input in
   // IITC windows with selectors like "body.x .ui-dialog-content button".
   // The store outranks them without !important: :is() takes the specificity
@@ -432,7 +609,7 @@
         background: rgba(32,168,177,0.2); color: var(--ipx-teal); font-weight: bold; font-size: 1.2em;
       }
       ${S} .ingressplus-plugin.is-on { border-left-color: var(--ipx-teal); background: rgba(32,168,177,0.07); }
-      ${S} .ingressplus-plugin-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; cursor: pointer; }
+      ${S} .ingressplus-plugin-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px; }
       ${S} .ingressplus-desc { opacity: 0.8; font-size: 0.9em; margin-top: 2px; }
       ${S} .ingressplus-plugin-body > .ingressplus-muted,
       ${S} .ingressplus-plugin-body > .ingressplus-error,
@@ -458,6 +635,32 @@
         ${S} .ingressplus-switch-track, ${S} .ingressplus-switch-track::after { transition: none; }
         ${S} .ingressplus-faction { animation: none; filter: drop-shadow(0 0 3px var(--ipx-faction)); }
       }
+      ${S} .ingressplus-plugin-title label { cursor: pointer; }
+      ${S} .ingressplus-version {
+        padding: 0; background: none; border: none; border-radius: 0;
+        color: inherit; opacity: 0.7; font-size: 0.9em;
+        text-decoration: underline dotted; text-underline-offset: 2px;
+      }
+      ${S} .ingressplus-version:hover, ${S} .ingressplus-version:focus-visible { background: none; opacity: 1; color: var(--ipx-accent); }
+
+      ${S}.ingressplus-changelog-dialog { max-height: min(70vh, 560px); overflow-y: auto; }
+      ${S} .ingressplus-versions { list-style: none; margin: 0; padding: 0; }
+      ${S} .ingressplus-versions li { padding: 6px 0; border-bottom: 1px solid var(--ipx-line); }
+      ${S} .ingressplus-versions li:last-child { border-bottom: none; }
+      ${S} .ingressplus-version-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+      ${S} .ingressplus-version-head b { color: var(--ipx-accent); }
+      ${S} .ingressplus-changelog { white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 3px; opacity: 0.9; }
+      ${S} .ingressplus-update { border: 1px solid var(--ipx-line); border-radius: 2px; margin-bottom: 6px; }
+      ${S} .ingressplus-update[open] { border-color: var(--ipx-teal); }
+      ${S} .ingressplus-update summary {
+        display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer;
+        list-style: none; background: rgba(32,168,177,0.08);
+      }
+      ${S} .ingressplus-update summary::-webkit-details-marker { display: none; }
+      ${S} .ingressplus-update summary::after { content: '▸'; margin-left: auto; color: var(--ipx-teal); }
+      ${S} .ingressplus-update[open] summary::after { content: '▾'; }
+      ${S} .ingressplus-update summary .ingressplus-icon { width: 24px; height: 24px; font-size: 0.9em; }
+      ${S} .ingressplus-update .ingressplus-changelog-list { padding: 2px 10px 4px; }
       ${S} .ingressplus-chip { font-size: 0.75em; padding: 0 6px; border: 1px solid var(--ipx-line); border-radius: 8px; opacity: 0.8; }
 
       ${S} .ingressplus-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--ipx-line); }
@@ -485,6 +688,8 @@
   function setup () {
     addStyles()
     addFactionFilters()
+    booted = true
+    checkUpdates()
     if (window.IITC && window.IITC.toolbox && window.IITC.toolbox.addButton) {
       window.IITC.toolbox.addButton({ label: 'Ingress Plus', title: 'Ingress Plus plugins', action: openDialog })
     } else {
@@ -494,7 +699,9 @@
   setup.info = { script: { name: 'Ingress Plus store', version: STORE_VERSION } }
 
   ip.openDialog = openDialog
+  ip.openChangelog = openChangelog
   ip.onChange(renderDialog)
+  ip.onChange(checkUpdates)
 
   if (window.iitcLoaded) {
     setup()

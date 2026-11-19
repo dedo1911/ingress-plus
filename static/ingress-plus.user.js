@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name IITC Plugin: Ingress Plus
 // @category Misc
-// @version 2.1.0
+// @version 2.2.0
 // @namespace https://ingress.plus
 // @downloadURL https://ingress.plus/ingress-plus.user.js
 // @updateURL https://ingress.plus/ingress-plus.user.js
@@ -15,6 +15,9 @@
 // @grant none
 // ==/UserScript==
 
+//
+//  Changelog 2.2.0
+//    Shares its API helper with the store, for the plugin changelogs
 //
 //  Changelog 2.1.0
 //    Plugins download gzipped, and the store serves them without comments
@@ -44,7 +47,7 @@ function wrapper (pluginInfo) {
   if (typeof window.plugin !== 'function') window.plugin = function () {}
 
   pluginInfo.buildName = 'IngressPlus'
-  pluginInfo.dateTimeVersion = '202611171800'
+  pluginInfo.dateTimeVersion = '202611191200'
   pluginInfo.pluginId = 'ingress-plus'
 
   const self = window.plugin.ingressPlus = function () {}
@@ -345,6 +348,7 @@ function wrapper (pluginInfo) {
     loadPlugin,
     loadEnabled,
     fetchCatalog,
+    api,
     connect,
     saveToken,
     disconnect,
