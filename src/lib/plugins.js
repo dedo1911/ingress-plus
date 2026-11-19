@@ -61,6 +61,8 @@ export const ACCESS_RULE_TYPES = [
 export const describeAccess = (access) => {
   const rules = access?.rules || []
   if (rules.length === 0) return 'Only you'
+  const blocked = access?.blockedUserIds?.length || 0
+  const except = blocked ? `, except ${blocked} blocked agent${blocked === 1 ? '' : 's'}` : ''
   return rules.map(rule => {
     switch (rule.type) {
       case 'all': return 'every signed-in agent'
@@ -70,5 +72,5 @@ export const describeAccess = (access) => {
       case 'user': return `${rule.userIds.length} specific agent${rule.userIds.length === 1 ? '' : 's'}`
       default: return rule.type
     }
-  }).join(', ')
+  }).join(', ') + except
 }

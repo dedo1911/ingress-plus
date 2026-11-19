@@ -3,9 +3,10 @@
   import { pb } from '#lib/pocketbase/index.js'
   import { ACCESS_RULE_TYPES, FACTION_OPTIONS } from '#lib/plugins.js'
 
-  // Edits a plugin's access JSON ({ rules: [...] }), the same rule shape the
-  // email campaign targeting uses. Rules are OR'd; the author always has
-  // access, so an empty list means "only me".
+  // Edits a plugin's access JSON ({ rules: [...], blockedUserIds: [...] }).
+  // Rules use the same shape as the email campaign targeting and are OR'd;
+  // blocked agents never get access, whatever the rules say. The author
+  // always has access, so an empty rule list means "only me".
   let { access = $bindable({ rules: [] }) } = $props()
 
   // Local {#each} keys, not crypto.randomUUID(): that only exists in secure
@@ -25,10 +26,12 @@
 
   let rules = $state(untrack(() => (access?.rules || []).map(toEditorRule)))
   let addRuleType = $state('all')
+  // Same shape as a "user" rule, so the agent picker works for both.
+  let blocked = $state(untrack(() => toEditorRule({ type: 'blocked', userIds: access?.blockedUserIds })))
 
   // Saved rules only hold user ids; look the names up once for the chips.
   $effect(() => {
-    for (const rule of untrack(() => rules)) {
+    for (const rule of untrack(() => [...rules, blocked])) {
       for (const user of rule.users) {
         pb.collection('public_users').getOne(user.id, { requestKey: null })
           .then(record => { user.username = record.username })
@@ -39,13 +42,15 @@
 
   // Only the fields the backend reads; search state stays local.
   const sync = () => {
-    access = {
+    const next = {
       rules: rules.map(r => {
         if (r.type === 'faction') return { type: 'faction', factions: r.factions }
         if (r.type === 'user') return { type: 'user', userIds: r.users.map(u => u.id) }
         return { type: r.type }
       })
     }
+    if (blocked.users.length > 0) next.blockedUserIds = blocked.users.map(u => u.id)
+    access = next
   }
 
   const addRule = () => {
@@ -95,6 +100,35 @@
   }
 </script>
 
+{#snippet agentPicker(rule)}
+  {#if rule.users.length > 0}
+    <div class="chips">
+      {#each rule.users as u (u.id)}
+        <span class="chip">
+          {u.username}
+          <button type="button" aria-label="Remove {u.username}" onclick={() => removeUser(rule, u.id)}>&times;</button>
+        </span>
+      {/each}
+    </div>
+  {/if}
+  <form class="search-row" onsubmit={(e) => { e.preventDefault(); searchUsers(rule) }}>
+    <input type="text" bind:value={rule.searchQuery} placeholder="Search by agent name…" />
+    <button type="submit" class="cta" disabled={rule.searching || !rule.searchQuery.trim()}>
+      {rule.searching ? 'Searching…' : 'Search'}
+    </button>
+  </form>
+  {#if rule.searchResults.length > 0}
+    <ul class="results">
+      {#each rule.searchResults as u (u.id)}
+        <li>
+          <strong>{u.username}</strong>
+          <button type="button" class="cta" onclick={() => addUser(rule, u)}>Add</button>
+        </li>
+      {/each}
+    </ul>
+  {/if}
+{/snippet}
+
 <div class="access">
   {#if rules.length === 0}
     <p class="hint">No rules yet: only you can see and load this plugin.</p>
@@ -118,32 +152,7 @@
         </div>
         <p class="hint">Only counts for verified agents, since unverified agents can change their faction at will.</p>
       {:else if rule.type === 'user'}
-        {#if rule.users.length > 0}
-          <div class="chips">
-            {#each rule.users as u (u.id)}
-              <span class="chip">
-                {u.username}
-                <button type="button" aria-label="Remove {u.username}" onclick={() => removeUser(rule, u.id)}>&times;</button>
-              </span>
-            {/each}
-          </div>
-        {/if}
-        <form class="search-row" onsubmit={(e) => { e.preventDefault(); searchUsers(rule) }}>
-          <input type="text" bind:value={rule.searchQuery} placeholder="Search by agent name…" />
-          <button type="submit" class="cta" disabled={rule.searching || !rule.searchQuery.trim()}>
-            {rule.searching ? 'Searching…' : 'Search'}
-          </button>
-        </form>
-        {#if rule.searchResults.length > 0}
-          <ul class="results">
-            {#each rule.searchResults as u (u.id)}
-              <li>
-                <strong>{u.username}</strong>
-                <button type="button" class="cta" onclick={() => addUser(rule, u)}>Add</button>
-              </li>
-            {/each}
-          </ul>
-        {/if}
+        {@render agentPicker(rule)}
       {/if}
     </div>
   {/each}
@@ -155,6 +164,14 @@
       {/each}
     </select>
     <button type="button" class="cta" onclick={addRule}>+ Add rule</button>
+  </div>
+
+  <div class="rule-card blocked">
+    <div class="rule-card-header">
+      <strong>Blocked agents</strong>
+    </div>
+    <p class="hint">These agents can't see or load the plugin, even if a rule above lets them in.</p>
+    {@render agentPicker(blocked)}
   </div>
 </div>
 
@@ -178,6 +195,9 @@
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.03);
+  }
+  div.rule-card.blocked {
+    border-color: rgba(255, 120, 120, 0.35);
   }
   div.rule-card-header {
     display: flex;
