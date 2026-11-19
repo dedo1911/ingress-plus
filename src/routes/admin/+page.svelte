@@ -9,6 +9,7 @@
   import Callout from '#lib/components/Callout.svelte'
   import Modal from '#lib/components/Modal.svelte'
   import AdminPlugins from '#lib/components/plugins/AdminPlugins.svelte'
+  import AdminTokens from '#lib/components/plugins/AdminTokens.svelte'
 
   // pbAdmin.authStore is PocketBase's own store, not a Svelte one - it has
   // to be mirrored into local state via onChange to react to it here.
@@ -56,7 +57,8 @@
     { id: 'impersonation', label: 'Impersonation' },
     { id: 'emails', label: 'Emails' },
     { id: 'flags', label: 'Feature Flags' },
-    { id: 'plugins', label: 'IITC Plugins' }
+    { id: 'plugins', label: 'IITC Plugins' },
+    { id: 'tokens', label: 'IITC Tokens' }
   ]
   let activeTab = $state('impersonation')
   const switchTab = (id) => { activeTab = id }
@@ -669,6 +671,8 @@
 
     {#if activeTab === 'plugins'}
       <AdminPlugins />
+    {:else if activeTab === 'tokens'}
+      <AdminTokens />
     {/if}
 
     {#if activeTab === 'impersonation'}
