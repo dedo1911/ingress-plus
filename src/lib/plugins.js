@@ -1,5 +1,6 @@
 import { Carta } from 'carta-md'
 import DOMPurify from 'isomorphic-dompurify'
+import remarkBreaks from 'remark-breaks'
 import { pb } from '#lib/pocketbase/index.js'
 
 // The sideloader userscript, served from static/.
@@ -8,6 +9,17 @@ export const SIDELOADER_URL = '/ingress-plus.user.js'
 // Plugin descriptions are written by other agents, so the markdown viewer
 // must sanitize: carta-md renders raw HTML otherwise.
 export const pluginCarta = () => new Carta({ sanitizer: DOMPurify.sanitize })
+
+// Changelogs are markdown too, but most are written one change per line, so
+// a single newline is a line break there (as it was when they were shown as
+// plain text). The IITC store renders the same text with its own small
+// renderer, see src/lib/iitc/store.js.
+export const changelogCarta = () => new Carta({
+  sanitizer: DOMPurify.sanitize,
+  extensions: [{
+    transformers: [{ execution: 'sync', type: 'remark', transform: ({ processor }) => { processor.use(remarkBreaks) } }]
+  }]
+})
 
 // Store catalog and detail. Both need the agent signed in, and the backend
 // only returns plugins they have access to (a 404 otherwise), so these are

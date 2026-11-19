@@ -7,7 +7,7 @@
 // window.plugin.ingressPlus.
 /* global $, Node */
 (function () {
-  const STORE_VERSION = '1.2.0'
+  const STORE_VERSION = '1.3.0'
   const API_VERSION = 1
   const LOG_PREFIX = '[Ingress Plus store]'
 
@@ -405,6 +405,121 @@
     return pa.suffix.localeCompare(pb.suffix, undefined, { numeric: true })
   }
 
+  // Changelogs are markdown. The store can't load a markdown library, so
+  // this covers what changelogs use: paragraphs (a newline is a line break,
+  // as on the site), headings, lists, quotes, code, bold, italics,
+  // strikethrough and links. It builds DOM nodes, never HTML, so whatever
+  // an author writes ends up as text. Only http(s) links become links.
+  const INLINE = new RegExp([
+    '(?<code>`+)(?<codeText>[^`]|[^`][\\s\\S]*?[^`])\\k<code>(?!`)',
+    '\\[(?<linkText>[^\\]]+)\\]\\(\\s*<?(?<href>[^\\s)>]+)>?(?:\\s+"[^"]*")?\\s*\\)',
+    '(?<!\\w)(?<strong>\\*\\*|__)(?=\\S)(?<strongText>[\\s\\S]*?\\S)\\k<strong>(?!\\w)',
+    '(?<!\\w)(?<em>[*_])(?=[^\\s*_])(?<emText>[\\s\\S]*?[^\\s*_])\\k<em>(?!\\w)',
+    '~~(?=\\S)(?<delText>[\\s\\S]*?\\S)~~',
+    '(?<url>https?:\\/\\/[^\\s<]*[^\\s<.,:;"\')\\]!?*_~])'
+  ].join('|'))
+
+  const safeHref = (href) => /^https?:\/\//i.test(href) ? href : null
+  const link = (href, children) => el('a', { class: 'ingressplus-link', href, target: '_blank', rel: 'noopener noreferrer' }, children)
+
+  const inline = (text) => {
+    const out = []
+    let rest = text
+    while (rest) {
+      const m = INLINE.exec(rest)
+      if (!m) { out.push(rest); break }
+      if (m.index) out.push(rest.slice(0, m.index))
+      const g = m.groups
+      if (g.code) out.push(el('code', {}, g.codeText.trim() || g.codeText))
+      else if (g.linkText) {
+        const href = safeHref(g.href)
+        out.push(href ? link(href, inline(g.linkText)) : inline(g.linkText))
+      } else if (g.strong) out.push(el('strong', {}, inline(g.strongText)))
+      else if (g.em) out.push(el('em', {}, inline(g.emText)))
+      else if (g.delText) out.push(el('del', {}, inline(g.delText)))
+      else if (g.url) out.push(link(g.url, g.url))
+      rest = rest.slice(m.index + m[0].length)
+    }
+    return out
+  }
+
+  // Lines joined with <br>, like remark-breaks on the site.
+  const inlineLines = (lines) => lines.flatMap((line, i) => i ? [el('br'), ...inline(line)] : inline(line))
+
+  const LIST_ITEM = /^\s{0,3}(?:([-*+])|(\d{1,9})[.)])\s+(.*)$/
+  const FENCE = /^\s{0,3}(```+|~~~+)/
+  const HEADING = /^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$/
+  const QUOTE = /^\s{0,3}>\s?(.*)$/
+  const RULE = /^\s{0,3}([-*_])(\s*\1){2,}\s*$/
+
+  const markdown = (text) => {
+    const lines = String(text || '').replace(/\r\n?/g, '\n').split('\n')
+    const blocks = []
+    let i = 0
+    while (i < lines.length) {
+      const line = lines[i]
+      if (!line.trim()) { i++; continue }
+
+      const fence = FENCE.exec(line)
+      if (fence) {
+        const code = []
+        i++
+        while (i < lines.length && !lines[i].trim().startsWith(fence[1])) code.push(lines[i++])
+        i++
+        blocks.push(el('pre', {}, el('code', {}, code.join('\n'))))
+        continue
+      }
+
+      const heading = HEADING.exec(line)
+      if (heading) {
+        blocks.push(el('div', { class: 'ingressplus-md-heading' }, inline(heading[2])))
+        i++
+        continue
+      }
+
+      if (RULE.test(line)) {
+        blocks.push(el('hr'))
+        i++
+        continue
+      }
+
+      if (QUOTE.test(line)) {
+        const quoted = []
+        while (i < lines.length && QUOTE.test(lines[i])) quoted.push(QUOTE.exec(lines[i++])[1])
+        blocks.push(el('blockquote', {}, markdown(quoted.join('\n'))))
+        continue
+      }
+
+      const item = LIST_ITEM.exec(line)
+      if (item) {
+        const ordered = !!item[2]
+        const list = el(ordered ? 'ol' : 'ul', { start: ordered && item[2] !== '1' ? item[2] : null })
+        // Items run until a blank line or an item of the other kind; other
+        // lines continue the item above (indented sub-items included).
+        while (i < lines.length && lines[i].trim()) {
+          const m = LIST_ITEM.exec(lines[i])
+          if (m && !!m[2] !== ordered && !/^\s/.test(lines[i])) break
+          if (m && !/^\s{2,}/.test(lines[i])) {
+            list.append(el('li', {}, inline(m[3])))
+          } else if (list.lastChild) {
+            list.lastChild.append(el('br'), ...inline(m ? `${m[1] || m[2] + '.'} ${m[3]}` : lines[i].trim()))
+          }
+          i++
+        }
+        blocks.push(list)
+        continue
+      }
+
+      const para = []
+      while (i < lines.length && lines[i].trim() && !FENCE.test(lines[i]) && !HEADING.test(lines[i]) &&
+        !QUOTE.test(lines[i]) && !LIST_ITEM.test(lines[i]) && !RULE.test(lines[i])) {
+        para.push(lines[i++].trim())
+      }
+      blocks.push(el('p', {}, inlineLines(para)))
+    }
+    return blocks
+  }
+
   const STATUS_LABELS = { pending: 'pending review', rejected: 'rejected' }
 
   const versionList = (versions) => {
@@ -417,7 +532,7 @@
           v.status && STATUS_LABELS[v.status] ? el('span', { class: 'ingressplus-chip' }, STATUS_LABELS[v.status]) : null
         ),
         (v.changelog || '').trim()
-          ? el('div', { class: 'ingressplus-changelog' }, v.changelog.trim())
+          ? el('div', { class: 'ingressplus-changelog' }, markdown(v.changelog))
           : el('div', { class: 'ingressplus-muted' }, 'No changelog for this version.')
       )))
   }
@@ -649,7 +764,20 @@
       ${S} .ingressplus-versions li:last-child { border-bottom: none; }
       ${S} .ingressplus-version-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
       ${S} .ingressplus-version-head b { color: var(--ipx-accent); }
-      ${S} .ingressplus-changelog { white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 3px; opacity: 0.9; }
+      ${S} .ingressplus-changelog { overflow-wrap: anywhere; margin-top: 3px; opacity: 0.9; }
+      ${S} .ingressplus-changelog > :first-child { margin-top: 0; }
+      ${S} .ingressplus-changelog > :last-child { margin-bottom: 0; }
+      ${S} .ingressplus-changelog :is(p, ul, ol, pre, blockquote) { margin: 0 0 6px; }
+      ${S} .ingressplus-changelog :is(ul, ol) { padding-left: 20px; }
+      ${S} .ingressplus-changelog ul { list-style: disc; }
+      ${S} .ingressplus-changelog ol { list-style: decimal; }
+      ${S} .ingressplus-changelog li { margin: 1px 0; }
+      ${S} .ingressplus-changelog .ingressplus-md-heading { margin: 8px 0 4px; font-weight: bold; color: var(--ipx-teal); }
+      ${S} .ingressplus-changelog code { font-family: monospace; font-size: 0.95em; padding: 0 3px; background: rgba(0,0,0,0.35); border-radius: 2px; }
+      ${S} .ingressplus-changelog pre { padding: 6px 8px; overflow-x: auto; background: rgba(0,0,0,0.35); border-radius: 2px; }
+      ${S} .ingressplus-changelog pre code { padding: 0; background: none; white-space: pre; }
+      ${S} .ingressplus-changelog blockquote { padding-left: 8px; border-left: 2px solid var(--ipx-line); opacity: 0.85; }
+      ${S} .ingressplus-changelog hr { border: none; border-top: 1px solid var(--ipx-line); margin: 6px 0; }
       ${S} .ingressplus-update { border: 1px solid var(--ipx-line); border-radius: 2px; margin-bottom: 6px; }
       ${S} .ingressplus-update[open] { border-color: var(--ipx-teal); }
       ${S} .ingressplus-update summary {

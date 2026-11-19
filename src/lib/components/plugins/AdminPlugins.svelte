@@ -5,6 +5,7 @@
   import { pbAdmin } from '#lib/pocketbase/admin.js'
   import { STATUS_LABELS, describeAccess } from '#lib/plugins.js'
   import Callout from '#lib/components/Callout.svelte'
+  import Changelog from './Changelog.svelte'
 
   // Review queue for the IITC plugin store. Approving or rejecting a version
   // is just a status change on the record; the backend hooks then update the
@@ -131,7 +132,7 @@
           {plugin?.expand?.current_version ? `Update from v${plugin.expand.current_version.version}` : 'First submission'}
           &middot; access: {describeAccess(plugin?.access)} &middot; sha256 <code>{v.sha256.slice(0, 12)}…</code>
         </p>
-        {#if v.changelog}<p class="changelog">{v.changelog}</p>{/if}
+        {#if v.changelog}<Changelog value={v.changelog} />{/if}
 
         <button type="button" class="row-action" onclick={() => viewSource(v)}>
           {source.id === v.id ? 'Hide source' : 'View source'}
@@ -224,10 +225,6 @@
   .hint {
     font-size: 0.85em;
     color: rgba(255, 255, 255, 0.6);
-  }
-  p.changelog {
-    white-space: pre-wrap;
-    font-size: 0.9em;
   }
   pre.code {
     max-height: 50vh;

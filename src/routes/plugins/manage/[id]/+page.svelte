@@ -11,6 +11,7 @@
   import { pluginCarta, STATUS_LABELS, VERSION_STATUS_LABELS } from '#lib/plugins.js'
   import AccessRulesEditor from '#lib/components/plugins/AccessRulesEditor.svelte'
   import Callout from '#lib/components/Callout.svelte'
+  import Changelog from '#lib/components/plugins/Changelog.svelte'
   import Modal from '#lib/components/Modal.svelte'
 
   const carta = pluginCarta()
@@ -213,7 +214,10 @@
             <span class="hint">Needs a <code>// ==UserScript==</code> header; its <code>@version</code> must match below. Max 1 MB.</span>
           </label>
           <label>Version <input type="text" bind:value={newVersion} placeholder="1.0.0" required /></label>
-          <label>Changelog <textarea rows="4" maxlength="5000" bind:value={changelog}></textarea></label>
+          <label>
+            Changelog <textarea rows="4" maxlength="5000" bind:value={changelog}></textarea>
+            <span class="hint">Markdown: <code>**bold**</code>, <code>- lists</code>, <code>`code`</code>, <code>[links](https://…)</code>. Each line break is kept.</span>
+          </label>
           <button type="submit" class="cta" disabled={uploading || !newVersion}>{uploading ? 'Uploading…' : 'Submit for review'}</button>
         </form>
       {/if}
@@ -227,7 +231,7 @@
                 <Time timestamp={v.created} format="YYYY-MM-DD HH:mm" /> &middot; {VERSION_STATUS_LABELS[v.status] || v.status}
                 {#if plugin.current_version === v.id}&middot; <b>live</b>{/if}
               </span>
-              {#if v.changelog}<p class="changelog">{v.changelog}</p>{/if}
+              {#if v.changelog}<Changelog value={v.changelog} />{/if}
               {#if v.review_notes}<p class="changelog notes">Review: {v.review_notes}</p>{/if}
             </li>
           {/each}

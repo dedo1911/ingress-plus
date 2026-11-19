@@ -7,6 +7,7 @@
   import { featureFlags } from '#lib/featureFlags.js'
   import { getPlugin, pluginCarta, describeAccess, STATUS_LABELS, VERSION_STATUS_LABELS, SIDELOADER_URL } from '#lib/plugins.js'
   import Callout from '#lib/components/Callout.svelte'
+  import Changelog from '#lib/components/plugins/Changelog.svelte'
 
   const carta = pluginCarta()
 
@@ -92,7 +93,7 @@
               <b>v{v.version}</b>
               <span class="meta"><Time timestamp={v.created} format="YYYY-MM-DD" />
                 {#if v.status}&middot; {VERSION_STATUS_LABELS[v.status] || v.status}{/if}</span>
-              {#if v.changelog}<p class="changelog">{v.changelog}</p>{/if}
+              {#if v.changelog}<Changelog value={v.changelog} />{/if}
               {#if v.reviewNotes}<p class="changelog notes">Review: {v.reviewNotes}</p>{/if}
             </li>
           {/each}
@@ -159,6 +160,9 @@
     margin: 0.3em 0 0;
     white-space: pre-wrap;
     font-size: 0.9em;
+  }
+  ul.versions :global(div.changelog) {
+    margin-top: 0.3em;
   }
   p.notes {
     color: #ffb84d;
