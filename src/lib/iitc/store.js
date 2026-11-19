@@ -7,7 +7,7 @@
 // window.plugin.ingressPlus.
 /* global $, Node */
 (function () {
-  const STORE_VERSION = '1.3.0'
+  const STORE_VERSION = '1.3.1'
   const API_VERSION = 1
   const LOG_PREFIX = '[Ingress Plus store]'
 
@@ -616,12 +616,19 @@
     if (items.length === 0) return
 
     items.sort((a, b) => a.plugin.name.localeCompare(b.plugin.name))
-    const sections = items.map(({ plugin, from, to }, i) => {
+    // Every section starts closed, so the popup is just the list of plugins
+    // and versions. A changelog loads the first time its section opens.
+    const sections = items.map(({ plugin, from, to }) => {
       const holder = el('div', { class: 'ingressplus-changelog-list' })
-      fillChangelog(holder, plugin, (versions) => versions.filter(v =>
-        (!v.status || v.status === 'approved') &&
-        compareVersions(v.version, from) > 0 && compareVersions(v.version, to) <= 0))
-      return el('details', { class: 'ingressplus-update', name: 'ingressplus-updates', open: i === 0 },
+      let filled = false
+      const ontoggle = (e) => {
+        if (filled || !e.currentTarget.open) return
+        filled = true
+        fillChangelog(holder, plugin, (versions) => versions.filter(v =>
+          (!v.status || v.status === 'approved') &&
+          compareVersions(v.version, from) > 0 && compareVersions(v.version, to) <= 0))
+      }
+      return el('details', { class: 'ingressplus-update', name: 'ingressplus-updates', ontoggle },
         el('summary', {},
           pluginIcon(plugin),
           el('b', {}, plugin.name),
