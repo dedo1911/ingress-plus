@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name IITC Plugin: Ingress Plus
 // @category Misc
-// @version 2.3.0
+// @version 2.4.0
 // @namespace https://ingress.plus
 // @downloadURL https://ingress.plus/ingress-plus.user.js
 // @updateURL https://ingress.plus/ingress-plus.user.js
@@ -16,9 +16,12 @@
 // ==/UserScript==
 
 //
-//  Changelog 2.3.0
+//  Changelog 2.4.0
 //    One request on start brings the plugin list and every enabled plugin,
 //    which then run in the usual order
+//
+//  Changelog 2.3.0
+//    Plugins download all at once on start, then run in the usual order
 //
 //  Changelog 2.2.0
 //    Shares its API helper with the store, for the plugin changelogs
